@@ -1,7 +1,7 @@
 import tkinter as tk
 
 
-LARGE_FONT = ("Verdana", 12)
+LARGE_FONT = ("Verdana", 10)
 
 
 class ShootingClub(tk.Tk):
