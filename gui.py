@@ -19,9 +19,10 @@ def popup_new_user():
     entry_last_name = ttk.Entry(popup, width=15).grid(row=1, column=1)
 
     label_user_type = ttk.Label(popup, text="User Type:").grid(row=2, column=0)
-    default_value = tk.StringVar(popup)
-    default_value.set("select")
-    option_menu_user_type = tk.OptionMenu(popup, default_value, "Regular", "Super", "Admin").grid(row=2, column=1)
+    options = ("Regular", "Super", "Admin")
+    value = tk.StringVar(popup)
+    value.set("Select")
+    option_menu_user_type = ttk.OptionMenu(popup, value, options[0], *options).grid(row=2, column=1)
 
     label_licence_number = ttk.Label(popup, text="Licence Number:").grid(row=3, column=0)
     entry_licence_number = ttk.Entry(popup, width=15).grid(row=3, column=1)
