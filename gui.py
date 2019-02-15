@@ -35,7 +35,6 @@ def popup_new_user():
     button_submit = ttk.Button(popup, text="Submit").grid(row=6, column=0)
     button_cancel = ttk.Button(popup, text="Cancel", command=popup.destroy).grid(row=6, column=1)
 
-    popup.pack()
     popup.mainloop()
 
 
