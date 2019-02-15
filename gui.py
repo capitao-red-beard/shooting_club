@@ -19,7 +19,7 @@ def popup_new_user():
     entry_last_name = ttk.Entry(popup, width=15).grid(row=1, column=1)
 
     label_user_type = ttk.Label(popup, text="User Type:").grid(row=2, column=0)
-    options = ("Regular", "Super", "Admin")
+    options = ("Regular", "Admin")
     value = tk.StringVar(popup)
     value.set("Select")
     option_menu_user_type = ttk.OptionMenu(popup, value, options[0], *options).grid(row=2, column=1)
@@ -30,10 +30,11 @@ def popup_new_user():
     label_email = ttk.Label(popup, text="Email:").grid(row=4, column=0)
     entry_email = ttk.Entry(popup, width=15).grid(row=4, column=1)
 
-    label_password = ttk.Label(popup, text="Password:").grid(row=5, column=0)
-    entry_password = ttk.Entry(popup, show="*", width=15).grid(row=5, column=1)
+    button_submit = ttk.Button(popup, text="Submit", command=lambda: clicked()).grid(row=6, column=0)
 
-    button_submit = ttk.Button(popup, text="Submit").grid(row=6, column=0)
+    def clicked():
+        print("clicked")
+
     button_cancel = ttk.Button(popup, text="Cancel", command=popup.destroy).grid(row=6, column=1)
 
     popup.mainloop()
