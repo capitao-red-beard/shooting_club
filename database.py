@@ -16,6 +16,9 @@ statement2 = '''INSERT OR IGNORE INTO user
 
 statement3 = 'SELECT * FROM user;'
 
+statement4 = '''CREATE TABLE IF NOT EXISTS weapon (
+                            weapon TEXT PRIMARY KEY);'''
+
 
 def create_connection():
     try:
@@ -41,7 +44,11 @@ def execute_sql(sql):
             return rows
         else:
             connection.commit()
-        print('Successfully executed query')
+            print('Successfully executed and committed SQL')
         close_connection(connection)
+        return 'success'
     except Error as e:
         print(e)
+
+
+# execute_sql(statement4)
