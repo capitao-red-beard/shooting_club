@@ -109,6 +109,7 @@ class ShootingClub(tk.Tk):
         file_menu.add_separator()
 
         file_menu.add_command(label="Exit", command=quit, accelerator="Ctrl+Q")
+
         menu_bar.add_cascade(label="File", menu=file_menu)
 
         tk.Tk.config(self, menu=menu_bar)
