@@ -4,18 +4,18 @@ from sqlite3 import Error
 
 statement1 = '''CREATE TABLE IF NOT EXISTS user (
                             type NUMBER NOT NULL,
-                            voor_naam TEXT NOT NULL,
-                            tussenvoegsel TEXT NOT NULL,
-                            achter_naam TEXT NOT NULL,
-                            geboorte_datum DATE NOT NULL,
-                            telefoon_nummer NUMBER NOT NULL,
-                            adres TEXT NOT NULL,
-                            woonplaats TEXT NOT NULL,
-                            postcode TEXT NOT NULL,
-                            email_adres TEXT NOT NULL,
-                            wachtwoord TEXT NOT NULL,
-                            knsa_licentie_nummer NUMBER NOT NULL,
-                            ingang_maatschap DATE NOT NULL);'''
+                            first_name TEXT NOT NULL,
+                            infix TEXT NOT NULL,
+                            surname TEXT NOT NULL,
+                            date_of_birth DATE NOT NULL,
+                            address TEXT NOT NULL,
+                            city TEXT NOT NULL,
+                            post_code TEXT NOT NULL,
+                            telephone_number NUMBER NOT NULL,
+                            email_address TEXT UNIQUE NOT NULL,
+                            password TEXT NOT NULL,
+                            knsa_licence_number NUMBER PRIMARY KEY,
+                            date_of_membership DATE NOT NULL);'''
 
 statement2 = '''INSERT OR IGNORE INTO user
                 VALUES ();
@@ -23,8 +23,8 @@ statement2 = '''INSERT OR IGNORE INTO user
 
 statement3 = 'SELECT * FROM user;'
 
-statement4 = '''CREATE TABLE IF NOT EXISTS wapen (
-                            wapen TEXT PRIMARY KEY);'''
+statement4 = '''CREATE TABLE IF NOT EXISTS weapon (
+                            weapon TEXT PRIMARY KEY);'''
 
 
 def create_connection():
