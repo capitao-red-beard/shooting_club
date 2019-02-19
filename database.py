@@ -146,6 +146,6 @@ execute_sql(statement6)
 execute_sql(statement7)
 execute_sql(statement0)'''
 
-result = execute_sql('SELECT knsa_licence_number, forename, infix, surname FROM user;')
+result = execute_sql('SELECT knsa_licence_number, forename, infix, surname, telephone_number FROM user;')
 print(result[0][1])
 

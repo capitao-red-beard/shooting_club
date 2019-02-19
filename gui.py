@@ -122,6 +122,9 @@ def popup_new_weapon():
 
     label_user_type = ttk.Label(popup, text="Eigenaar Wapen:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
     result = database.execute_sql('SELECT knsa_licence_number, first_name, infix, surname FROM user;')
+    for i in result:
+        for x in i:
+            print(x)
     options = ()
     value_user_type = tk.StringVar(popup)
     value_user_type.set("Select")
