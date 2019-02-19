@@ -20,9 +20,9 @@ def popup_new_user():
     option_menu_user_type = ttk.OptionMenu(popup, value_user_type, options[0], *options)\
         .grid(row=0, column=1, padx=5, pady=2)
 
-    label_first_name = ttk.Label(popup, text="Voornaam:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_first_name = tk.StringVar()
-    entry_first_name = ttk.Entry(popup, textvariable=value_first_name, width=20).grid(row=1, column=1, padx=5, pady=2)
+    label_forename = ttk.Label(popup, text="Voornaam:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
+    value_forename = tk.StringVar()
+    entry_forename = ttk.Entry(popup, textvariable=value_forename, width=20).grid(row=1, column=1, padx=5, pady=2)
 
     label_infix = ttk.Label(popup, text="Tussenvoegsel:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_infix = tk.StringVar()
@@ -87,22 +87,8 @@ def popup_new_user():
             user_type = '1'
 
         result = database.execute_sql('INSERT OR IGNORE INTO member ('
-                                      'user_type, '
-                                      'first_name, '
-                                      'infix, '
-                                      'surname, '
-                                      'date_of_birth, '
-                                      'address, '
-                                      'city, '
-                                      'post_code, '
-                                      'telephone_number, '
-                                      'email_address, '
-                                      'password, '
-                                      'knsa_licence_number, '
-                                      'date_of_membership'
-                                      ') VALUES ('
                                       + "'" + user_type + "', "
-                                      + "'" + value_first_name.get() + "', "
+                                      + "'" + value_forename.get() + "', "
                                       + "'" + value_infix.get() + "', "
                                       + "'" + value_surname.get() + "', "
                                       + "'" + value_date_of_birth.get() + "', "
@@ -126,43 +112,21 @@ def popup_new_user():
     popup.mainloop()
 
 
-'''def popup_edit_user():
-    popup = tk.Tk()
-    popup.wm_title("Lid Aanpassen")
-
-    label_user_type = ttk.Label(popup, text="Gebruikerstype:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
-
-    members_result = database.execute_sql("SELECT knsa_licence_number, first_name, infix, surname FROM member;")
-    options = ()
-    value_user_type = tk.StringVar(popup)
-    value_user_type.set("Select")
-    option_menu_user_type = ttk.OptionMenu(popup, value_user_type, options[0], *options)\
-        .grid(row=0, column=1, padx=5, pady=2)
-
-    button_submit = ttk.Button(popup, text="Submit", command=lambda: clicked()).grid(row=2, column=0, padx=10, pady=15)
-
-    def clicked():
-        result = database.execute_sql()
-
-        if result == 'success':
-            messagebox.showinfo(title="Information", message="")
-        else:
-            messagebox.showerror(title="Error", message="An error occurred: " + result)
-        popup.destroy()
-
-    button_cancel = ttk.Button(popup, text="Cancel", command=popup.destroy).grid(row=2, column=1, padx=10, pady=15)
-
-    popup.mainloop()'''
-
-
 def popup_new_weapon():
     popup = tk.Tk()
     popup.wm_title("Nieuw Wapen")
 
     label_weapon = ttk.Label(popup, text="Wapen:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
-
     value_weapon = tk.StringVar()
     entry_weapon = ttk.Entry(popup, textvariable=value_weapon, width=20).grid(row=0, column=1, padx=5, pady=2)
+
+    label_user_type = ttk.Label(popup, text="Eigenaar Wapen:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
+    result = database.execute_sql('SELECT knsa_licence_number, first_name, infix, surname FROM user;')
+    options = ()
+    value_user_type = tk.StringVar(popup)
+    value_user_type.set("Select")
+    option_menu_user_type = ttk.OptionMenu(popup, value_user_type, options[0], *options)\
+        .grid(row=0, column=1, padx=5, pady=2)
 
     button_submit = ttk.Button(popup, text="Submit", command=lambda: clicked()).grid(row=2, column=0, padx=10, pady=15)
 
@@ -180,18 +144,13 @@ def popup_new_weapon():
     popup.mainloop()
 
 
-# def popup_edit_weapon():
-
-
 def popup_new_ammunition():
     popup = tk.Tk()
     popup.wm_title("Nieuwe Munitie")
 
-    label_ammunition_type = ttk.Label(popup, text="Munitie Type:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
-
-    value_ammunition_type = tk.StringVar()
-    entry_ammunition_type = ttk.Entry(popup, textvariable=value_ammunition_type, width=20)\
-        .grid(row=0, column=1, padx=5, pady=2)
+    label_type = ttk.Label(popup, text="Munitie Type:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
+    value_type = tk.StringVar()
+    entry_type = ttk.Entry(popup, textvariable=value_type, width=20).grid(row=0, column=1, padx=5, pady=2)
 
     label_price = ttk.Label(popup, text="Munitie Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_price = tk.StringVar()
@@ -209,7 +168,7 @@ def popup_new_ammunition():
                                       'price, '
                                       'stock'
                                       ') VALUES ('
-                                      + "'" + value_ammunition_type.get() + "', "
+                                      + "'" + value_type.get() + "', "
                                       + "'" + value_price.get() + "', "
                                       + "'" + value_stock.get() + "'" + ');')
 
@@ -223,9 +182,6 @@ def popup_new_ammunition():
     button_cancel = ttk.Button(popup, text="Cancel", command=popup.destroy).grid(row=3, column=1, padx=10, pady=15)
 
     popup.mainloop()
-
-
-# def popup_edit_ammunition():
 
 
 def popup_new_card():
@@ -268,9 +224,6 @@ def popup_new_card():
     button_cancel = ttk.Button(popup, text="Cancel", command=popup.destroy).grid(row=3, column=1, padx=10, pady=15)
 
     popup.mainloop()
-
-
-# def popup_edit_card():
 
 
 class ShootingClub(tk.Tk):
