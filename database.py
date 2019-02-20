@@ -21,7 +21,7 @@ def execute_sql(sql):
     try:
         cursor = connection.cursor()
         cursor.execute(sql)
-        if 'SELECT' in sql:
+        if sql.lstrip().upper().startswith('SELECT'):
             rows = cursor.fetchall()
             close_connection(connection)
             return rows
@@ -204,3 +204,5 @@ execute_sql(statement13)
 execute_sql(statement14)
 execute_sql(statement15)
 execute_sql(statement16)'''
+
+print(execute_sql('''SELECT * FROM user;'''))
