@@ -3,7 +3,6 @@ from tkinter import ttk
 from tkinter import messagebox
 import database
 
-
 LARGE_FONT = ("Verdana", 12)
 NORMAL_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
@@ -25,70 +24,70 @@ def popup_user_settings():
     user_types = ("Standaard", "Beheerder")
     value_user_type_new = tk.StringVar(tab_new)
     value_user_type_new.set("Select")
-    option_menu_user_type_new = ttk.OptionMenu(tab_new, value_user_type_new, user_types[0], *user_types)\
+    option_menu_user_type_new = ttk.OptionMenu(tab_new, value_user_type_new, user_types[0], *user_types) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_first_name_new = ttk.Label(tab_new, text="Voornaam:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_first_name_new = tk.StringVar(tab_new)
-    entry_first_name_new = ttk.Entry(tab_new, textvariable=value_first_name_new, width=20)\
+    entry_first_name_new = ttk.Entry(tab_new, textvariable=value_first_name_new, width=20) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_last_name_new = ttk.Label(tab_new, text="Familienaam:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_last_name_new = tk.StringVar(tab_new)
-    entry_last_name_new = ttk.Entry(tab_new, textvariable=value_last_name_new, width=20)\
+    entry_last_name_new = ttk.Entry(tab_new, textvariable=value_last_name_new, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
-    label_date_of_birth_new = ttk.Label(tab_new, text="Geboorte Datum (YYYY-MM-DD):")\
+    label_date_of_birth_new = ttk.Label(tab_new, text="Geboorte Datum (YYYY-MM-DD):") \
         .grid(row=3, column=0, padx=5, pady=2, sticky="W")
     value_date_of_birth_new = tk.StringVar(tab_new)
-    entry_date_of_birth_new = ttk.Entry(tab_new, textvariable=value_date_of_birth_new, width=20)\
+    entry_date_of_birth_new = ttk.Entry(tab_new, textvariable=value_date_of_birth_new, width=20) \
         .grid(row=3, column=1, padx=5, pady=2, sticky="W")
 
     label_address_new = ttk.Label(tab_new, text="Adres:").grid(row=4, column=0, padx=5, pady=2, sticky="W")
     value_address_new = tk.StringVar(tab_new)
-    entry_address_new = ttk.Entry(tab_new, textvariable=value_address_new, width=20)\
+    entry_address_new = ttk.Entry(tab_new, textvariable=value_address_new, width=20) \
         .grid(row=4, column=1, padx=5, pady=2)
 
     label_city_new = ttk.Label(tab_new, text="Woonplaats:").grid(row=5, column=0, padx=5, pady=5, sticky="W")
     value_city_new = tk.StringVar(tab_new)
-    entry_city_new = ttk.Entry(tab_new, textvariable=value_city_new, width=20)\
+    entry_city_new = ttk.Entry(tab_new, textvariable=value_city_new, width=20) \
         .grid(row=5, column=1, padx=5, pady=2, sticky="W")
 
     label_post_code_new = ttk.Label(tab_new, text="Postcode:").grid(row=6, column=0, padx=5, pady=2, sticky="W")
     value_post_code_new = tk.StringVar(tab_new)
-    entry_post_code_new = ttk.Entry(tab_new, textvariable=value_post_code_new, width=20)\
+    entry_post_code_new = ttk.Entry(tab_new, textvariable=value_post_code_new, width=20) \
         .grid(row=6, column=1, padx=5, pady=2, sticky="W")
 
-    label_telephone_number_new = ttk.Label(tab_new, text="Telefoonnummer:")\
+    label_telephone_number_new = ttk.Label(tab_new, text="Telefoonnummer:") \
         .grid(row=7, column=0, padx=5, pady=2, sticky="W")
     value_telephone_number_new = tk.StringVar(tab_new)
-    entry_telephone_number_new = ttk.Entry(tab_new, textvariable=value_telephone_number_new, width=20)\
+    entry_telephone_number_new = ttk.Entry(tab_new, textvariable=value_telephone_number_new, width=20) \
         .grid(row=7, column=1, padx=5, pady=2, sticky="W")
 
     label_email_address_new = ttk.Label(tab_new, text="Email Adres:").grid(row=8, column=0, padx=5, pady=2, sticky="W")
     value_email_address_new = tk.StringVar(tab_new)
-    entry_email_address_new = ttk.Entry(tab_new, textvariable=value_email_address_new, width=20)\
+    entry_email_address_new = ttk.Entry(tab_new, textvariable=value_email_address_new, width=20) \
         .grid(row=8, column=1, padx=5, pady=2, sticky="W")
 
     label_password_new = ttk.Label(tab_new, text="Wachtwoord:").grid(row=9, column=0, padx=5, pady=2, sticky="W")
     value_password_new = tk.StringVar(tab_new)
-    entry_password_new = ttk.Entry(tab_new, show="*", textvariable=value_password_new, width=20)\
+    entry_password_new = ttk.Entry(tab_new, show="*", textvariable=value_password_new, width=20) \
         .grid(row=9, column=1, padx=5, pady=2, sticky="W")
 
-    label_knsa_licence_number_new = ttk.Label(tab_new, text="KNSA Licentienummer:")\
+    label_knsa_licence_number_new = ttk.Label(tab_new, text="KNSA Licentienummer:") \
         .grid(row=10, column=0, padx=5, pady=2, sticky="W")
     value_knsa_licence_number_new = tk.StringVar(tab_new)
-    entry_knsa_licence_number_new = ttk.Entry(tab_new, textvariable=value_knsa_licence_number_new, width=20)\
+    entry_knsa_licence_number_new = ttk.Entry(tab_new, textvariable=value_knsa_licence_number_new, width=20) \
         .grid(row=10, column=1, padx=5, pady=2, sticky="W")
 
-    label_date_of_membership_new = ttk.Label(tab_new, text="Datum van Lidmaatschap Ingang (YYYY-MM-DD):")\
+    label_date_of_membership_new = ttk.Label(tab_new, text="Datum van Lidmaatschap Ingang (YYYY-MM-DD):") \
         .grid(row=11, column=0, padx=5, pady=2, sticky="W")
     value_date_of_membership_new = tk.StringVar(tab_new)
-    entry_date_of_membership_new = ttk.Entry(tab_new, textvariable=value_date_of_membership_new, width=20)\
+    entry_date_of_membership_new = ttk.Entry(tab_new, textvariable=value_date_of_membership_new, width=20) \
         .grid(row=11, column=1, padx=5, pady=2, sticky="W")
 
-    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new())\
-        .grid(row=12, column=0, padx=120, pady=15)
+    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
+        .grid(row=12, column=0, padx=10, pady=15)
 
     def clicked_new():
         print('Clicked')
@@ -99,7 +98,7 @@ def popup_user_settings():
             messagebox.showerror(title="Error", message="An error occurred: " + result)
         popup.destroy()'''
 
-    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy)\
+    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=12, column=1, padx=10, pady=15)
 
     tab_edit = ttk.Frame(notebook)
@@ -120,12 +119,12 @@ def popup_user_settings():
 
     label_first_name_edit = ttk.Label(tab_edit, text="Voornaam:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_first_name_edit = tk.StringVar(tab_edit)
-    entry_first_name_edit = ttk.Entry(tab_edit, textvariable=value_first_name_edit, width=20)\
+    entry_first_name_edit = ttk.Entry(tab_edit, textvariable=value_first_name_edit, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     label_last_name_edit = ttk.Label(tab_edit, text="Familienaam:").grid(row=3, column=0, padx=5, pady=2, sticky="W")
     value_last_name_edit = tk.StringVar(tab_edit)
-    entry_last_name_edit = ttk.Entry(tab_edit, textvariable=value_last_name_edit, width=20)\
+    entry_last_name_edit = ttk.Entry(tab_edit, textvariable=value_last_name_edit, width=20) \
         .grid(row=3, column=1, padx=5, pady=2, sticky="W")
 
     label_address_edit = ttk.Label(tab_edit, text="Adres:").grid(row=4, column=0, padx=5, pady=2, sticky="W")
@@ -135,7 +134,7 @@ def popup_user_settings():
 
     label_city_edit = ttk.Label(tab_edit, text="Woonplaats:").grid(row=5, column=0, padx=5, pady=5, sticky="W")
     value_city_edit = tk.StringVar(tab_edit)
-    entry_city_edit = ttk.Entry(tab_edit, textvariable=value_city_new, width=20)\
+    entry_city_edit = ttk.Entry(tab_edit, textvariable=value_city_new, width=20) \
         .grid(row=5, column=1, padx=5, pady=2, sticky="W")
 
     label_post_code_edit = ttk.Label(tab_edit, text="Postcode:").grid(row=6, column=0, padx=5, pady=2, sticky="W")
@@ -143,13 +142,13 @@ def popup_user_settings():
     entry_post_code_edit = ttk.Entry(tab_edit, textvariable=value_post_code_edit, width=20) \
         .grid(row=6, column=1, padx=5, pady=2, sticky="W")
 
-    label_telephone_number_edit = ttk.Label(tab_edit, text="Telefoonnummer:")\
+    label_telephone_number_edit = ttk.Label(tab_edit, text="Telefoonnummer:") \
         .grid(row=7, column=0, padx=5, pady=2, sticky="W")
     value_telephone_number_edit = tk.StringVar(tab_edit)
     entry_telephone_number_edit = ttk.Entry(tab_edit, textvariable=value_telephone_number_edit, width=20) \
         .grid(row=7, column=1, padx=5, pady=2, sticky="W")
 
-    label_email_address_edit = ttk.Label(tab_edit, text="Email Adres:")\
+    label_email_address_edit = ttk.Label(tab_edit, text="Email Adres:") \
         .grid(row=8, column=0, padx=5, pady=2, sticky="W")
     value_email_address_edit = tk.StringVar(tab_edit)
     entry_email_address_edit = ttk.Entry(tab_edit, textvariable=value_email_address_edit, width=20) \
@@ -167,7 +166,7 @@ def popup_user_settings():
         .grid(row=10, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Bewerken", command=lambda: clicked_edit()) \
-        .grid(row=11, column=0, padx=120, pady=15)
+        .grid(row=11, column=0, padx=10, pady=15)
 
     def clicked_edit():
         print('Clicked')
@@ -227,7 +226,7 @@ def popup_firearm_settings():
 
     label_type_new = ttk.Label(tab_new, text="Type Vuurwapen:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_new = tk.StringVar(tab_new)
-    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20)\
+    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_users_new = ttk.Label(tab_new, text="Eigenaar:") \
@@ -238,7 +237,7 @@ def popup_firearm_settings():
     option_menu_type_edit = ttk.OptionMenu(tab_new, value_users_new, users[0], *users) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
-    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new())\
+    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=2, column=0, padx=10, pady=15)
 
     def clicked_new():
@@ -251,14 +250,14 @@ def popup_firearm_settings():
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_new)
         popup.destroy()'''
 
-    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy)\
+    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=2, column=1, padx=10, pady=15)
 
     # creation of the edit tab
     tab_edit = ttk.Frame(notebook)
     notebook.add(tab_edit, text="Bewerk Vuurwapen")
 
-    label_existing_edit = ttk.Label(tab_edit, text="Vuurwapen te Bewerken:")\
+    label_existing_edit = ttk.Label(tab_edit, text="Vuurwapen te Bewerken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     firearms = database.execute_sql('''SELECT owner, type FROM firearm;''')
     value_existing_edit = tk.StringVar(tab_edit)
@@ -266,19 +265,19 @@ def popup_firearm_settings():
     option_menu_existing_edit = ttk.OptionMenu(tab_edit, value_existing_edit, firearms[0], *firearms) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    label_type_edit = ttk.Label(tab_edit, text="Nieuw Type:")\
+    label_type_edit = ttk.Label(tab_edit, text="Nieuw Type:") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_type_edit = tk.StringVar(tab_edit)
+    # this seems stupid, check it again and edit if needed
     value_type_edit = value_existing_edit
-    entry_type_edit = ttk.Entry(tab_edit, textvariable=value_type_edit, width=20)\
+    entry_type_edit = ttk.Entry(tab_edit, textvariable=value_type_edit, width=20) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
-    label_users_edit = ttk.Label(tab_edit, text="Nieuwe Eigenaar:")\
+    label_users_edit = ttk.Label(tab_edit, text="Nieuwe Eigenaar:") \
         .grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    options = users
     value_users_edit = tk.StringVar(tab_edit)
     value_users_edit.set("Select")
-    option_menu_users_edit = ttk.OptionMenu(tab_edit, value_users_edit, options[0], *options) \
+    option_menu_users_edit = ttk.OptionMenu(tab_edit, value_users_edit, users[0], *users) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Bewerken", command=lambda: clicked_edit()) \
@@ -297,7 +296,7 @@ def popup_firearm_settings():
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_edit)
         popup.destroy()'''
 
-    button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy)\
+    button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
 
     tab_delete = ttk.Frame(notebook)
@@ -346,20 +345,20 @@ def popup_ammunition_settings():
 
     label_type_new = ttk.Label(tab_new, text="Type munitie:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_new = tk.StringVar(tab_new)
-    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20)\
+    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_price_new = ttk.Label(tab_new, text="Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_price_new = tk.StringVar(tab_new)
-    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=20)\
+    value_price_new = tk.DoubleVar(tab_new)
+    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=20) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_stock_new = ttk.Label(tab_new, text="Voorraad:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_stock_new = tk.StringVar(tab_new)
-    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=20)\
+    value_stock_new = tk.IntVar(tab_new)
+    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
-    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new())\
+    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
     def clicked_new():
@@ -372,30 +371,29 @@ def popup_ammunition_settings():
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_new)
         popup.destroy()'''
 
-    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy)\
+    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
 
     # creation of the edit tab
     tab_edit = ttk.Frame(notebook)
     notebook.add(tab_edit, text="Bewerk")
 
-    label_type_edit = ttk.Label(tab_edit, text="Munitie te bewerken:")\
+    label_type_edit = ttk.Label(tab_edit, text="Munitie te bewerken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     ammunition_types = database.execute_sql('''SELECT type FROM ammunition;''')
-    options = ammunition_types
     value_type_edit = tk.StringVar(tab_edit)
     value_type_edit.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, options[0], *options) \
+    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, ammunition_types[0], *ammunition_types) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_price_edit = ttk.Label(tab_edit, text="Nieuwe prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_price_edit = tk.StringVar(tab_edit)
-    entry_price_edit = ttk.Entry(tab_edit, textvariable=value_price_edit, width=20)\
+    value_price_edit = tk.DoubleVar(tab_edit)
+    entry_price_edit = ttk.Entry(tab_edit, textvariable=value_price_edit, width=20) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_stock_edit = ttk.Label(tab_edit, text="Voorraad toevoegen:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_stock_edit = tk.StringVar(tab_edit)
-    entry_stock_edit = ttk.Entry(tab_edit, textvariable=value_stock_edit, width=20)\
+    value_stock_edit = tk.IntVar(tab_edit)
+    entry_stock_edit = ttk.Entry(tab_edit, textvariable=value_stock_edit, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
@@ -414,18 +412,17 @@ def popup_ammunition_settings():
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_edit)
         popup.destroy()'''
 
-    button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy)\
+    button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
 
     tab_delete = ttk.Frame(notebook)
     notebook.add(tab_delete, text="Verwijder")
 
-    label_type_delete= ttk.Label(tab_delete, text="Munitie te verwijderen:") \
+    label_type_delete = ttk.Label(tab_delete, text="Munitie te verwijderen:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
-    options = ammunition_types
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, options[0], *options) \
+    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, ammunition_types[0], *ammunition_types) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
@@ -464,17 +461,17 @@ def popup_scorecard_settings():
 
     label_type_new = ttk.Label(tab_new, text="Type kaart:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_new = tk.StringVar(tab_new)
-    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20)\
+    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_price_new = ttk.Label(tab_new, text="Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_price_new = tk.StringVar(tab_new)
-    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=20)\
+    value_price_new = tk.DoubleVar(tab_new)
+    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=20) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_stock_new = ttk.Label(tab_new, text="Voorraad:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_stock_new = tk.StringVar(tab_new)
-    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=20)\
+    value_stock_new = tk.IntVar(tab_new)
+    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
@@ -499,20 +496,19 @@ def popup_scorecard_settings():
 
     label_type_edit = ttk.Label(tab_edit, text="Score kaart te bewerken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
-    ammunition_types = database.execute_sql('''SELECT type FROM scorecard;''')
-    options = ammunition_types
+    scorecard_types = database.execute_sql('''SELECT type FROM scorecard;''')
     value_type_edit = tk.StringVar(tab_edit)
     value_type_edit.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, options[0], *options) \
+    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, scorecard_types[0], *scorecard_types) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_price_edit = ttk.Label(tab_edit, text="Nieuwe Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_price_edit = tk.StringVar(tab_edit)
+    value_price_edit = tk.DoubleVar(tab_edit)
     entry_price_edit = ttk.Entry(tab_edit, textvariable=value_price_edit, width=20) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_stock_edit = ttk.Label(tab_edit, text="Voorraad toevoegen:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_stock_edit = tk.StringVar(tab_edit)
+    value_stock_edit = tk.IntVar(tab_edit)
     entry_stock_edit = ttk.Entry(tab_edit, textvariable=value_stock_edit, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
@@ -540,10 +536,9 @@ def popup_scorecard_settings():
 
     label_type_delete = ttk.Label(tab_delete, text="Score kaart te verwijderen:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
-    options = ammunition_types
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, options[0], *options) \
+    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, scorecard_types[0], *scorecard_types) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
@@ -569,7 +564,6 @@ def popup_scorecard_settings():
 class ShootingClub(tk.Tk):
 
     def __init__(self, *args, **kwargs):
-
         tk.Tk.__init__(self, *args, **kwargs)
 
         # tk.Tk.iconbitmap(self, default="logo_16_16.ico")
@@ -584,17 +578,11 @@ class ShootingClub(tk.Tk):
         file_menu = tk.Menu(menu_bar, tearoff=0)
 
         file_menu.add_command(label="Lid Instellingen", command=lambda: popup_user_settings())
-
         file_menu.add_command(label="Vuurapen Instellingen", command=lambda: popup_firearm_settings())
-
         file_menu.add_command(label="Munitie Instellingen", command=lambda: popup_ammunition_settings())
-
         file_menu.add_command(label="Score Kaart Instellingen", command=lambda: popup_scorecard_settings())
-
         file_menu.add_separator()
-
         file_menu.add_command(label="Sluiten", command=quit, accelerator="Ctrl+Q")
-
         menu_bar.add_cascade(label="Instellingen", menu=file_menu)
 
         tk.Tk.config(self, menu=menu_bar)
@@ -602,7 +590,6 @@ class ShootingClub(tk.Tk):
         self.frames = {}
 
         for F in (MainMenu, ScorePage, FinancePage):
-
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -612,7 +599,6 @@ class ShootingClub(tk.Tk):
         self.show_frame(MainMenu)
 
     def show_frame(self, cont):
-
         frame = self.frames[cont]
         frame.tkraise()
 
