@@ -16,11 +16,11 @@ def close_connection(connection):
     print('Connection closed. SQLite: ' + sqlite3.version)
 
 
-def execute_sql(sql):
+def execute_sql(sql, *args):
     connection = create_connection()
     try:
         cursor = connection.cursor()
-        cursor.execute(sql)
+        cursor.execute(sql, *args)
         if sql.lstrip().upper().startswith('SELECT'):
             rows = cursor.fetchall()
             close_connection(connection)
@@ -205,4 +205,4 @@ execute_sql(statement14)
 execute_sql(statement15)
 execute_sql(statement16)'''
 
-print(execute_sql('''SELECT * FROM user;'''))
+# print(execute_sql('''SELECT * FROM user;'''))
