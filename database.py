@@ -205,4 +205,3 @@ execute_sql(statement14)
 execute_sql(statement15)
 execute_sql(statement16)'''
 
-# print(execute_sql('''SELECT * FROM user;'''))
