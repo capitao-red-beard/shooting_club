@@ -103,7 +103,6 @@ statement14 = '''INSERT INTO firearm (type, owner) VALUES ('pistol', '123456')''
 statement15 = '''INSERT INTO firearm (type, owner) VALUES ('shotgun', '123456')'''
 statement16 = '''INSERT INTO firearm (type, owner) VALUES ('pistol', '654321')'''
 
-
 statement1 = '''CREATE TABLE IF NOT EXISTS user (
                             type INTEGER NOT NULL,
                             first_name TEXT NOT NULL,

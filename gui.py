@@ -171,7 +171,7 @@ def popup_user_settings():
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid "
-                                                             + value_user_edit.get()[2:8] +" aangepast")
+                                                             + value_user_edit.get()[2:8] + " aangepast")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
