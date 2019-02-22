@@ -408,6 +408,7 @@ def popup_ammunition_settings():
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
+    # TODO add functionality for stock
     def clicked_edit():
         result_edit = database.execute_sql('UPDATE ammunition SET ' + fields.get(value_field_edit.get())
                                            + ' = ? WHERE type = ?',
@@ -541,8 +542,8 @@ def popup_scorecard_settings():
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
+    # TODO add functionality for stock
     def clicked_edit():
-
         result_edit = database.execute_sql('UPDATE scorecard SET ' + fields.get(value_field_edit.get())
                                            + ' = ? WHERE type = ?',
                                            (value_update_edit.get(), fields2.get(value_type_edit.get())))
