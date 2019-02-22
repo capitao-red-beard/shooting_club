@@ -12,8 +12,11 @@ def create_connection():
 
 
 def close_connection(connection):
-    connection.close()
-    print('Connection closed. SQLite: ' + sqlite3.version)
+    try:
+        connection.close()
+        print('Connection closed. SQLite: ' + sqlite3.version)
+    except Error as e:
+        print(e)
 
 
 def execute_sql(sql, *args):

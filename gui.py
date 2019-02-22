@@ -20,11 +20,15 @@ def popup_user_settings():
     tab_new = ttk.Frame(notebook)
     notebook.add(tab_new, text="Nieuw Lid")
 
+    fields = {
+        'Standaard': 1,
+        'Beheerder': 0
+    }
+
     label_user_type_new = ttk.Label(tab_new, text="Gebruikerstype:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
-    user_types = ("Standaard", "Beheerder")
     value_user_type_new = tk.StringVar(tab_new)
     value_user_type_new.set("Select")
-    option_menu_user_type_new = ttk.OptionMenu(tab_new, value_user_type_new, user_types[0], *user_types) \
+    option_menu_user_type_new = ttk.OptionMenu(tab_new, value_user_type_new, next(iter(fields)), *fields.keys()) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_first_name_new = ttk.Label(tab_new, text="Voornaam:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
@@ -90,11 +94,6 @@ def popup_user_settings():
         .grid(row=12, column=0, padx=10, pady=15)
 
     def clicked_new():
-        if value_user_type_new.get() == 'Beheerder':
-            user_type = 0
-        else:
-            user_type = 1
-
         result_new = database.execute_sql('''INSERT OR IGNORE INTO user (
                 type, 
                 first_name,
@@ -109,7 +108,7 @@ def popup_user_settings():
                 knsa_licence_number, 
                 date_of_membership
                 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
-            (user_type,
+            (fields.get(value_user_type_new.get()),
              value_first_name_new.get(),
              value_last_name_new.get(),
              value_date_of_birth_new.get(),
@@ -123,8 +122,9 @@ def popup_user_settings():
              value_date_of_membership_new.get())))
 
         if result_new == 'success':
-            messagebox.showinfo(title="Information", message=
-            "Het systeem heeft met succes een nieuw lid in de database ingevoerd")
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes een nieuw lid "
+                                        + value_first_name_new.get() + " in de database ingevoerd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -170,7 +170,8 @@ def popup_user_settings():
                                            (value_update_edit.get(), value_user_edit.get()[2:8]))
 
         if result_edit == 'success':
-            messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid aangepast")
+            messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid "
+                                                             + value_user_edit.get()[2:8] +" aangepast")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -197,10 +198,12 @@ def popup_user_settings():
             '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[0]))
 
         if result_delete == 'success':
-            messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid verwijderd")
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes het lid "
+                                        + value_user_delete.get()[0] + " verwijderd")
         else:
-            messagebox.showerror(title="Error", message=
-            "Er was een fout bij het verwijderen van deze lid")
+            messagebox.showerror(title="Error",
+                                 message="Er was een fout bij het verwijderen van deze lid")
         popup.destroy()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
@@ -245,7 +248,8 @@ def popup_firearm_settings():
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een nieuw vuurwapen in de database ingevoerd")
+                                message="Het systeem heeft met succes een nieuw vuurwapen "
+                                        + value_type_new.get().lower() + " in de database ingevoerd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -280,7 +284,10 @@ def popup_firearm_settings():
                                            (value_users_edit.get()[2:8], value_existing_edit.get()[2:8]))
 
         if result_edit == 'success':
-            messagebox.showinfo(title="Information", message="Het systeem heeft met succes het vuurwapen aangepast")
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes het vuurwapen eigenaar aangepast van "
+                                        + value_existing_edit.get()[2:8] + " tot "
+                                        + value_users_edit.get()[2:8].lower())
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -308,8 +315,9 @@ def popup_firearm_settings():
             (value_type_delete.get()[0], value_type_delete.get()[1]))
 
         if result_delete == 'success':
-            messagebox.showinfo(title="Information", message=
-            "Het systeem heeft met succes het vuurwapen verwijderd")
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes het vuurwapen "
+                                        + value_type_delete.get()[0].lower() + " verwijderd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -358,7 +366,8 @@ def popup_ammunition_settings():
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een nieuwe munitietype in de database ingevoerd")
+                                message="Het systeem heeft met succes een nieuwe munitietype "
+                                        + value_type_new.get().lower() + " in de database ingevoerd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -404,8 +413,9 @@ def popup_ammunition_settings():
                                            (value_update_edit.get(), value_type_edit.get()))
 
         if result_edit == 'success':
-            messagebox.showinfo(title="Information", message=
-            "Het systeem heeft met succes nieuwe voorraad in de database ingevoerd")
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes nieuwe " + value_field_edit.get().lower()
+                                        + " in de database ingevoerd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -432,7 +442,8 @@ def popup_ammunition_settings():
 
         if result_delete == 'success':
             messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes de ammunitie verwijderd")
+                                message="Het systeem heeft met succes de ammunitie "
+                                        + value_type_delete.get().lower() + " verwijderd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
         popup.destroy()
@@ -482,7 +493,8 @@ def popup_scorecard_settings():
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een nieuwe scorecard in de database ingevoerd")
+                                message="Het systeem heeft met succes een nieuwe scorecard "
+                                        + value_type_new.get().lower() + " in de database ingevoerd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -530,14 +542,14 @@ def popup_scorecard_settings():
 
     def clicked_edit():
 
-        result_edit = database.execute_sql('UPDATE ammunition SET ' + fields.get(value_field_edit.get())
+        result_edit = database.execute_sql('UPDATE scorecard SET ' + fields.get(value_field_edit.get())
                                            + ' = ? WHERE type = ?',
-                                           [value_update_edit.get(), fields2.get(value_type_edit.get())])
+                                           (value_update_edit.get(), fields2.get(value_type_edit.get())))
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes nieuwe" + value_field_edit.get()
-                                        + "in de database ingevoerd")
+                                message="Het systeem heeft met succes nieuwe " + value_field_edit.get().lower()
+                                        + " in de database ingevoerd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
@@ -563,8 +575,9 @@ def popup_scorecard_settings():
         result_delete = database.execute_sql('''DELETE FROM scorecard WHERE type = ?''', (value_type_delete.get()))
 
         if result_delete == 'success':
-            messagebox.showinfo(title="Information", message=
-            "Het systeem heeft met succes de scorecard verwijderd")
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes de scorecard " + value_type_delete.get().lower()
+                                        + " verwijderd")
         else:
             messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
         popup.destroy()
