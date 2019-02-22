@@ -8,7 +8,7 @@ NORMAL_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 
 
-# popup for the settings of users
+# popup for the settings of users (FINISHED)
 def popup_user_settings():
     popup = tk.Tk()
     popup.wm_title("Lid Instellingen")
@@ -90,6 +90,11 @@ def popup_user_settings():
         .grid(row=12, column=0, padx=10, pady=15)
 
     def clicked_new():
+        if value_user_type_new.get() == 'Beheerder':
+            user_type = 0
+        else:
+            user_type = 1
+
         result_new = database.execute_sql('''INSERT OR IGNORE INTO user (
                 type, 
                 first_name,
@@ -104,7 +109,7 @@ def popup_user_settings():
                 knsa_licence_number, 
                 date_of_membership
                 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
-            (value_user_type_new.get(),
+            (user_type,
              value_first_name_new.get(),
              value_last_name_new.get(),
              value_date_of_birth_new.get(),
@@ -121,7 +126,7 @@ def popup_user_settings():
             messagebox.showinfo(title="Information", message=
             "Het systeem heeft met succes een nieuw lid in de database ingevoerd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_new)
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
@@ -137,75 +142,41 @@ def popup_user_settings():
     option_menu_user_edit = ttk.OptionMenu(tab_edit, value_user_edit, users[0], *users) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    label_user_type_edit = ttk.Label(tab_edit, text="Gebruikerstype:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_user_type_edit = tk.StringVar(tab_edit)
-    value_user_type_edit.set("Select")
-    option_menu_user_type_edit = ttk.OptionMenu(tab_edit, value_user_type_new, user_types[0], *user_types) \
+    fields = {'Type': 'type',
+              'Adres': 'address',
+              'Woonplaats': 'city',
+              'Telefoonnummer': 'telephone_number',
+              'Email Adres': 'email_address',
+              'KNSA Licentienummer': 'knsa_licence_number'}
+
+    label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
+        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+    value_field_edit = tk.StringVar(tab_edit)
+    value_field_edit.set("Select")
+    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys()) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
-    label_first_name_edit = ttk.Label(tab_edit, text="Voornaam:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_first_name_edit = tk.StringVar(tab_edit)
-    entry_first_name_edit = ttk.Entry(tab_edit, textvariable=value_first_name_edit, width=20) \
+    label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
+    value_update_edit = tk.StringVar(tab_edit)
+    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
-    label_last_name_edit = ttk.Label(tab_edit, text="Familienaam:").grid(row=3, column=0, padx=5, pady=2, sticky="W")
-    value_last_name_edit = tk.StringVar(tab_edit)
-    entry_last_name_edit = ttk.Entry(tab_edit, textvariable=value_last_name_edit, width=20) \
-        .grid(row=3, column=1, padx=5, pady=2, sticky="W")
-
-    label_address_edit = ttk.Label(tab_edit, text="Adres:").grid(row=4, column=0, padx=5, pady=2, sticky="W")
-    value_address_edit = tk.StringVar(tab_edit)
-    entry_address_edit = ttk.Entry(tab_edit, textvariable=value_address_edit, width=20) \
-        .grid(row=4, column=1, padx=5, pady=2, sticky="W")
-
-    label_city_edit = ttk.Label(tab_edit, text="Woonplaats:").grid(row=5, column=0, padx=5, pady=5, sticky="W")
-    value_city_edit = tk.StringVar(tab_edit)
-    entry_city_edit = ttk.Entry(tab_edit, textvariable=value_city_new, width=20) \
-        .grid(row=5, column=1, padx=5, pady=2, sticky="W")
-
-    label_post_code_edit = ttk.Label(tab_edit, text="Postcode:").grid(row=6, column=0, padx=5, pady=2, sticky="W")
-    value_post_code_edit = tk.StringVar(tab_edit)
-    entry_post_code_edit = ttk.Entry(tab_edit, textvariable=value_post_code_edit, width=20) \
-        .grid(row=6, column=1, padx=5, pady=2, sticky="W")
-
-    label_telephone_number_edit = ttk.Label(tab_edit, text="Telefoonnummer:") \
-        .grid(row=7, column=0, padx=5, pady=2, sticky="W")
-    value_telephone_number_edit = tk.StringVar(tab_edit)
-    entry_telephone_number_edit = ttk.Entry(tab_edit, textvariable=value_telephone_number_edit, width=20) \
-        .grid(row=7, column=1, padx=5, pady=2, sticky="W")
-
-    label_email_address_edit = ttk.Label(tab_edit, text="Email Adres:") \
-        .grid(row=8, column=0, padx=5, pady=2, sticky="W")
-    value_email_address_edit = tk.StringVar(tab_edit)
-    entry_email_address_edit = ttk.Entry(tab_edit, textvariable=value_email_address_edit, width=20) \
-        .grid(row=8, column=1, padx=5, pady=2, sticky="W")
-
-    label_password_edit = ttk.Label(tab_edit, text="Wachtwoord:").grid(row=9, column=0, padx=5, pady=2, sticky="W")
-    value_password_edit = tk.StringVar(tab_edit)
-    entry_password_edit = ttk.Entry(tab_edit, show="*", textvariable=value_password_edit, width=20) \
-        .grid(row=9, column=1, padx=5, pady=2, sticky="W")
-
-    label_knsa_licence_number_edit = ttk.Label(tab_edit, text="KNSA Licentienummer:") \
-        .grid(row=10, column=0, padx=5, pady=2, sticky="W")
-    value_knsa_licence_number_edit = tk.StringVar(tab_edit)
-    entry_knsa_licence_number_edit = ttk.Entry(tab_edit, textvariable=value_knsa_licence_number_edit, width=20) \
-        .grid(row=10, column=1, padx=5, pady=2, sticky="W")
-
     button_submit_edit = ttk.Button(tab_edit, text="Bewerken", command=lambda: clicked_edit()) \
-        .grid(row=11, column=0, padx=10, pady=15)
+        .grid(row=3, column=0, padx=10, pady=15)
 
-    # TODO add function for editing user
     def clicked_edit():
-        print('Clicked')
+        result_edit = database.execute_sql('UPDATE user SET ' + fields.get(value_field_edit.get())
+                                           + ' = ? WHERE  knsa_licence_number = ?',
+                                           (value_update_edit.get(), value_user_edit.get()[2:8]))
 
-        '''if result_edit == 'success':
+        if result_edit == 'success':
             messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid aangepast")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_edit)
-        popup.destroy()'''
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+        popup.destroy()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
-        .grid(row=11, column=1, padx=10, pady=15)
+        .grid(row=3, column=1, padx=10, pady=15)
 
     tab_delete = ttk.Frame(notebook)
     notebook.add(tab_delete, text="Verwijder Lid")
@@ -229,7 +200,7 @@ def popup_user_settings():
             messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid verwijderd")
         else:
             messagebox.showerror(title="Error", message=
-            "Er was een fout bij het verwijderen van deze lid: " + result_delete)
+            "Er was een fout bij het verwijderen van deze lid")
         popup.destroy()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
@@ -238,7 +209,7 @@ def popup_user_settings():
     popup.mainloop()
 
 
-# popup for the settings of firearm
+# popup for the settings of firearm (FINISHED)
 def popup_firearm_settings():
     # main window holding all elements
     popup = tk.Tk()
@@ -276,7 +247,7 @@ def popup_firearm_settings():
             messagebox.showinfo(title="Information",
                                 message="Het systeem heeft met succes een nieuw vuurwapen in de database ingevoerd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_new)
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
@@ -294,36 +265,28 @@ def popup_firearm_settings():
     option_menu_existing_edit = ttk.OptionMenu(tab_edit, value_existing_edit, firearms[0], *firearms) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    label_type_edit = ttk.Label(tab_edit, text="Nieuw Type:") \
-        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_type_edit = tk.StringVar(tab_edit)
-    # this seems stupid, check it again and edit if needed
-    value_type_edit = value_existing_edit
-    entry_type_edit = ttk.Entry(tab_edit, textvariable=value_type_edit, width=20) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
-
     label_users_edit = ttk.Label(tab_edit, text="Nieuwe Eigenaar:") \
-        .grid(row=2, column=0, padx=5, pady=2, sticky="W")
+        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_users_edit = tk.StringVar(tab_edit)
     value_users_edit.set("Select")
     option_menu_users_edit = ttk.OptionMenu(tab_edit, value_users_edit, users[0], *users) \
-        .grid(row=2, column=1, padx=5, pady=2, sticky="W")
+        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Bewerken", command=lambda: clicked_edit()) \
-        .grid(row=3, column=0, padx=10, pady=15)
+        .grid(row=2, column=0, padx=10, pady=15)
 
-    # TODO Add function for editing a firearm
     def clicked_edit():
-        print('Clicked')
+        result_edit = database.execute_sql('''UPDATE firearm SET owner = ? WHERE owner = ?''',
+                                           (value_users_edit.get()[2:8], value_existing_edit.get()[2:8]))
 
-        '''if result_edit == 'success':
+        if result_edit == 'success':
             messagebox.showinfo(title="Information", message="Het systeem heeft met succes het vuurwapen aangepast")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_edit)
-        popup.destroy()'''
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+        popup.destroy()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
-        .grid(row=3, column=1, padx=10, pady=15)
+        .grid(row=2, column=1, padx=10, pady=15)
 
     tab_delete = ttk.Frame(notebook)
     notebook.add(tab_delete, text="Verwijder Vuurwapen")
@@ -348,7 +311,7 @@ def popup_firearm_settings():
             messagebox.showinfo(title="Information", message=
             "Het systeem heeft met succes het vuurwapen verwijderd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_delete)
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
@@ -357,7 +320,7 @@ def popup_firearm_settings():
     popup.mainloop()
 
 
-# popup for the settings of ammunition
+# popup for the settings of ammunition (FINISHED)
 def popup_ammunition_settings():
     # main window holding all elements
     popup = tk.Tk()
@@ -397,7 +360,7 @@ def popup_ammunition_settings():
             messagebox.showinfo(title="Information",
                                 message="Het systeem heeft met succes een nieuwe munitietype in de database ingevoerd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_new)
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
@@ -407,6 +370,11 @@ def popup_ammunition_settings():
     tab_edit = ttk.Frame(notebook)
     notebook.add(tab_edit, text="Bewerk")
 
+    fields = {
+        'Prijs': 'price',
+        'Voorraad': 'stock'
+    }
+
     label_type_edit = ttk.Label(tab_edit, text="Munitie te bewerken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     ammunition_types = database.execute_sql('''SELECT type FROM ammunition;''')
@@ -415,29 +383,32 @@ def popup_ammunition_settings():
     option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, ammunition_types[0], *ammunition_types) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    label_price_edit = ttk.Label(tab_edit, text="Nieuwe prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_price_edit = tk.DoubleVar(tab_edit)
-    entry_price_edit = ttk.Entry(tab_edit, textvariable=value_price_edit, width=20) \
+    label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
+        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+    value_field_edit = tk.StringVar(tab_edit)
+    value_field_edit.set("Select")
+    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys()) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
-    label_stock_edit = ttk.Label(tab_edit, text="Voorraad toevoegen:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_stock_edit = tk.IntVar(tab_edit)
-    entry_stock_edit = ttk.Entry(tab_edit, textvariable=value_stock_edit, width=20) \
+    label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
+    value_update_edit = tk.DoubleVar(tab_edit)
+    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
-    # TODO add functionality for editing ammunition
     def clicked_edit():
-        print('Clicked')
+        result_edit = database.execute_sql('UPDATE ammunition SET ' + fields.get(value_field_edit.get())
+                                           + ' = ? WHERE type = ?',
+                                           (value_update_edit.get(), value_type_edit.get()))
 
-        '''if result_edit == 'success':
+        if result_edit == 'success':
             messagebox.showinfo(title="Information", message=
-                                "Het systeem heeft met succes nieuwe voorraad in de database ingevoerd")
+            "Het systeem heeft met succes nieuwe voorraad in de database ingevoerd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_edit)
-        popup.destroy()'''
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+        popup.destroy()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -460,10 +431,10 @@ def popup_ammunition_settings():
         result_delete = database.execute_sql('''DELETE FROM ammunition WHERE type = ?''', (value_type_delete.get()))
 
         if result_delete == 'success':
-            messagebox.showinfo(title="Information", message=
-                                "Het systeem heeft met succes de ammunitie verwijderd")
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes de ammunitie verwijderd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data: " + result_delete)
+            messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
         popup.destroy()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
@@ -472,7 +443,7 @@ def popup_ammunition_settings():
     popup.mainloop()
 
 
-# popup for scorecard settings
+# popup for scorecard settings (FINISHED)
 def popup_scorecard_settings():
     # main window holding all elements
     popup = tk.Tk()
@@ -513,7 +484,7 @@ def popup_scorecard_settings():
             messagebox.showinfo(title="Information",
                                 message="Het systeem heeft met succes een nieuwe scorecard in de database ingevoerd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_new)
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
         popup.destroy()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
@@ -523,37 +494,53 @@ def popup_scorecard_settings():
     tab_edit = ttk.Frame(notebook)
     notebook.add(tab_edit, text="Bewerk")
 
+    fields = {
+        'Prijs': 'price',
+        'Voorraad': 'stock'
+    }
+
+    fields2 = {
+        'Standaard': 'regular',
+        'Competitie': 'competition'
+    }
+
     label_type_edit = ttk.Label(tab_edit, text="Score kaart te bewerken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     scorecard_types = database.execute_sql('''SELECT type FROM scorecard;''')
+
     value_type_edit = tk.StringVar(tab_edit)
     value_type_edit.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, scorecard_types[0], *scorecard_types) \
+    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, next(iter(fields2)), *fields2.keys()) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    label_price_edit = ttk.Label(tab_edit, text="Nieuwe Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_price_edit = tk.DoubleVar(tab_edit)
-    entry_price_edit = ttk.Entry(tab_edit, textvariable=value_price_edit, width=20) \
+    label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
+        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+    value_field_edit = tk.StringVar(tab_edit)
+    value_field_edit.set("Select")
+    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys()) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
-    label_stock_edit = ttk.Label(tab_edit, text="Voorraad toevoegen:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_stock_edit = tk.IntVar(tab_edit)
-    entry_stock_edit = ttk.Entry(tab_edit, textvariable=value_stock_edit, width=20) \
+    label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
+    value_update_edit = tk.DoubleVar(tab_edit)
+    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=20) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
-    # TODO add functionality to be able to edit scorecards
     def clicked_edit():
-        print('Clicked')
 
-        '''if result_edit == 'success':
-            messagebox.showinfo(title="Information", message=
-                                "Het systeem heeft met succes nieuwe voorraad in de database ingevoerd")
+        result_edit = database.execute_sql('UPDATE ammunition SET ' + fields.get(value_field_edit.get())
+                                           + ' = ? WHERE type = ?',
+                                           [value_update_edit.get(), fields2.get(value_type_edit.get())])
+
+        if result_edit == 'success':
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes nieuwe" + value_field_edit.get()
+                                        + "in de database ingevoerd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data: " + result_edit)
-        popup.destroy()'''
+            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+        popup.destroy()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -579,7 +566,7 @@ def popup_scorecard_settings():
             messagebox.showinfo(title="Information", message=
             "Het systeem heeft met succes de scorecard verwijderd")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data: " + result_delete)
+            messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
         popup.destroy()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
