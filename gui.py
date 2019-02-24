@@ -408,11 +408,17 @@ def popup_ammunition_settings():
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
-    # TODO add functionality for stock
     def clicked_edit():
+        if fields.get(value_field_edit.get()) == 'stock':
+            current_stock = database.execute_sql('''SELECT stock from ammunition WHERE type = ?''',
+                                                 (value_type_edit.get()[2:5],))
+            new_value = int(current_stock[0][0] + value_update_edit.get())
+        else:
+            new_value = value_update_edit.get()
+
         result_edit = database.execute_sql('UPDATE ammunition SET ' + fields.get(value_field_edit.get())
                                            + ' = ? WHERE type = ?',
-                                           (value_update_edit.get(), value_type_edit.get()))
+                                           (new_value, value_type_edit.get()[2:5]))
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information",
@@ -542,11 +548,18 @@ def popup_scorecard_settings():
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
-    # TODO add functionality for stock
     def clicked_edit():
+        if fields.get(value_field_edit.get()) == 'stock':
+            print(fields2.get(value_type_edit.get()))
+            current_stock = database.execute_sql('''SELECT stock from scorecard WHERE type = ?''',
+                                                 (fields2.get(value_type_edit.get()),))
+            new_value = int(current_stock[0][0] + value_update_edit.get())
+        else:
+            new_value = value_update_edit.get()
+
         result_edit = database.execute_sql('UPDATE scorecard SET ' + fields.get(value_field_edit.get())
                                            + ' = ? WHERE type = ?',
-                                           (value_update_edit.get(), fields2.get(value_type_edit.get())))
+                                           (new_value, fields2.get(value_type_edit.get())))
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information",
