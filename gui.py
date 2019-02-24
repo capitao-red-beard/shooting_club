@@ -9,7 +9,7 @@ NORMAL_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 
 
-# popup for the settings of users (FINISHED)
+# popup for the settings of users (1 ERROR)
 def popup_user_settings():
     popup = tk.Tk()
     popup.wm_title("Lid Instellingen")
@@ -94,11 +94,8 @@ def popup_user_settings():
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=12, column=0, padx=10, pady=15)
 
-    print(type(fields.get(value_user_type_new.get())))
-
     # TODO fix the issue that user type is not being entered into the database
     def clicked_new():
-        print(fields.get(value_user_type_new.get()))
         result_new = database.execute_sql('''INSERT OR IGNORE INTO user (
                 type, 
                 first_name,
@@ -113,18 +110,18 @@ def popup_user_settings():
                 knsa_licence_number, 
                 date_of_membership
                 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
-             fields.get(value_user_type_new.get()),
-             value_first_name_new.get().lower(),
-             value_last_name_new.get().lower(),
-             value_date_of_birth_new.get().lower(),
-             value_address_new.get().lower(),
-             value_city_new.get().lower(),
-             value_post_code_new.get().lower(),
-             value_telephone_number_new.get().lower(),
-             value_email_address_new.get().lower(),
-             value_password_new.get().lower(),
-             value_knsa_licence_number_new.get().lower(),
-             value_date_of_membership_new.get().lower()))
+            fields.get(value_user_type_new.get()),
+            value_first_name_new.get().lower(),
+            value_last_name_new.get().lower(),
+            value_date_of_birth_new.get().lower(),
+            value_address_new.get().lower(),
+            value_city_new.get().lower(),
+            value_post_code_new.get().lower(),
+            value_telephone_number_new.get().lower(),
+            value_email_address_new.get().lower(),
+            value_password_new.get().lower(),
+            value_knsa_licence_number_new.get().lower(),
+            value_date_of_membership_new.get().lower()))
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
@@ -147,8 +144,7 @@ def popup_user_settings():
     option_menu_user_edit = ttk.OptionMenu(tab_edit, value_user_edit, users[0], *users) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    fields = {'Type': 'type',
-              'Adres': 'address',
+    fields = {'Adres': 'address',
               'Woonplaats': 'city',
               'Telefoonnummer': 'telephone_number',
               'Email Adres': 'email_address',
@@ -197,11 +193,8 @@ def popup_user_settings():
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
-    print(value_user_delete.get()[2:8])
-
     # this should delete the record in the dropdown menu
     def clicked_delete():
-        print(value_user_delete.get()[2:8])
         result_delete = database.execute_sql(
             '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[2:8],))
 
@@ -455,7 +448,7 @@ def popup_ammunition_settings():
     # this should delete the record in the dropdown menu
     def clicked_delete():
         result_delete = database.execute_sql('''DELETE FROM ammunition WHERE type = ?''',
-                                             (value_type_delete.get()[2:-3]),)
+                                             (value_type_delete.get()[2:-3]), )
 
         if result_delete == 'success':
             messagebox.showinfo(title="Information",
