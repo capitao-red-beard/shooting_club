@@ -23,7 +23,7 @@ def popup_user_settings():
 
     fields = {
         'Standaard': 1,
-        'Beheerder': 0
+        'Beheerder': 2
     }
 
     label_user_type_new = ttk.Label(tab_new, text="Gebruikerstype:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
@@ -94,7 +94,11 @@ def popup_user_settings():
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=12, column=0, padx=10, pady=15)
 
+    print(type(fields.get(value_user_type_new.get())))
+
+    # TODO fix the issue that user type is not being entered into the database
     def clicked_new():
+        print(fields.get(value_user_type_new.get()))
         result_new = database.execute_sql('''INSERT OR IGNORE INTO user (
                 type, 
                 first_name,
@@ -109,18 +113,18 @@ def popup_user_settings():
                 knsa_licence_number, 
                 date_of_membership
                 ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
-            (fields.get(value_user_type_new.get()),
-             value_first_name_new.get(),
-             value_last_name_new.get(),
-             value_date_of_birth_new.get(),
-             value_address_new.get(),
-             value_city_new.get(),
-             value_post_code_new.get(),
-             value_telephone_number_new.get(),
-             value_email_address_new.get(),
-             value_password_new.get(),
-             value_knsa_licence_number_new.get(),
-             value_date_of_membership_new.get())))
+             fields.get(value_user_type_new.get()),
+             value_first_name_new.get().lower(),
+             value_last_name_new.get().lower(),
+             value_date_of_birth_new.get().lower(),
+             value_address_new.get().lower(),
+             value_city_new.get().lower(),
+             value_post_code_new.get().lower(),
+             value_telephone_number_new.get().lower(),
+             value_email_address_new.get().lower(),
+             value_password_new.get().lower(),
+             value_knsa_licence_number_new.get().lower(),
+             value_date_of_membership_new.get().lower()))
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
@@ -168,7 +172,7 @@ def popup_user_settings():
     def clicked_edit():
         result_edit = database.execute_sql('UPDATE user SET ' + fields.get(value_field_edit.get())
                                            + ' = ? WHERE  knsa_licence_number = ?',
-                                           (value_update_edit.get(), value_user_edit.get()[2:8]))
+                                           (value_update_edit.get().lower(), value_user_edit.get()[2:8]))
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid "
@@ -193,10 +197,13 @@ def popup_user_settings():
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
+    print(value_user_delete.get()[2:8])
+
     # this should delete the record in the dropdown menu
     def clicked_delete():
+        print(value_user_delete.get()[2:8])
         result_delete = database.execute_sql(
-            '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[0]))
+            '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[2:8],))
 
         if result_delete == 'success':
             messagebox.showinfo(title="Information",
@@ -245,7 +252,7 @@ def popup_firearm_settings():
 
     def clicked_new():
         result_new = database.execute_sql('''INSERT OR IGNORE INTO firearm (
-        type, owner) VALUES (?, ?)''', (value_type_new.get(), value_users_new.get()))
+        type, owner) VALUES (?, ?)''', (value_type_new.get().lower(), value_users_new.get()[2:8]))
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
@@ -313,7 +320,7 @@ def popup_firearm_settings():
     def clicked_delete():
         result_delete = database.execute_sql(
             '''DELETE FROM firearm WHERE type = ? AND owner = ?''',
-            (value_type_delete.get()[0], value_type_delete.get()[1]))
+            (value_type_delete.get()[12:-2], value_type_delete.get()[2:8]))
 
         if result_delete == 'success':
             messagebox.showinfo(title="Information",
@@ -363,7 +370,8 @@ def popup_ammunition_settings():
 
     def clicked_new():
         result_new = database.execute_sql('''INSERT OR IGNORE INTO ammunition (
-        type, price, stock) VALUES (?, ?, ?)''', (value_type_new.get(), value_price_new.get(), value_stock_new.get()))
+        type, price, stock) VALUES (?, ?, ?)''',
+                                          (value_type_new.get().lower(), value_price_new.get(), value_stock_new.get()))
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
@@ -446,7 +454,8 @@ def popup_ammunition_settings():
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
-        result_delete = database.execute_sql('''DELETE FROM ammunition WHERE type = ?''', (value_type_delete.get()))
+        result_delete = database.execute_sql('''DELETE FROM ammunition WHERE type = ?''',
+                                             (value_type_delete.get()[2:-3]),)
 
         if result_delete == 'success':
             messagebox.showinfo(title="Information",
@@ -497,7 +506,7 @@ def popup_scorecard_settings():
     def clicked_new():
         result_new = database.execute_sql('''INSERT OR IGNORE INTO scorecard (
                 type, price, stock) VALUES (?, ?, ?)''',
-                                          (value_type_new.get(), value_price_new.get(), value_stock_new.get()))
+                                          (value_type_new.get().lower(), value_price_new.get(), value_stock_new.get()))
 
         if result_new == 'success':
             messagebox.showinfo(title="Information",
@@ -587,7 +596,8 @@ def popup_scorecard_settings():
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
-        result_delete = database.execute_sql('''DELETE FROM scorecard WHERE type = ?''', (value_type_delete.get()))
+        result_delete = database.execute_sql('''DELETE FROM scorecard WHERE type = ?''',
+                                             (fields.get(value_type_delete.get()),))
 
         if result_delete == 'success':
             messagebox.showinfo(title="Information",
