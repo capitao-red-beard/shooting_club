@@ -136,23 +136,24 @@ statement4 = '''CREATE TABLE IF NOT EXISTS scorecard (
 
 statement5 = '''CREATE TABLE IF NOT EXISTS score (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,                            
-                            shot_one INTEGER NOT NULL,
-                            shot_two INTEGER NOT NULL,
-                            shot_three INTEGER NOT NULL,
-                            shot_four INTEGER NOT NULL,
-                            shot_five INTEGER NOT NULL,
-                            date_score TEXT NOT NULL,
-                            ammunition_type TEXT NOT NULL,                            
+                            card_one_shot_one INTEGER NOT NULL,
+                            card_one_shot_two INTEGER NOT NULL,
+                            card_one_shot_three INTEGER NOT NULL,
+                            card_one_shot_four INTEGER NOT NULL,
+                            card_one_shot_five INTEGER NOT NULL,
+                            card_one_total INTEGER NOT NULL,
+                            card_two_shot_one INTEGER NOT NULL,
+                            card_two_shot_two INTEGER NOT NULL,
+                            card_two_shot_three INTEGER NOT NULL,
+                            card_two_shot_four INTEGER NOT NULL,
+                            card_two_shot_five INTEGER NOT NULL,
+                            card_two_total INTEGER NOT NULL,
+                            date_score TEXT NOT NULL,                           
                             shooter TEXT NOT NULL,                            
                             firearm_type TEXT NOT NULL,                           
-                            scorecard_type TEXT NOT NULL,
-                            FOREIGN KEY (ammunition_type) REFERENCES ammunition (type)
-                            ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (shooter) REFERENCES user (knsa_licence_number)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (firearm_type) REFERENCES firearm (type)
-                            ON DELETE NO ACTION ON UPDATE CASCADE,
-                            FOREIGN KEY (scorecard_type) REFERENCES scorecard (type)
                             ON DELETE NO ACTION ON UPDATE CASCADE);'''
 
 statement6 = '''CREATE TABLE IF NOT EXISTS sale_scorecard (

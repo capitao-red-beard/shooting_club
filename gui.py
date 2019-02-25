@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 
+from datetime import date
+
 import database
 
 LARGE_FONT = ("Verdana", 12)
@@ -689,76 +691,125 @@ class ScorePage(tk.Frame):
         label_details = tk.Frame(label_frame_left)
         label_details.pack(side="top", anchor="nw")
 
-        label_user = ttk.Label(label_details, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        label_user_left = ttk.Label(label_details, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
         users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
         value_user_left = tk.StringVar(label_details)
         value_user_left.set("Select")
-        option_menu_user_edit = ttk.OptionMenu(label_details, value_user_left, users[0], *users) \
-            .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+        option_menu_user_left = ttk.OptionMenu(label_details, value_user_left, users[0], *users) \
+            .grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
-        fields = {
-            'Standaard': 'regular',
-            'Competitie': 'competition'
-        }
+        label_firearm_left = ttk.Label(label_details, text="Vuurwapen:") \
+            .grid(row=1, column=0, padx=5, pady=5, sticky="W")
 
-        label_scorecard_left = ttk.Label(label_details, text="Scorecard:") \
-            .grid(row=1, column=0, padx=5, pady=2, sticky="W")
-
-        scorecards = database.execute_sql('''SELECT type FROM scorecard;''')
-        value_scorecard_left = tk.StringVar(label_details)
-        value_scorecard_left.set("Select")
+        firearms = database.execute_sql('''SELECT owner, type FROM firearm;''')
+        value_firearm_left = tk.StringVar(label_details)
+        value_firearm_left.set("Select")
         option_menu_scorecard_left = ttk.OptionMenu(
-            label_details, value_scorecard_left, next(iter(fields)), *fields.keys()) \
-            .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+            label_details, value_firearm_left, firearms[0], *firearms) \
+            .grid(row=1, column=1, padx=5, pady=5, sticky="W")
 
         frame_scores = tk.Frame(label_frame_left)
         frame_scores.pack(anchor="w")
 
-        label_scorecard_1 = ttk.Label(frame_scores, text="Scorecard 1:") \
-            .grid(row=2, column=0, padx=5, pady=2, sticky="W")
-        value_scorecard_1_1 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_1, width=5) \
-            .grid(row=2, column=2, padx=5, pady=2, sticky="W")
-        value_scorecard_1_2 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_2, width=5) \
-            .grid(row=2, column=3, padx=5, pady=2, sticky="W")
-        value_scorecard_1_3 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_3, width=5) \
-            .grid(row=2, column=4, padx=5, pady=2, sticky="W")
-        value_scorecard_1_4 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_4, width=5) \
-            .grid(row=2, column=5, padx=5, pady=2, sticky="W")
-        value_scorecard_1_5 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_5, width=5) \
-            .grid(row=2, column=6, padx=5, pady=2, sticky="W")
+        label_scorecard1 = ttk.Label(frame_scores, text="1e Scorecard:") \
+            .grid(row=2, column=0, padx=5, pady=5, sticky="W")
 
-        label_scorecard_2 = ttk.Label(frame_scores, text="Scorecard 2:") \
-            .grid(row=3, column=0, padx=5, pady=2, sticky="W")
-        value_scorecard_2_1 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_1, width=5) \
-            .grid(row=3, column=2, padx=5, pady=2, sticky="W")
-        value_scorecard_2_2 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_2, width=5) \
-            .grid(row=3, column=3, padx=5, pady=2, sticky="W")
-        value_scorecard_2_3 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_3, width=5) \
-            .grid(row=3, column=4, padx=5, pady=2, sticky="W")
-        value_scorecard_2_4 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_4, width=5) \
-            .grid(row=3, column=5, padx=5, pady=2, sticky="W")
-        value_scorecard_2_5 = tk.IntVar(frame_scores)
-        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_5, width=5) \
-            .grid(row=3, column=6, padx=5, pady=2, sticky="W")
+        value_scorecard1_shot1 = tk.IntVar(frame_scores)
+        entry_scorecard1_shot1 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot1, width=5) \
+            .grid(row=2, column=2, padx=5, pady=5, sticky="W")
+
+        value_scorecard1_shot2 = tk.IntVar(frame_scores)
+        entry_scorecard1_shot2 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot2, width=5) \
+            .grid(row=2, column=3, padx=5, pady=5, sticky="W")
+
+        value_scorecard1_shot3 = tk.IntVar(frame_scores)
+        entry_scorecard1_shot3 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot3, width=5) \
+            .grid(row=2, column=4, padx=5, pady=5, sticky="W")
+
+        value_scorecard1_shot4 = tk.IntVar(frame_scores)
+        entry_scorecard1_shot4 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot4, width=5) \
+            .grid(row=2, column=5, padx=5, pady=5, sticky="W")
+
+        value_scorecard1_shot5 = tk.IntVar(frame_scores)
+        entry_scorecard1_shot5 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot5, width=5) \
+            .grid(row=2, column=6, padx=5, pady=5, sticky="W")
+
+        label_scorecard_2 = ttk.Label(frame_scores, text="2e Scorecard:") \
+            .grid(row=3, column=0, padx=5, pady=5, sticky="W")
+
+        value_scorecard2_shot1 = tk.IntVar(frame_scores)
+        entry_scorecard2_shot1 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot1, width=5) \
+            .grid(row=3, column=2, padx=5, pady=5, sticky="W")
+
+        value_scorecard2_shot2 = tk.IntVar(frame_scores)
+        entry_scorecard2_shot2 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot2, width=5) \
+            .grid(row=3, column=3, padx=5, pady=5, sticky="W")
+
+        value_scorecard2_shot3 = tk.IntVar(frame_scores)
+        entry_scorecard2_shot3 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot3, width=5) \
+            .grid(row=3, column=4, padx=5, pady=5, sticky="W")
+
+        value_scorecard2_shot4 = tk.IntVar(frame_scores)
+        entry_scorecard2_shot4 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot4, width=5) \
+            .grid(row=3, column=5, padx=5, pady=5, sticky="W")
+
+        value_scorecard2_shot5 = tk.IntVar(frame_scores)
+        entry_scorecard2_shot5 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot5, width=5) \
+            .grid(row=3, column=6, padx=5, pady=5, sticky="W")
 
         frame_buttons_left = tk.Frame(label_frame_left)
         frame_buttons_left.pack(anchor="w")
 
-        button_submit_left = ttk.Button(frame_buttons_left, text="Invoeren", command=lambda: clicked_delete()) \
+        button_submit_left = ttk.Button(frame_buttons_left, text="Invoeren", command=lambda: clicked_submit_left()) \
             .grid(row=0, column=0, padx=10, pady=15, sticky="W")
 
-        def clicked_delete():
-            result_submit_left = database.execute_sql('''''')
+        def clicked_submit_left():
+            total_card1 = int(value_scorecard1_shot1.get()
+                              + value_scorecard1_shot2.get()
+                              + value_scorecard1_shot3.get()
+                              + value_scorecard1_shot4.get()
+                              + value_scorecard1_shot5.get())
 
+            total_card2 = int(value_scorecard2_shot1.get()
+                              + value_scorecard2_shot2.get()
+                              + value_scorecard2_shot3.get()
+                              + value_scorecard2_shot4.get()
+                              + value_scorecard2_shot5.get())
+
+            date_of_score = str(date.today())
+
+            result_submit_left = database.execute_sql('''INSERT OR IGNORE INTO score (
+            card_one_shot_one,
+            card_one_shot_two,
+            card_one_shot_three,
+            card_one_shot_four,
+            card_one_shot_five,
+            card_one_total,
+            card_two_shot_one,
+            card_two_shot_two,
+            card_two_shot_three,
+            card_two_shot_four,
+            card_two_shot_five,
+            card_two_total,
+            date_score,
+            shooter,
+            firearm_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
+                value_scorecard1_shot1.get(),
+                value_scorecard1_shot2.get(),
+                value_scorecard1_shot3.get(),
+                value_scorecard1_shot4.get(),
+                value_scorecard1_shot5.get(),
+                total_card1,
+                value_scorecard2_shot1,
+                value_scorecard2_shot2,
+                value_scorecard2_shot3,
+                value_scorecard2_shot4,
+                value_scorecard2_shot5,
+                total_card2,
+                date_of_score,
+                value_user_left.get()[2:8],
+                value_firearm_left.get()[12:-2]
+            ))
             if result_submit_left == 'success':
                 messagebox.showinfo(title="Information",
                                     message="Het systeem heeft met success de score voor "
@@ -767,16 +818,16 @@ class ScorePage(tk.Frame):
                 messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
 
         def clicked_reset():
-            value_scorecard_1_1.set(0)
-            value_scorecard_1_2.set(0)
-            value_scorecard_1_3.set(0)
-            value_scorecard_1_4.set(0)
-            value_scorecard_1_5.set(0)
-            value_scorecard_2_1.set(0)
-            value_scorecard_2_2.set(0)
-            value_scorecard_2_3.set(0)
-            value_scorecard_2_4.set(0)
-            value_scorecard_2_5.set(0)
+            value_scorecard1_shot1.set(0)
+            value_scorecard1_shot2.set(0)
+            value_scorecard1_shot3.set(0)
+            value_scorecard1_shot4.set(0)
+            value_scorecard1_shot5.set(0)
+            value_scorecard2_shot1.set(0)
+            value_scorecard2_shot2.set(0)
+            value_scorecard2_shot3.set(0)
+            value_scorecard2_shot4.set(0)
+            value_scorecard2_shot5.set(0)
 
         button_reset_left = ttk.Button(frame_buttons_left, text="Reset", command=lambda: clicked_reset()) \
             .grid(row=0, column=1, padx=10, pady=15, sticky="W")
