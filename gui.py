@@ -146,6 +146,7 @@ def popup_user_settings():
 
     fields = {'Adres': 'address',
               'Woonplaats': 'city',
+              'Postcode': 'post_code',
               'Telefoonnummer': 'telephone_number',
               'Email Adres': 'email_address',
               'KNSA Licentienummer': 'knsa_licence_number'}
@@ -652,7 +653,7 @@ class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text="Finance Page", font=LARGE_FONT)
+        label = ttk.Label(self, text="Main Menu", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         button1 = ttk.Button(self, text="Score Page", command=lambda: controller.show_frame(ScorePage))
@@ -667,81 +668,151 @@ class ScorePage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        header_left = ttk.Label(self, text='Submit Score').grid(row=0, column=0)
-        label_left_user = ttk.Label(self, text='Lid:').grid(row=1, column=0)
+        tk.Frame.__init__(self, parent)
+        frame_left = tk.Frame(self)
+        frame_left.pack(side="left")
 
+        button_main_menu = ttk.Button(frame_left, text="Main Menu",
+                                      command=lambda: controller.show_frame(MainMenu))
+        button_main_menu.pack()
+
+        button_finance_page = ttk.Button(frame_left, text="Finance Page",
+                                         command=lambda: controller.show_frame(FinancePage))
+        button_finance_page.pack()
+
+        frame_right = tk.Frame(self)
+        frame_right.pack(side="right", fill='both', expand=True)
+
+        label_frame_left = tk.LabelFrame(frame_right, text="Submit Score")
+        label_frame_left.pack(side="left", fill="both", expand=True)
+
+        label_details = tk.Frame(label_frame_left)
+        label_details.pack(side="top", anchor="nw")
+
+        label_user = ttk.Label(label_details, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
         users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
-        value_left_user = tk.StringVar(self)
-        value_left_user.set("Select")
-        option_menu_left_user = ttk.OptionMenu(self, value_left_user, users[0], *users) \
-            .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+        value_user_left = tk.StringVar(label_details)
+        value_user_left.set("Select")
+        option_menu_user_edit = ttk.OptionMenu(label_details, value_user_left, users[0], *users) \
+            .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+        fields = {
+            'Standaard': 'regular',
+            'Competitie': 'competition'
+        }
+
+        label_scorecard_left = ttk.Label(label_details, text="Scorecard:") \
+            .grid(row=1, column=0, padx=5, pady=2, sticky="W")
 
         scorecards = database.execute_sql('''SELECT type FROM scorecard;''')
-        value_left_scorecard = tk.StringVar(self)
-        value_left_scorecard.set("Select")
-        option_menu_left_scorecard = ttk.OptionMenu(self, value_left_scorecard, scorecards[0], *scorecards) \
-            .grid(row=2, column=1, padx=5, pady=2, sticky="W")
+        value_scorecard_left = tk.StringVar(label_details)
+        value_scorecard_left.set("Select")
+        option_menu_scorecard_left = ttk.OptionMenu(
+            label_details, value_scorecard_left, next(iter(fields)), *fields.keys()) \
+            .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
-        label_scores_top = ttk.Label(self, text="Scores eerste scorecard:") \
+        frame_scores = tk.Frame(label_frame_left)
+        frame_scores.pack(anchor="w")
+
+        label_scorecard_1 = ttk.Label(frame_scores, text="Scorecard 1:") \
+            .grid(row=2, column=0, padx=5, pady=2, sticky="W")
+        value_scorecard_1_1 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_1, width=5) \
+            .grid(row=2, column=2, padx=5, pady=2, sticky="W")
+        value_scorecard_1_2 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_2, width=5) \
+            .grid(row=2, column=3, padx=5, pady=2, sticky="W")
+        value_scorecard_1_3 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_3, width=5) \
+            .grid(row=2, column=4, padx=5, pady=2, sticky="W")
+        value_scorecard_1_4 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_4, width=5) \
+            .grid(row=2, column=5, padx=5, pady=2, sticky="W")
+        value_scorecard_1_5 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_1_5, width=5) \
+            .grid(row=2, column=6, padx=5, pady=2, sticky="W")
+
+        label_scorecard_2 = ttk.Label(frame_scores, text="Scorecard 2:") \
             .grid(row=3, column=0, padx=5, pady=2, sticky="W")
-        value_scores_top_1 = tk.IntVar(self)
-        entry_scores_top_1 = ttk.Entry(self, textvariable=value_scores_top_1, width=5) \
+        value_scorecard_2_1 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_1, width=5) \
             .grid(row=3, column=2, padx=5, pady=2, sticky="W")
-        value_scores_top_2 = tk.IntVar(self)
-        entry_scores_top_2 = ttk.Entry(self, textvariable=value_scores_top_2, width=5) \
+        value_scorecard_2_2 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_2, width=5) \
             .grid(row=3, column=3, padx=5, pady=2, sticky="W")
-        value_scores_top_3 = tk.IntVar(self)
-        entry_scores_top_3 = ttk.Entry(self, textvariable=value_scores_top_3, width=5) \
+        value_scorecard_2_3 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_3, width=5) \
             .grid(row=3, column=4, padx=5, pady=2, sticky="W")
-        value_scores_top_4 = tk.IntVar(self)
-        entry_scores_top_4 = ttk.Entry(self, textvariable=value_scores_top_4, width=5) \
+        value_scorecard_2_4 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_4, width=5) \
             .grid(row=3, column=5, padx=5, pady=2, sticky="W")
-        value_scores_top_5 = tk.IntVar(self)
-        entry_scores_top_5 = ttk.Entry(self, textvariable=value_scores_top_5, width=5) \
+        value_scorecard_2_5 = tk.IntVar(frame_scores)
+        entry_update_edit = ttk.Entry(frame_scores, textvariable=value_scorecard_2_5, width=5) \
             .grid(row=3, column=6, padx=5, pady=2, sticky="W")
 
-        total = value_scores_top_1.get() \
-                + value_scores_top_2.get() \
-                + value_scores_top_3.get() \
-                + value_scores_top_4.get() \
-                + value_scores_top_5.get()
+        frame_buttons_left = tk.Frame(label_frame_left)
+        frame_buttons_left.pack(anchor="w")
 
-        label_scores_top_total = ttk.Label(self, textvariable=total) \
-            .grid(row=3, column=7, padx=5, pady=2, sticky="W")
+        button_submit_left = ttk.Button(frame_buttons_left, text="Invoeren", command=lambda: clicked_delete()) \
+            .grid(row=0, column=0, padx=10, pady=15, sticky="W")
 
-        label_scores_bottom = ttk.Label(self, text="Scores tweede scorecard:") \
-            .grid(row=4, column=0, padx=5, pady=2, sticky="W")
-        value_scores_bottom_1 = tk.IntVar(self)
-        entry_scores_top_1 = ttk.Entry(self, textvariable=value_scores_bottom_1, width=5) \
-            .grid(row=4, column=2, padx=5, pady=2, sticky="W")
-        value_scores_bottom_2 = tk.IntVar(self)
-        entry_scores_bottom_2 = ttk.Entry(self, textvariable=value_scores_bottom_2, width=5) \
-            .grid(row=4, column=3, padx=5, pady=2, sticky="W")
-        value_scores_bottom_3 = tk.IntVar(self)
-        entry_scores_bottom_3 = ttk.Entry(self, textvariable=value_scores_bottom_3, width=5) \
-            .grid(row=4, column=4, padx=5, pady=2, sticky="W")
-        value_scores_bottom_4 = tk.IntVar(self)
-        entry_scores_bottom_4 = ttk.Entry(self, textvariable=value_scores_bottom_4, width=5) \
-            .grid(row=4, column=5, padx=5, pady=2, sticky="W")
-        value_scores_bottom_5 = tk.IntVar(self)
-        entry_scores_bottom_5 = ttk.Entry(self, textvariable=value_scores_bottom_5, width=5) \
-            .grid(row=4, column=6, padx=5, pady=2, sticky="W")
+        def clicked_delete():
+            result_submit_left = database.execute_sql('''''')
+
+            if result_submit_left == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met success de score voor "
+                                            + value_user_left.get()[2:8] + " ingevoerd")
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
+
+        def clicked_reset():
+            value_scorecard_1_1.set(0)
+            value_scorecard_1_2.set(0)
+            value_scorecard_1_3.set(0)
+            value_scorecard_1_4.set(0)
+            value_scorecard_1_5.set(0)
+            value_scorecard_2_1.set(0)
+            value_scorecard_2_2.set(0)
+            value_scorecard_2_3.set(0)
+            value_scorecard_2_4.set(0)
+            value_scorecard_2_5.set(0)
+
+        button_reset_left = ttk.Button(frame_buttons_left, text="Reset", command=lambda: clicked_reset()) \
+            .grid(row=0, column=1, padx=10, pady=15, sticky="W")
+
+        label_frame_right = tk.LabelFrame(frame_right, text="View Scores")
+        label_frame_right.pack(side="right", fill="both", expand=True)
 
 
 class FinancePage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text="Finance Page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
+        frame_left = tk.Frame(self)
+        frame_left.pack(side="left")
 
-        button1 = ttk.Button(self, text="Main Menu", command=lambda: controller.show_frame(MainMenu))
-        button1.pack()
+        button_main_menu = ttk.Button(frame_left, text="Main Menu",
+                                      command=lambda: controller.show_frame(MainMenu))
+        button_main_menu.pack()
 
-        button2 = ttk.Button(self, text="Score Page", command=lambda: controller.show_frame(ScorePage))
-        button2.pack()
+        button_finance_page = ttk.Button(frame_left, text="Score Page",
+                                         command=lambda: controller.show_frame(ScorePage))
+        button_finance_page.pack()
+
+        frame_right = tk.Frame(self)
+        frame_right.pack(side="right", fill='both', expand=True)
+        frame_right.pack(side="right", fill='both', expand=True)
+
+        label_frame_left = tk.LabelFrame(frame_right, text="Make Transaction")
+        label_frame_left.pack(side="left", fill="both", expand=True)
+        label_left_user = ttk.Label(label_frame_left, text="Lid:").grid(row=0, column=0, padx=5, pady=2)
+
+        label_frame_right = tk.LabelFrame(frame_right, text="View Transactions")
+        label_frame_right.pack(side="right", fill="both", expand=True)
+        label_right_user = ttk.Label(label_frame_right, text="Lid:").grid(row=0, column=0, padx=5, pady=2)
 
 
 app = ShootingClub()
-app.geometry("1080x720")
+app.geometry("900x500")
 app.mainloop()
