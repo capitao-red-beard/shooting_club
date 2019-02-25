@@ -1,8 +1,7 @@
 import tkinter as tk
+from datetime import date
 from tkinter import messagebox
 from tkinter import ttk
-
-from datetime import date
 
 import database
 
@@ -770,17 +769,11 @@ class ScorePage(tk.Frame):
                               + value_scorecard1_shot4.get()
                               + value_scorecard1_shot5.get())
 
-            print(total_card1)
-
             total_card2 = int(value_scorecard2_shot1.get()
                               + value_scorecard2_shot2.get()
                               + value_scorecard2_shot3.get()
                               + value_scorecard2_shot4.get()
                               + value_scorecard2_shot5.get())
-
-            print(total_card2)
-
-            date_of_score = str(date.today())
 
             result_submit_left = database.execute_sql('''INSERT OR IGNORE INTO score (
             card_one_shot_one,
@@ -804,16 +797,16 @@ class ScorePage(tk.Frame):
                 value_scorecard1_shot4.get(),
                 value_scorecard1_shot5.get(),
                 total_card1,
-                value_scorecard2_shot1,
-                value_scorecard2_shot2,
-                value_scorecard2_shot3,
-                value_scorecard2_shot4,
-                value_scorecard2_shot5,
+                value_scorecard2_shot1.get(),
+                value_scorecard2_shot2.get(),
+                value_scorecard2_shot3.get(),
+                value_scorecard2_shot4.get(),
+                value_scorecard2_shot5.get(),
                 total_card2,
-                date_of_score,
+                str(date.today()),
                 value_user_left.get()[2:8],
-                value_firearm_left.get()[12:-2]
-            ))
+                value_firearm_left.get()[12:-2]))
+
             if result_submit_left == 'success':
                 messagebox.showinfo(title="Information",
                                     message="Het systeem heeft met success de score voor "
