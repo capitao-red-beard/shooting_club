@@ -770,11 +770,15 @@ class ScorePage(tk.Frame):
                               + value_scorecard1_shot4.get()
                               + value_scorecard1_shot5.get())
 
+            print(total_card1)
+
             total_card2 = int(value_scorecard2_shot1.get()
                               + value_scorecard2_shot2.get()
                               + value_scorecard2_shot3.get()
                               + value_scorecard2_shot4.get()
                               + value_scorecard2_shot5.get())
+
+            print(total_card2)
 
             date_of_score = str(date.today())
 
