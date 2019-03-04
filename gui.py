@@ -891,7 +891,6 @@ class FinancePage(tk.Frame):
                                               textvariable=value_ammunition_quantity,
                                               width=5).grid(row=0, column=3, padx=5, pady=5, sticky="W")
 
-        # TODO fix the total here
         label_ammunition_valuation = ttk.Label(frame_ammunition_middle, text="Totaal (EUR):") \
             .grid(row=1, column=0, padx=5, pady=2, sticky="W")
         total_price_left = tk.DoubleVar()
@@ -908,35 +907,48 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=0, padx=10, pady=15, sticky="W")
 
         def clicked_submit_left():
-            ammunition_price = database.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
+            ammunition_stock = database.execute_sql('''SELECT stock FROM ammunition WHERE type = ?''',
                                                     (value_ammunition_type.get()[2:-3],))
 
-            total_ammunition_price = value_ammunition_quantity.get() * ammunition_price[0][0]
+            new_ammunition_stock = ammunition_stock[0][0] - value_ammunition_quantity.get()
 
-            result_submit_left = database.execute_sql('''INSERT OR IGNORE INTO sale_ammunition (
-                            date_sold,
-                            quantity,
-                            type,
-                            seller,
-                            buyer,
-                            price) VALUES (?, ?, ?, ?, ?, ?)''', (
-                str(date.today()),
-                value_ammunition_quantity.get(),
-                value_ammunition_type.get()[2:-3],
-                '123456',
-                value_user_top_left.get()[2:8],
-                total_ammunition_price
-            ))
-
-            value_ammunition_quantity.set(0)
-            total_price_left.set(0.0)
-
-            if result_submit_left == 'success':
-                messagebox.showinfo(title="Information",
-                                    message="Het systeem heeft met succes munitie verkocht")
+            if new_ammunition_stock < 0:
+                messagebox.showinfo(title="Error",
+                                    message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
+                                            str(ammunition_stock[0][0]) + " over en u probeert " +
+                                            str(value_ammunition_quantity.get()) + " te verkopen")
             else:
-                messagebox.showerror(title="Error",
-                                     message="Er was een fout bij het verkopen van de munitie")
+                ammunition_price = database.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
+                                                        (value_ammunition_type.get()[2:-3],))
+
+                total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
+
+                result_submit_left = database.execute_sql('''INSERT OR IGNORE INTO sale_ammunition (
+                                            date_sold,
+                                            quantity,
+                                            type,
+                                            seller,
+                                            buyer,
+                                            price) VALUES (?, ?, ?, ?, ?, ?)''', (
+                    str(date.today()),
+                    value_ammunition_quantity.get(),
+                    value_ammunition_type.get()[2:-3],
+                    '123456',
+                    value_user_top_left.get()[2:8],
+                    total_ammunition_price
+                ))
+
+                value_ammunition_quantity.set(0)
+                total_price_left.set(0.0)
+
+                if result_submit_left == 'success':
+                    messagebox.showinfo(title="Information",
+                                        message="Het systeem heeft met succes munitie verkocht er is nu " +
+                                                str(new_ammunition_stock) + " voorraad van " +
+                                                value_ammunition_type.get() + " over")
+                else:
+                    messagebox.showerror(title="Error",
+                                         message="Er was een fout bij het verkopen van de munitie")
 
         button_reset_left = ttk.Button(frame_ammunition_bottom, text="Reset", command=lambda: clicked_reset_left()) \
             .grid(row=0, column=1, padx=10, pady=15, sticky="W")
@@ -954,11 +966,9 @@ class FinancePage(tk.Frame):
             ammunition_price = database.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
                                                     (value_ammunition_type.get()[2:-3],))
 
-            total_ammunition_price = value_ammunition_quantity.get() * ammunition_price[0][0]
+            total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
 
             total_price_left.set(total_ammunition_price)
-
-            return total_ammunition_price
 
         # scorecard sales starts here
 
@@ -1001,7 +1011,6 @@ class FinancePage(tk.Frame):
                                              textvariable=value_scorecard_quantity,
                                              width=5).grid(row=0, column=3, padx=5, pady=5, sticky="W")
 
-        # TODO fix the total here
         label_scorecard_valuation = ttk.Label(frame_scorecard_middle, text="Totaal (EUR):") \
             .grid(row=1, column=0, padx=5, pady=2, sticky="W")
         total_price_right = tk.DoubleVar()
@@ -1018,35 +1027,51 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=0, padx=10, pady=15, sticky="W")
 
         def clicked_submit_right():
-            scorecard_price = database.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+            scorecard_stock = database.execute_sql('''SELECT stock FROM scorecard WHERE type = ?''',
                                                    (fields.get(value_scorecard_type.get()),))
 
-            total_scorecard_price = value_scorecard_quantity.get() * scorecard_price[0][0]
+            new_scorecard_stock = scorecard_stock[0][0] - value_scorecard_quantity.get()
 
-            result_submit_right = database.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
-                                    date_sold,
-                                    quantity,
-                                    type,
-                                    seller,
-                                    buyer,
-                                    price) VALUES (?, ?, ?, ?, ?, ?)''', (
-                str(date.today()),
-                value_scorecard_quantity.get(),
-                fields.get(value_scorecard_type.get()),
-                '123456',
-                value_user_top_right.get()[2:8],
-                total_scorecard_price
-            ))
-
-            value_scorecard_quantity.set(0)
-            total_price_right.set(0.0)
-
-            if result_submit_right == 'success':
-                messagebox.showinfo(title="Information",
-                                    message="Het systeem heeft met succes scorecard verkocht")
+            if new_scorecard_stock < 0:
+                messagebox.showinfo(title="Error",
+                                    message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
+                                            str(scorecard_stock[0][0]) + " over en u probeert " +
+                                            str(value_scorecard_quantity.get()) + " te verkopen")
             else:
-                messagebox.showerror(title="Error",
-                                     message="Er was een fout bij het verkopen van de scorecard")
+                scorecard_price = database.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+                                                       (fields.get(value_scorecard_type.get()),))
+
+                total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
+
+                database.execute_sql('''UPDATE scorecard SET stock = ? WHERE type = ?''',
+                                     (new_scorecard_stock, fields.get(value_scorecard_type.get()),))
+
+                result_submit_right = database.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
+                                                    date_sold,
+                                                    quantity,
+                                                    type,
+                                                    seller,
+                                                    buyer,
+                                                    price) VALUES (?, ?, ?, ?, ?, ?)''', (
+                    str(date.today()),
+                    value_scorecard_quantity.get(),
+                    fields.get(value_scorecard_type.get()),
+                    '123456',
+                    value_user_top_right.get()[2:8],
+                    total_scorecard_price
+                ))
+
+                value_scorecard_quantity.set(0)
+                total_price_right.set(0.0)
+
+                if result_submit_right == 'success':
+                    messagebox.showinfo(title="Information",
+                                        message="Het systeem heeft met succes scorecard verkocht u heeft nu " +
+                                                str(new_scorecard_stock) + " voorraad van " +
+                                                fields.get(value_scorecard_type.get()) + " over")
+                else:
+                    messagebox.showerror(title="Error",
+                                         message="Er was een fout bij het verkopen van de scorecard")
 
         button_reset_right = ttk.Button(frame_scorecard_bottom, text="Reset", command=lambda: clicked_reset_right()) \
             .grid(row=0, column=1, padx=10, pady=15, sticky="W")
@@ -1064,11 +1089,9 @@ class FinancePage(tk.Frame):
             scorecard_price = database.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
                                                    (fields.get(value_scorecard_type.get()),))
 
-            total_scorecard_price = value_scorecard_quantity.get() * scorecard_price[0][0]
+            total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
 
             total_price_right.set(total_scorecard_price)
-
-            return total_scorecard_price
 
         frame_bottom = tk.Frame(frame_right)
         frame_bottom.pack(side="bottom", fill="both", expand=True)
@@ -1079,4 +1102,5 @@ class FinancePage(tk.Frame):
 
 app = ShootingClub()
 app.geometry("900x500")
+app.minsize(900, 500)
 app.mainloop()
