@@ -10,7 +10,7 @@ NORMAL_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 
 
-# popup for the settings of users (1 ERROR)
+# popup for the settings of users (1 ERROR / USER TYPE NOT ENTERING INTO DATABASE)
 def popup_user_settings():
     popup = tk.Tk()
     popup.wm_title("Lid Instellingen")
@@ -664,6 +664,7 @@ class MainMenu(tk.Frame):
         button2.pack()
 
 
+# TODO add email functionality to mail the scores to the user also add total scores for both cards
 class ScorePage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -833,6 +834,7 @@ class ScorePage(tk.Frame):
         label_frame_right.pack(side="right", fill="both", expand=True)
 
 
+# TODO add email functionality to mail a receipt to the user also add totals for transactions
 class FinancePage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -849,16 +851,192 @@ class FinancePage(tk.Frame):
         button_finance_page.pack()
 
         frame_right = tk.Frame(self)
-        frame_right.pack(side="right", fill='both', expand=True)
-        frame_right.pack(side="right", fill='both', expand=True)
+        frame_right.pack(side="right", fill="both", expand=True)
 
-        label_frame_left = tk.LabelFrame(frame_right, text="Make Transaction")
-        label_frame_left.pack(side="left", fill="both", expand=True)
-        label_left_user = ttk.Label(label_frame_left, text="Lid:").grid(row=0, column=0, padx=5, pady=2)
+        frame_top = tk.Frame(frame_right)
+        frame_top.pack(side="top", fill="both", expand=True)
 
-        label_frame_right = tk.LabelFrame(frame_right, text="View Transactions")
-        label_frame_right.pack(side="right", fill="both", expand=True)
-        label_right_user = ttk.Label(label_frame_right, text="Lid:").grid(row=0, column=0, padx=5, pady=2)
+        label_frame_top_left = tk.LabelFrame(frame_top, text="Ammunition Transaction")
+        label_frame_top_left.pack(side="left", fill="both", expand=True)
+
+        frame_ammunition_top = tk.Frame(label_frame_top_left)
+        frame_ammunition_top.pack(side="top", anchor="nw")
+
+        label_user_top_left = ttk.Label(frame_ammunition_top, text="Lid:") \
+            .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
+        value_user_top_left = tk.StringVar(frame_ammunition_top)
+        value_user_top_left.set("Select")
+        option_menu_user_top_left = ttk.OptionMenu(frame_ammunition_top, value_user_top_left, users[0], *users) \
+            .grid(row=0, column=1, padx=5, pady=5, sticky="W")
+
+        frame_ammunition_middle = tk.Frame(label_frame_top_left)
+        frame_ammunition_middle.pack(anchor="nw")
+
+        label_ammunition_type = ttk.Label(frame_ammunition_middle, text="Munitie type:") \
+            .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        ammunition_types = database.execute_sql('''SELECT type FROM ammunition;''')
+        value_ammunition_type = tk.StringVar(frame_ammunition_middle)
+        value_ammunition_type.set("Select")
+        option_menu_ammunition_type = ttk.OptionMenu(frame_ammunition_middle,
+                                                     value_ammunition_type,
+                                                     ammunition_types[0],
+                                                     *ammunition_types).grid(row=0, column=1, padx=5, pady=2,
+                                                                             sticky="W")
+
+        label_ammunition_quantity = ttk.Label(frame_ammunition_middle, text="Aantal:") \
+            .grid(row=0, column=2, padx=5, pady=2, sticky="W")
+        value_ammunition_quantity = tk.IntVar(frame_ammunition_middle)
+        entry_ammunition_quantity = ttk.Entry(frame_ammunition_middle,
+                                              textvariable=value_ammunition_quantity,
+                                              width=5).grid(row=0, column=3, padx=5, pady=5, sticky="W")
+
+        # TODO fix the total here
+        label_ammunition_valuation = ttk.Label(frame_ammunition_middle, text="Totaal (EUR):") \
+            .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+        label_ammunition_total = ttk.Label(frame_ammunition_middle, text="0") \
+            .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+
+        frame_ammunition_bottom = tk.Frame(label_frame_top_left)
+        frame_ammunition_bottom.pack(anchor="w")
+
+        button_submit_left = ttk.Button(frame_ammunition_bottom,
+                                        text="Verkopen",
+                                        command=lambda: clicked_submit_left()) \
+            .grid(row=0, column=0, padx=10, pady=15, sticky="W")
+
+        def clicked_submit_left():
+            ammunition_price = database.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
+                                                    (value_ammunition_type.get()[2:-3],))
+
+            total_ammunition_price = value_ammunition_quantity.get() * ammunition_price[0][0]
+
+            result_submit_left = database.execute_sql('''INSERT OR IGNORE INTO sale_ammunition (
+                            date_sold,
+                            quantity,
+                            type,
+                            seller,
+                            buyer,
+                            price) VALUES (?, ?, ?, ?, ?, ?)''', (
+                str(date.today()),
+                value_ammunition_quantity.get(),
+                value_ammunition_type.get()[2:-3],
+                '123456',
+                value_user_top_left.get()[2:8],
+                total_ammunition_price
+            ))
+
+            value_ammunition_quantity.set(0)
+
+            if result_submit_left == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes munitie verkocht")
+            else:
+                messagebox.showerror(title="Error",
+                                     message="Er was een fout bij het verkopen van de munitie")
+
+        button_reset_left = ttk.Button(frame_ammunition_bottom, text="Reset", command=lambda: clicked_reset_left()) \
+            .grid(row=0, column=1, padx=10, pady=15, sticky="W")
+
+        def clicked_reset_left():
+            value_ammunition_quantity.set(0)
+
+        # scorecard sales starts here
+
+        fields = {
+            'Standaard': 'regular',
+            'Competitie': 'competition'
+        }
+
+        label_frame_top_right = tk.LabelFrame(frame_top, text="Scorecard Transaction")
+        label_frame_top_right.pack(side="right", fill="both", expand=True)
+
+        frame_scorecard_top = tk.Frame(label_frame_top_right)
+        frame_scorecard_top.pack(side="top", anchor="nw")
+
+        label_user_top_right = ttk.Label(frame_scorecard_top, text="Lid:") \
+            .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
+        value_user_top_right = tk.StringVar(frame_scorecard_top)
+        value_user_top_right.set("Select")
+        option_menu_user_top_right = ttk.OptionMenu(frame_scorecard_top, value_user_top_right, users[0], *users) \
+            .grid(row=0, column=1, padx=5, pady=5, sticky="W")
+
+        frame_scorecard_middle = tk.Frame(label_frame_top_right)
+        frame_scorecard_middle.pack(anchor="nw")
+
+        label_scorecard_type = ttk.Label(frame_scorecard_middle, text="Scorecard type:") \
+            .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        scorecard_types = database.execute_sql('''SELECT type FROM scorecard;''')
+        value_scorecard_type = tk.StringVar(frame_scorecard_middle)
+        value_scorecard_type.set("Select")
+        option_menu_scorecard_type = ttk.OptionMenu(frame_scorecard_middle,
+                                                    value_scorecard_type,
+                                                    next(iter(fields)),
+                                                    *fields.keys()).grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+        label_scorecard_quantity = ttk.Label(frame_scorecard_middle, text="Aantal:") \
+            .grid(row=0, column=2, padx=5, pady=2, sticky="W")
+        value_scorecard_quantity = tk.IntVar(frame_scorecard_middle)
+        entry_scorecard_quantity = ttk.Entry(frame_scorecard_middle,
+                                             textvariable=value_scorecard_quantity,
+                                             width=5).grid(row=0, column=3, padx=5, pady=5, sticky="W")
+
+        # TODO fix the total here
+        label_scorecard_valuation = ttk.Label(frame_scorecard_middle, text="Totaal (EUR):") \
+            .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+        label_scorecard_total = ttk.Label(frame_scorecard_middle, text="0") \
+            .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+
+        frame_scorecard_bottom = tk.Frame(label_frame_top_right)
+        frame_scorecard_bottom.pack(anchor="w")
+
+        button_submit_right = ttk.Button(frame_scorecard_bottom,
+                                         text="Verkopen",
+                                         command=lambda: clicked_submit_right()) \
+            .grid(row=0, column=0, padx=10, pady=15, sticky="W")
+
+        def clicked_submit_right():
+            scorecard_price = database.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+                                                   (fields.get(value_scorecard_type.get()),))
+
+            total_scorecard_price = value_scorecard_quantity.get() * scorecard_price[0][0]
+
+            result_submit_right = database.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
+                                    date_sold,
+                                    quantity,
+                                    type,
+                                    seller,
+                                    buyer,
+                                    price) VALUES (?, ?, ?, ?, ?, ?)''', (
+                str(date.today()),
+                value_scorecard_quantity.get(),
+                fields.get(value_scorecard_type.get()),
+                '123456',
+                value_user_top_right.get()[2:8],
+                total_scorecard_price
+            ))
+
+            value_scorecard_quantity.set(0)
+
+            if result_submit_right == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes scorecard verkocht")
+            else:
+                messagebox.showerror(title="Error",
+                                     message="Er was een fout bij het verkopen van de scorecard")
+
+        button_reset_right = ttk.Button(frame_scorecard_bottom, text="Reset", command=lambda: clicked_reset_right()) \
+            .grid(row=0, column=1, padx=10, pady=15, sticky="W")
+
+        def clicked_reset_right():
+            value_scorecard_quantity.set(0)
+
+        frame_bottom = tk.Frame(frame_right)
+        frame_bottom.pack(side="bottom", fill="both", expand=True)
+
+        label_frame_bottom = tk.LabelFrame(frame_bottom, text="View Transactions")
+        label_frame_bottom.pack(side="bottom", fill="both", expand=True)
 
 
 app = ShootingClub()
