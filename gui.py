@@ -894,7 +894,9 @@ class FinancePage(tk.Frame):
         # TODO fix the total here
         label_ammunition_valuation = ttk.Label(frame_ammunition_middle, text="Totaal (EUR):") \
             .grid(row=1, column=0, padx=5, pady=2, sticky="W")
-        label_ammunition_total = ttk.Label(frame_ammunition_middle, text="0") \
+        total_price_left = tk.DoubleVar()
+        total_price_left.set(0.0)
+        label_ammunition_total = ttk.Label(frame_ammunition_middle, textvariable=total_price_left) \
             .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
         frame_ammunition_bottom = tk.Frame(label_frame_top_left)
@@ -927,6 +929,7 @@ class FinancePage(tk.Frame):
             ))
 
             value_ammunition_quantity.set(0)
+            total_price_left.set(0.0)
 
             if result_submit_left == 'success':
                 messagebox.showinfo(title="Information",
@@ -940,6 +943,22 @@ class FinancePage(tk.Frame):
 
         def clicked_reset_left():
             value_ammunition_quantity.set(0)
+            total_price_left.set(0.0)
+
+        button_ammunition_total = ttk.Button(frame_ammunition_bottom,
+                                             text="Reken Totaal",
+                                             command=lambda: clicked_total_left()) \
+            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
+
+        def clicked_total_left():
+            ammunition_price = database.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
+                                                    (value_ammunition_type.get()[2:-3],))
+
+            total_ammunition_price = value_ammunition_quantity.get() * ammunition_price[0][0]
+
+            total_price_left.set(total_ammunition_price)
+
+            return total_ammunition_price
 
         # scorecard sales starts here
 
@@ -985,7 +1004,9 @@ class FinancePage(tk.Frame):
         # TODO fix the total here
         label_scorecard_valuation = ttk.Label(frame_scorecard_middle, text="Totaal (EUR):") \
             .grid(row=1, column=0, padx=5, pady=2, sticky="W")
-        label_scorecard_total = ttk.Label(frame_scorecard_middle, text="0") \
+        total_price_right = tk.DoubleVar()
+        total_price_right.set(0.0)
+        label_scorecard_total = ttk.Label(frame_scorecard_middle, textvariable=total_price_right) \
             .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
         frame_scorecard_bottom = tk.Frame(label_frame_top_right)
@@ -1018,6 +1039,7 @@ class FinancePage(tk.Frame):
             ))
 
             value_scorecard_quantity.set(0)
+            total_price_right.set(0.0)
 
             if result_submit_right == 'success':
                 messagebox.showinfo(title="Information",
@@ -1031,6 +1053,22 @@ class FinancePage(tk.Frame):
 
         def clicked_reset_right():
             value_scorecard_quantity.set(0)
+            total_price_right.set(0.0)
+
+        button_scorecard_total = ttk.Button(frame_scorecard_bottom,
+                                            text="Reken Totaal",
+                                            command=lambda: clicked_total_right()) \
+            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
+
+        def clicked_total_right():
+            scorecard_price = database.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+                                                   (fields.get(value_scorecard_type.get()),))
+
+            total_scorecard_price = value_scorecard_quantity.get() * scorecard_price[0][0]
+
+            total_price_right.set(total_scorecard_price)
+
+            return total_scorecard_price
 
         frame_bottom = tk.Frame(frame_right)
         frame_bottom.pack(side="bottom", fill="both", expand=True)
