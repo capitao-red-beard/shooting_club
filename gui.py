@@ -945,7 +945,7 @@ class FinancePage(tk.Frame):
                     messagebox.showinfo(title="Information",
                                         message="Het systeem heeft met succes munitie verkocht er is nu " +
                                                 str(new_ammunition_stock) + " voorraad van " +
-                                                value_ammunition_type.get() + " over")
+                                                value_ammunition_type.get()[2:-3] + " over")
                 else:
                     messagebox.showerror(title="Error",
                                          message="Er was een fout bij het verkopen van de munitie")
