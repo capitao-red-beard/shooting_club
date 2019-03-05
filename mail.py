@@ -12,9 +12,15 @@ def send_email(to_email, subject, text):
     msg['Subject'] = subject
     msg.attach(MIMEText(text, 'plain'))
 
-    mail = smtplib.SMTP(host='smtp.gmail.com', port=587)
-    mail.ehlo()
-    mail.starttls()
-    mail.login(from_email, '!Password123')
-    mail.sendmail(from_email, to_email, msg.as_string())
-    mail.close()
+    try:
+        mail = smtplib.SMTP(host='smtp.gmail.com', port=587)
+        mail.ehlo()
+        mail.starttls()
+        mail.login(from_email, '!Password123')
+        mail.sendmail(from_email, to_email, msg.as_string())
+        mail.close()
+        print('Sent email successfully')
+        return True
+    except smtplib.SMTPException as e:
+        print('Error sending email: ' + str(e))
+        return False

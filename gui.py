@@ -4,6 +4,7 @@ from tkinter import messagebox
 from tkinter import ttk
 
 import database
+import mail
 
 LARGE_FONT = ("Verdana", 12)
 NORMAL_FONT = ("Verdana", 10)
@@ -664,7 +665,6 @@ class MainMenu(tk.Frame):
         button2.pack()
 
 
-# TODO add email functionality to mail the scores to the user also add total scores for both cards
 class ScorePage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -812,6 +812,50 @@ class ScorePage(tk.Frame):
                 messagebox.showinfo(title="Information",
                                     message="Het systeem heeft met success de score voor "
                                             + value_user_left.get()[2:8] + " ingevoerd")
+
+                sc1 = [value_scorecard1_shot1.get(),
+                       value_scorecard1_shot2.get(),
+                       value_scorecard1_shot3.get(),
+                       value_scorecard1_shot4.get(),
+                       value_scorecard1_shot5.get(),
+                       total_card1]
+
+                sc2 = [value_scorecard2_shot1.get(),
+                       value_scorecard2_shot2.get(),
+                       value_scorecard2_shot3.get(),
+                       value_scorecard2_shot4.get(),
+                       value_scorecard2_shot5.get(),
+                       total_card2]
+
+                user_data = database.execute_sql('''SELECT email_address, first_name 
+                                                 FROM user WHERE knsa_licence_number = ?''',
+                                                 (value_user_left.get()[2:8],))
+
+                email_body = 'Hallo ' + user_data[0][1] + \
+                             ', \n\n u scores zijn voor ' + \
+                             str(date.today()) + \
+                             ' in de database ingevoerd. U heeft met ' + value_firearm_left.get()[12:-2] + \
+                             ' geschoten. \n U heeft voor uw eerste kaart: \n schot 1: ' + str(sc1[0]) + \
+                             '\n schot 2: ' + str(sc1[1]) + \
+                             '\n schot 3: ' + str(sc1[2]) + \
+                             '\n schot 4: ' + str(sc1[3]) + \
+                             '\n schot 5: ' + str(sc1[4]) + \
+                             '\n met een totaal score van: ' + str(sc1[5]) + \
+                             '\n\n en voor uw tweede kaart: \n schot 1: ' + str(sc2[0]) + \
+                             '\n schot 2: ' + str(sc2[1]) + \
+                             '\n schot 3: ' + str(sc2[2]) + \
+                             '\n schot 4: ' + str(sc2[3]) + \
+                             '\n schot 5: ' + str(sc2[4]) + \
+                             '\n met een totaal score van: ' + str(sc2[5]) + \
+                             '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
+
+                email_result = mail.send_email(user_data[0][0], 'U heeft nieuwe scores ingediend', email_body)
+
+                if email_result:
+                    clicked_reset()
+                else:
+                    messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
             else:
                 messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
 
@@ -834,7 +878,6 @@ class ScorePage(tk.Frame):
         label_frame_right.pack(side="right", fill="both", expand=True)
 
 
-# TODO add email functionality to mail a receipt to the user also add totals for transactions
 class FinancePage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -938,14 +981,33 @@ class FinancePage(tk.Frame):
                     total_ammunition_price
                 ))
 
-                value_ammunition_quantity.set(0)
-                total_price_left.set(0.0)
-
                 if result_submit_left == 'success':
                     messagebox.showinfo(title="Information",
                                         message="Het systeem heeft met succes munitie verkocht er is nu " +
                                                 str(new_ammunition_stock) + " voorraad van " +
                                                 value_ammunition_type.get()[2:-3] + " over")
+
+                    user_data = database.execute_sql('''SELECT email_address, first_name 
+                                                                     FROM user WHERE knsa_licence_number = ?''',
+                                                     (value_user_top_left.get()[2:8],))
+
+                    email_body = 'Hallo ' + user_data[0][1] + \
+                                 ', \n\n u heeft een transactie afgerond bij de scheitvereniging op ' \
+                                 + str(date.today()) + \
+                                 '. \n U heeft ' + str(value_ammunition_quantity.get()) + ' van ' + \
+                                 value_ammunition_type.get() + \
+                                 ' gekocht voor een prijs van totaal €' + str(total_price_left.get()) + \
+                                 '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
+
+                    email_result = mail.send_email(user_data[0][0],
+                                                   'U heeft iets gekocht op de schietvereniging',
+                                                   email_body)
+
+                    if email_result:
+                        clicked_reset_left()
+                    else:
+                        messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
                 else:
                     messagebox.showerror(title="Error",
                                          message="Er was een fout bij het verkopen van de munitie")
@@ -1061,14 +1123,33 @@ class FinancePage(tk.Frame):
                     total_scorecard_price
                 ))
 
-                value_scorecard_quantity.set(0)
-                total_price_right.set(0.0)
-
                 if result_submit_right == 'success':
                     messagebox.showinfo(title="Information",
                                         message="Het systeem heeft met succes scorecard verkocht u heeft nu " +
                                                 str(new_scorecard_stock) + " voorraad van " +
                                                 fields.get(value_scorecard_type.get()) + " over")
+
+                    user_data = database.execute_sql('''SELECT email_address, first_name 
+                                                     FROM user WHERE knsa_licence_number = ?''',
+                                                     (value_user_top_right.get()[2:8],))
+
+                    email_body = 'Hallo ' + user_data[0][1] + \
+                                 ', \n\n u heeft een transactie afgerond bij de scheitvereniging op ' \
+                                 + str(date.today()) + \
+                                 '. \n U heeft ' + str(value_scorecard_quantity.get()) + ' van ' + \
+                                 fields.get(value_scorecard_type.get()) + \
+                                 ' gekocht voor een prijs van totaal €' + str(total_price_right.get()) + \
+                                 '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
+
+                    email_result = mail.send_email(user_data[0][0],
+                                                   'U heeft iets gekocht op de schietvereniging',
+                                                   email_body)
+
+                    if email_result:
+                        clicked_reset_right()
+                    else:
+                        messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
                 else:
                     messagebox.showerror(title="Error",
                                          message="Er was een fout bij het verkopen van de scorecard")
