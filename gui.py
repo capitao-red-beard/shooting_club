@@ -988,14 +988,14 @@ class FinancePage(tk.Frame):
                                                 value_ammunition_type.get()[2:-3] + " over")
 
                     user_data = database.execute_sql('''SELECT email_address, first_name 
-                                                                     FROM user WHERE knsa_licence_number = ?''',
+                                                     FROM user WHERE knsa_licence_number = ?''',
                                                      (value_user_top_left.get()[2:8],))
 
                     email_body = 'Hallo ' + user_data[0][1] + \
-                                 ', \n\n u heeft een transactie afgerond bij de scheitvereniging op ' \
+                                 ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
                                  + str(date.today()) + \
-                                 '. \n U heeft ' + str(value_ammunition_quantity.get()) + ' van ' + \
-                                 value_ammunition_type.get() + \
+                                 '. \n\n U heeft ' + str(value_ammunition_quantity.get()) + ' van ' + \
+                                 value_ammunition_type.get()[2:-3] + \
                                  ' gekocht voor een prijs van totaal €' + str(total_price_left.get()) + \
                                  '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
 
@@ -1127,17 +1127,17 @@ class FinancePage(tk.Frame):
                     messagebox.showinfo(title="Information",
                                         message="Het systeem heeft met succes scorecard verkocht u heeft nu " +
                                                 str(new_scorecard_stock) + " voorraad van " +
-                                                fields.get(value_scorecard_type.get()) + " over")
+                                                value_scorecard_type.get() + " over")
 
                     user_data = database.execute_sql('''SELECT email_address, first_name 
                                                      FROM user WHERE knsa_licence_number = ?''',
                                                      (value_user_top_right.get()[2:8],))
 
                     email_body = 'Hallo ' + user_data[0][1] + \
-                                 ', \n\n u heeft een transactie afgerond bij de scheitvereniging op ' \
+                                 ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
                                  + str(date.today()) + \
-                                 '. \n U heeft ' + str(value_scorecard_quantity.get()) + ' van ' + \
-                                 fields.get(value_scorecard_type.get()) + \
+                                 '. \n\n U heeft ' + str(value_scorecard_quantity.get()) + ' van ' + \
+                                 value_scorecard_type.get() + \
                                  ' gekocht voor een prijs van totaal €' + str(total_price_right.get()) + \
                                  '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
 
