@@ -129,9 +129,24 @@ def popup_user_settings():
             messagebox.showinfo(title="Information",
                                 message="Het systeem heeft met succes een nieuw lid "
                                         + value_first_name_new.get() + " in de database ingevoerd")
+
+            email_body = 'Gefeliciteerd ' + value_first_name_new.get() + \
+                         ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
+                         '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
+                         '\n\n Reageer aub niet op deze email.' \
+                         '\n\n Fijne dag!'
+
+            email_result = mail.send_email(value_email_address_new.get(),
+                                           'Welkom bij Schietvereniging Prinses Juliana',
+                                           email_body)
+
+            if email_result:
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=12, column=1, padx=10, pady=15)
@@ -169,16 +184,30 @@ def popup_user_settings():
         .grid(row=3, column=0, padx=10, pady=15)
 
     def clicked_edit():
-        result_edit = database.execute_sql('UPDATE user SET ' + fields.get(value_field_edit.get())
+        result_edit = database.execute_sql('UPDATE user SET ' + str(fields.get(value_field_edit.get()))
                                            + ' = ? WHERE  knsa_licence_number = ?',
                                            (value_update_edit.get().lower(), value_user_edit.get()[2:8]))
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid "
                                                              + value_user_edit.get()[2:8] + " aangepast")
+
+            user_data = database.execute_sql('''SELECT email_address, first_name 
+            FROM user WHERE knsa_licence_number = ?''', (value_user_edit.get()[2:8],))
+
+            email_body = 'Hallo ' + user_data[0][1] + \
+                         ', \n\n Uw ' + value_field_edit.get() + ' is met succes veranderd in het systeem.' \
+                                                                 ' \n\n Reageer aub niet op deze email. \n\n Fijne dag!'
+
+            email_result = mail.send_email(user_data[0][0], 'Uw gegevens zijn veranderd', email_body)
+
+            if email_result:
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -204,7 +233,7 @@ def popup_user_settings():
         if result_delete == 'success':
             messagebox.showinfo(title="Information",
                                 message="Het systeem heeft met succes het lid "
-                                        + value_user_delete.get()[0] + " verwijderd")
+                                        + value_user_delete.get()[2:8] + " verwijderd")
         else:
             messagebox.showerror(title="Error",
                                  message="Er was een fout bij het verwijderen van deze lid")
