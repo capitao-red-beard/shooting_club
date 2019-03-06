@@ -848,72 +848,94 @@ class ScorePage(tk.Frame):
         firearms = database.execute_sql('''SELECT owner, type FROM firearm;''')
         value_firearm_left = tk.StringVar(frame_details)
         value_firearm_left.set("Select")
-        option_menu_scorecard_left = ttk.OptionMenu(frame_details, value_firearm_left, firearms[0], *firearms)
-        option_menu_scorecard_left.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 3)
-        option_menu_scorecard_left.grid(row=1, column=1, padx=5, pady=5, sticky="W")
+        option_menu_firearm_left = ttk.OptionMenu(frame_details, value_firearm_left, firearms[0], *firearms)
+        option_menu_firearm_left.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 3)
+        option_menu_firearm_left.grid(row=1, column=1, padx=5, pady=5, sticky="W")
 
         frame_scores = tk.Frame(frame_top)
         frame_scores.pack(side="right", anchor="nw")
+
+        list_score = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
         label_scorecard1 = ttk.Label(frame_scores, text="1e Scorecard:") \
             .grid(row=2, column=0, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot1 = tk.IntVar(frame_scores)
-        entry_scorecard1_shot1 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot1, width=5) \
-            .grid(row=2, column=2, padx=5, pady=5, sticky="W")
+        value_scorecard1_shot1.set(0)
+        option_menu_scorecard1_shot1 = ttk.OptionMenu(frame_scores, value_scorecard1_shot1, list_score[0], *list_score)
+        option_menu_scorecard1_shot1.config(width=2)
+        option_menu_scorecard1_shot1.grid(row=2, column=1, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot2 = tk.IntVar(frame_scores)
-        entry_scorecard1_shot2 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot2, width=5) \
-            .grid(row=2, column=3, padx=5, pady=5, sticky="W")
+        value_scorecard1_shot2.set(0)
+        option_menu_scorecard1_shot2 = ttk.OptionMenu(frame_scores, value_scorecard1_shot2, list_score[0], *list_score)
+        option_menu_scorecard1_shot2.config(width=2)
+        option_menu_scorecard1_shot2.grid(row=2, column=2, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot3 = tk.IntVar(frame_scores)
-        entry_scorecard1_shot3 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot3, width=5) \
-            .grid(row=2, column=4, padx=5, pady=5, sticky="W")
+        value_scorecard1_shot3.set(0)
+        option_menu_scorecard1_shot3 = ttk.OptionMenu(frame_scores, value_scorecard1_shot3, list_score[0], *list_score)
+        option_menu_scorecard1_shot3.config(width=2)
+        option_menu_scorecard1_shot3.grid(row=2, column=3, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot4 = tk.IntVar(frame_scores)
-        entry_scorecard1_shot4 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot4, width=5) \
-            .grid(row=2, column=5, padx=5, pady=5, sticky="W")
+        value_scorecard1_shot4.set(0)
+        option_menu_scorecard1_shot4 = ttk.OptionMenu(frame_scores, value_scorecard1_shot4, list_score[0], *list_score)
+        option_menu_scorecard1_shot4.config(width=2)
+        option_menu_scorecard1_shot4.grid(row=2, column=4, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot5 = tk.IntVar(frame_scores)
-        entry_scorecard1_shot5 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot5, width=5) \
-            .grid(row=2, column=6, padx=5, pady=5, sticky="W")
+        value_scorecard1_shot5.set(0)
+        option_menu_scorecard1_shot5 = ttk.OptionMenu(frame_scores, value_scorecard1_shot5, list_score[0], *list_score)
+        option_menu_scorecard1_shot5.config(width=2)
+        option_menu_scorecard1_shot5.grid(row=2, column=5, padx=5, pady=5, sticky="W")
 
         label_scorecard1_valuation = ttk.Label(frame_scores, text="Totaal Scorecard 1:") \
-            .grid(row=2, column=7, padx=5, pady=5, sticky="W")
+            .grid(row=2, column=6, padx=5, pady=5, sticky="W")
         total_scorecard1 = tk.IntVar()
         total_scorecard1.set(0)
         label_ammunition_total = ttk.Label(frame_scores, textvariable=total_scorecard1) \
-            .grid(row=2, column=8, padx=5, pady=5, sticky="W")
+            .grid(row=2, column=7, padx=5, pady=5, sticky="W")
 
         label_scorecard_2 = ttk.Label(frame_scores, text="2e Scorecard:") \
             .grid(row=3, column=0, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot1 = tk.IntVar(frame_scores)
-        entry_scorecard2_shot1 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot1, width=5) \
-            .grid(row=3, column=2, padx=5, pady=5, sticky="W")
+        value_scorecard2_shot1.set(0)
+        option_menu_scorecard2_shot1 = ttk.OptionMenu(frame_scores, value_scorecard2_shot1, list_score[0], *list_score)
+        option_menu_scorecard2_shot1.config(width=2)
+        option_menu_scorecard2_shot1.grid(row=3, column=1, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot2 = tk.IntVar(frame_scores)
-        entry_scorecard2_shot2 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot2, width=5) \
-            .grid(row=3, column=3, padx=5, pady=5, sticky="W")
+        value_scorecard2_shot2.set(0)
+        option_menu_scorecard2_shot2 = ttk.OptionMenu(frame_scores, value_scorecard2_shot2, list_score[0], *list_score)
+        option_menu_scorecard2_shot2.config(width=2)
+        option_menu_scorecard2_shot2.grid(row=3, column=2, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot3 = tk.IntVar(frame_scores)
-        entry_scorecard2_shot3 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot3, width=5) \
-            .grid(row=3, column=4, padx=5, pady=5, sticky="W")
+        value_scorecard2_shot3.set(0)
+        option_menu_scorecard2_shot3 = ttk.OptionMenu(frame_scores, value_scorecard2_shot3, list_score[0], *list_score)
+        option_menu_scorecard2_shot3.config(width=2)
+        option_menu_scorecard2_shot3.grid(row=3, column=3, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot4 = tk.IntVar(frame_scores)
-        entry_scorecard2_shot4 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot4, width=5) \
-            .grid(row=3, column=5, padx=5, pady=5, sticky="W")
+        value_scorecard2_shot4.set(0)
+        option_menu_scorecard2_shot4 = ttk.OptionMenu(frame_scores, value_scorecard2_shot4, list_score[0], *list_score)
+        option_menu_scorecard2_shot4.config(width=2)
+        option_menu_scorecard2_shot4.grid(row=3, column=4, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot5 = tk.IntVar(frame_scores)
-        entry_scorecard2_shot5 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot5, width=5) \
-            .grid(row=3, column=6, padx=5, pady=5, sticky="W")
+        value_scorecard2_shot5.set(0)
+        option_menu_scorecard2_shot5 = ttk.OptionMenu(frame_scores, value_scorecard2_shot5, list_score[0], *list_score)
+        option_menu_scorecard2_shot5.config(width=2)
+        option_menu_scorecard2_shot5.grid(row=3, column=5, padx=5, pady=5, sticky="W")
 
         label_scorecard2_valuation = ttk.Label(frame_scores, text="Totaal Scorecard 2:") \
-            .grid(row=3, column=7, padx=5, pady=5, sticky="W")
+            .grid(row=3, column=6, padx=5, pady=5, sticky="W")
         total_scorecard2 = tk.IntVar()
         total_scorecard2.set(0)
         label_ammunition_total = ttk.Label(frame_scores, textvariable=total_scorecard2) \
-            .grid(row=3, column=8, padx=5, pady=5, sticky="W")
+            .grid(row=3, column=7, padx=5, pady=5, sticky="W")
 
         frame_bottom = tk.Frame(label_frame_top)
         frame_bottom.pack(anchor="nw")
@@ -1053,12 +1075,25 @@ class ScorePage(tk.Frame):
         label_frame_bottom = tk.LabelFrame(frame_right, text="View Scores")
         label_frame_bottom.pack(side="right", fill="both", expand=True)
 
+        frame_menu = tk.Frame(label_frame_bottom)
+        frame_menu.pack(side="top", fill="x")
+
+        label_user_matplot = ttk.Label(frame_menu, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        value_user_matplot = tk.StringVar(frame_menu)
+        value_user_matplot.set("Select")
+        option_menu_user_matplot = ttk.OptionMenu(frame_menu, value_user_matplot, users[0], *users)
+        option_menu_user_matplot.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+        option_menu_user_matplot.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+
         # matplotlib graph starts here
-        canvas = FigureCanvasTkAgg(f, label_frame_bottom)
+        frame_matplot = tk.Frame(label_frame_bottom)
+        frame_matplot.pack(side="bottom", fill="both")
+
+        canvas = FigureCanvasTkAgg(f, frame_matplot)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
-        toolbar = NavigationToolbar2Tk(canvas, label_frame_bottom)
+        toolbar = NavigationToolbar2Tk(canvas, frame_matplot)
         toolbar.update()
         canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
@@ -1382,7 +1417,8 @@ class FinancePage(tk.Frame):
 
 
 app = ShootingClub()
-app.geometry("820x720")
-app.minsize(820, 720)
+app.geometry("820x730")
+app.minsize(860, 730)
+app.maxsize(860, 730)
 ani = animation.FuncAnimation(f, animate, interval=1000)
 app.mainloop()
