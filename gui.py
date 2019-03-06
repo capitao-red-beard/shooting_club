@@ -11,7 +11,6 @@ NORMAL_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 
 
-# popup for the settings of users (1 ERROR / USER TYPE NOT ENTERING INTO DATABASE)
 def popup_user_settings():
     popup = tk.Tk()
     popup.wm_title("Lid Instellingen")
@@ -96,57 +95,67 @@ def popup_user_settings():
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=12, column=0, padx=10, pady=15)
 
-    # TODO fix the issue that user type is not being entered into the database
     def clicked_new():
-        result_new = database.execute_sql('''INSERT OR IGNORE INTO user (
-                type, 
-                first_name,
-                last_name, 
-                date_of_birth, 
-                address, 
-                city, 
-                post_code, 
-                telephone_number, 
-                email_address, 
-                password, 
-                knsa_licence_number, 
-                date_of_membership
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
-            fields.get(value_user_type_new.get()),
-            value_first_name_new.get().lower(),
-            value_last_name_new.get().lower(),
-            value_date_of_birth_new.get().lower(),
-            value_address_new.get().lower(),
-            value_city_new.get().lower(),
-            value_post_code_new.get().lower(),
-            value_telephone_number_new.get().lower(),
-            value_email_address_new.get().lower(),
-            value_password_new.get().lower(),
-            value_knsa_licence_number_new.get().lower(),
-            value_date_of_membership_new.get().lower()))
+        data_list_new = [value_first_name_new.get(),
+                         value_last_name_new.get(),
+                         value_date_of_birth_new.get(),
+                         value_address_new.get(),
+                         value_city_new.get(),
+                         value_post_code_new.get(),
+                         value_telephone_number_new.get(),
+                         value_email_address_new.get(),
+                         value_password_new.get(),
+                         value_knsa_licence_number_new.get(),
+                         value_date_of_membership_new.get()]
 
-        if result_new == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een nieuw lid "
-                                        + value_first_name_new.get() + " in de database ingevoerd")
-
-            email_body = 'Gefeliciteerd ' + value_first_name_new.get() + \
-                         ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
-                         '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
-                         '\n\n Reageer aub niet op deze email.' \
-                         '\n\n Fijne dag!'
-
-            email_result = mail.send_email(value_email_address_new.get(),
-                                           'Welkom bij Schietvereniging Prinses Juliana',
-                                           email_body)
-
-            if email_result:
-                popup.destroy()
-            else:
-                messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
-
+        if data_list_new.count(None) > 0:
+            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+            result_new = database.execute_sql('''INSERT OR IGNORE INTO user (
+                            type, 
+                            first_name,
+                            last_name, 
+                            date_of_birth, 
+                            address, 
+                            city, 
+                            post_code, 
+                            telephone_number, 
+                            email_address, 
+                            password, 
+                            knsa_licence_number, 
+                            date_of_membership
+                            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
+                fields.get(value_user_type_new.get()),
+                value_first_name_new.get().lower(),
+                value_last_name_new.get().lower(),
+                value_date_of_birth_new.get().lower(),
+                value_address_new.get().lower(),
+                value_city_new.get().lower(),
+                value_post_code_new.get().lower(),
+                value_telephone_number_new.get().lower(),
+                value_email_address_new.get().lower(),
+                value_password_new.get().lower(),
+                value_knsa_licence_number_new.get().lower(),
+                value_date_of_membership_new.get().lower()))
+
+            if result_new == 'success':
+                email_body = 'Gefeliciteerd ' + value_first_name_new.get() + \
+                             ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
+                             '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
+                             '\n\n Reageer aub niet op deze email.' \
+                             '\n\n Fijne dag!'
+
+                email_result = mail.send_email(value_email_address_new.get(),
+                                               'Welkom bij Schietvereniging Prinses Juliana',
+                                               email_body)
+
+                if email_result:
+                    popup.destroy()
+                else:
+                    messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=12, column=1, padx=10, pady=15)
@@ -161,18 +170,18 @@ def popup_user_settings():
     option_menu_user_edit = ttk.OptionMenu(tab_edit, value_user_edit, users[0], *users) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    fields = {'Adres': 'address',
-              'Woonplaats': 'city',
-              'Postcode': 'post_code',
-              'Telefoonnummer': 'telephone_number',
-              'Email Adres': 'email_address',
-              'KNSA Licentienummer': 'knsa_licence_number'}
+    fields2 = {'Adres': 'address',
+               'Woonplaats': 'city',
+               'Postcode': 'post_code',
+               'Telefoonnummer': 'telephone_number',
+               'Email Adres': 'email_address',
+               'KNSA Licentienummer': 'knsa_licence_number'}
 
     label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_field_edit = tk.StringVar(tab_edit)
     value_field_edit.set("Select")
-    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys()) \
+    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields2)), *fields2.keys()) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
@@ -184,30 +193,33 @@ def popup_user_settings():
         .grid(row=3, column=0, padx=10, pady=15)
 
     def clicked_edit():
-        result_edit = database.execute_sql('UPDATE user SET ' + str(fields.get(value_field_edit.get()))
-                                           + ' = ? WHERE  knsa_licence_number = ?',
-                                           (value_update_edit.get().lower(), value_user_edit.get()[2:8]))
+        data_list_edit = [value_update_edit.get()]
 
-        if result_edit == 'success':
-            messagebox.showinfo(title="Information", message="Het systeem heeft met succes het lid "
-                                                             + value_user_edit.get()[2:8] + " aangepast")
-
-            user_data = database.execute_sql('''SELECT email_address, first_name 
-            FROM user WHERE knsa_licence_number = ?''', (value_user_edit.get()[2:8],))
-
-            email_body = 'Hallo ' + user_data[0][1] + \
-                         ', \n\n Uw ' + value_field_edit.get() + ' is met succes veranderd in het systeem.' \
-                                                                 ' \n\n Reageer aub niet op deze email. \n\n Fijne dag!'
-
-            email_result = mail.send_email(user_data[0][0], 'Uw gegevens zijn veranderd', email_body)
-
-            if email_result:
-                popup.destroy()
-            else:
-                messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
-
+        if data_list_edit.count(None) > 0:
+            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+            result_edit = database.execute_sql('UPDATE user SET ' + str(fields2.get(value_field_edit.get()))
+                                               + ' = ? WHERE  knsa_licence_number = ?',
+                                               (value_update_edit.get().lower(), value_user_edit.get()[2:8]))
+
+            if result_edit == 'success':
+                user_data = database.execute_sql('''SELECT email_address, first_name 
+                        FROM user WHERE knsa_licence_number = ?''', (value_user_edit.get()[2:8],))
+
+                email_body = 'Hallo ' + user_data[0][1] + \
+                             ', \n\n Uw ' + value_field_edit.get() + \
+                             ' is met succes veranderd in het systeem.' \
+                             ' \n\n Reageer aub niet op deze email. \n\n Fijne dag!'
+
+                email_result = mail.send_email(user_data[0][0], 'Uw gegevens zijn veranderd', email_body)
+
+                if email_result:
+                    popup.destroy()
+                else:
+                    messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -231,13 +243,10 @@ def popup_user_settings():
             '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[2:8],))
 
         if result_delete == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes het lid "
-                                        + value_user_delete.get()[2:8] + " verwijderd")
+            popup.destroy()
         else:
             messagebox.showerror(title="Error",
                                  message="Er was een fout bij het verwijderen van deze lid")
-        popup.destroy()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -245,7 +254,6 @@ def popup_user_settings():
     popup.mainloop()
 
 
-# popup for the settings of firearm (FINISHED)
 def popup_firearm_settings():
     # main window holding all elements
     popup = tk.Tk()
@@ -276,16 +284,19 @@ def popup_firearm_settings():
         .grid(row=2, column=0, padx=10, pady=15)
 
     def clicked_new():
-        result_new = database.execute_sql('''INSERT OR IGNORE INTO firearm (
-        type, owner) VALUES (?, ?)''', (value_type_new.get().lower(), value_users_new.get()[2:8]))
+        firearm_list_new = [value_type_new.get()]
 
-        if result_new == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een nieuw vuurwapen "
-                                        + value_type_new.get().lower() + " in de database ingevoerd")
+        if firearm_list_new.count(None) > 0:
+            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
+            result_new = database.execute_sql('''INSERT OR IGNORE INTO firearm (
+                    type, owner) VALUES (?, ?)''', (value_type_new.get().lower(), value_users_new.get()[2:8]))
+
+            if result_new == 'success':
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+            popup.destroy()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=2, column=1, padx=10, pady=15)
@@ -317,13 +328,9 @@ def popup_firearm_settings():
                                            (value_users_edit.get()[2:8], value_existing_edit.get()[2:8]))
 
         if result_edit == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes het vuurwapen eigenaar aangepast van "
-                                        + value_existing_edit.get()[2:8] + " tot "
-                                        + value_users_edit.get()[2:8].lower())
+            popup.destroy()
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=2, column=1, padx=10, pady=15)
@@ -348,12 +355,9 @@ def popup_firearm_settings():
             (value_type_delete.get()[12:-2], value_type_delete.get()[2:8]))
 
         if result_delete == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes het vuurwapen "
-                                        + value_type_delete.get()[0].lower() + " verwijderd")
+            popup.destroy()
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -361,7 +365,6 @@ def popup_firearm_settings():
     popup.mainloop()
 
 
-# popup for the settings of ammunition (FINISHED)
 def popup_ammunition_settings():
     # main window holding all elements
     popup = tk.Tk()
@@ -394,17 +397,20 @@ def popup_ammunition_settings():
         .grid(row=3, column=0, padx=10, pady=15)
 
     def clicked_new():
-        result_new = database.execute_sql('''INSERT OR IGNORE INTO ammunition (
-        type, price, stock) VALUES (?, ?, ?)''',
-                                          (value_type_new.get().lower(), value_price_new.get(), value_stock_new.get()))
+        ammunition_list_new = [value_type_new.get()]
 
-        if result_new == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een nieuwe munitietype "
-                                        + value_type_new.get().lower() + " in de database ingevoerd")
+        if ammunition_list_new.count(None) > 0:
+            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
+            result_new = database.execute_sql('''INSERT OR IGNORE INTO ammunition (
+                    type, price, stock) VALUES (?, ?, ?)''',
+                                              (value_type_new.get().lower(), value_price_new.get(),
+                                               value_stock_new.get()))
+
+            if result_new == 'success':
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -496,7 +502,6 @@ def popup_ammunition_settings():
     popup.mainloop()
 
 
-# popup for scorecard settings (FINISHED)
 def popup_scorecard_settings():
     # main window holding all elements
     popup = tk.Tk()
@@ -529,17 +534,20 @@ def popup_scorecard_settings():
         .grid(row=3, column=0, padx=10, pady=15)
 
     def clicked_new():
-        result_new = database.execute_sql('''INSERT OR IGNORE INTO scorecard (
-                type, price, stock) VALUES (?, ?, ?)''',
-                                          (value_type_new.get().lower(), value_price_new.get(), value_stock_new.get()))
+        scorecard_list_new = [value_type_new.get()]
 
-        if result_new == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een nieuwe scorecard "
-                                        + value_type_new.get().lower() + " in de database ingevoerd")
+        if scorecard_list_new.count(None) > 0:
+            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
+            result_new = database.execute_sql('''INSERT OR IGNORE INTO scorecard (
+                            type, price, stock) VALUES (?, ?, ?)''',
+                                              (value_type_new.get().lower(), value_price_new.get(),
+                                               value_stock_new.get()))
+
+            if result_new == 'success':
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -694,6 +702,7 @@ class MainMenu(tk.Frame):
         button2.pack()
 
 
+# TODO add matplotlib functionality
 class ScorePage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -907,6 +916,7 @@ class ScorePage(tk.Frame):
         label_frame_right.pack(side="right", fill="both", expand=True)
 
 
+# TODO add matplotlib functionality
 class FinancePage(tk.Frame):
 
     def __init__(self, parent, controller):
