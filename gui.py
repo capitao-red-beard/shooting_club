@@ -3,12 +3,41 @@ from datetime import date
 from tkinter import messagebox
 from tkinter import ttk
 
+import matplotlib
+import matplotlib.animation as animation
+from matplotlib import style
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.figure import Figure
+
 import database
 import mail
+
+matplotlib.use("TkAgg")
 
 LARGE_FONT = ("Verdana", 12)
 NORMAL_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
+style.use("ggplot")
+
+f = Figure(figsize=(5, 5), dpi=100)
+a = f.add_subplot(111)
+
+
+def animate(i):
+    pull_data = open("sample_data.txt", "r").read()
+    data_list = pull_data.split('\n')
+
+    x_list = []
+    y_list = []
+
+    for line in data_list:
+        if len(line) > 1:
+            x, y = line.split(',')
+            x_list.append(int(x))
+            y_list.append(int(y))
+
+    a.clear()
+    a.plot(x_list, y_list)
 
 
 def popup_user_settings():
@@ -30,66 +59,67 @@ def popup_user_settings():
     label_user_type_new = ttk.Label(tab_new, text="Gebruikerstype:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_user_type_new = tk.StringVar(tab_new)
     value_user_type_new.set("Select")
-    option_menu_user_type_new = ttk.OptionMenu(tab_new, value_user_type_new, next(iter(fields)), *fields.keys()) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_user_type_new = ttk.OptionMenu(tab_new, value_user_type_new, next(iter(fields)), *fields.keys())
+    option_menu_user_type_new.config(width=max([len(i) for i in fields.keys()]) + 1)
+    option_menu_user_type_new.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_first_name_new = ttk.Label(tab_new, text="Voornaam:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_first_name_new = tk.StringVar(tab_new)
-    entry_first_name_new = ttk.Entry(tab_new, textvariable=value_first_name_new, width=20) \
+    entry_first_name_new = ttk.Entry(tab_new, textvariable=value_first_name_new, width=25) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_last_name_new = ttk.Label(tab_new, text="Familienaam:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_last_name_new = tk.StringVar(tab_new)
-    entry_last_name_new = ttk.Entry(tab_new, textvariable=value_last_name_new, width=20) \
+    entry_last_name_new = ttk.Entry(tab_new, textvariable=value_last_name_new, width=25) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     label_date_of_birth_new = ttk.Label(tab_new, text="Geboorte Datum (YYYY-MM-DD):") \
         .grid(row=3, column=0, padx=5, pady=2, sticky="W")
     value_date_of_birth_new = tk.StringVar(tab_new)
-    entry_date_of_birth_new = ttk.Entry(tab_new, textvariable=value_date_of_birth_new, width=20) \
+    entry_date_of_birth_new = ttk.Entry(tab_new, textvariable=value_date_of_birth_new, width=25) \
         .grid(row=3, column=1, padx=5, pady=2, sticky="W")
 
     label_address_new = ttk.Label(tab_new, text="Adres:").grid(row=4, column=0, padx=5, pady=2, sticky="W")
     value_address_new = tk.StringVar(tab_new)
-    entry_address_new = ttk.Entry(tab_new, textvariable=value_address_new, width=20) \
-        .grid(row=4, column=1, padx=5, pady=2)
+    entry_address_new = ttk.Entry(tab_new, textvariable=value_address_new, width=25) \
+        .grid(row=4, column=1, padx=5, pady=2, sticky="W")
 
     label_city_new = ttk.Label(tab_new, text="Woonplaats:").grid(row=5, column=0, padx=5, pady=5, sticky="W")
     value_city_new = tk.StringVar(tab_new)
-    entry_city_new = ttk.Entry(tab_new, textvariable=value_city_new, width=20) \
+    entry_city_new = ttk.Entry(tab_new, textvariable=value_city_new, width=25) \
         .grid(row=5, column=1, padx=5, pady=2, sticky="W")
 
     label_post_code_new = ttk.Label(tab_new, text="Postcode:").grid(row=6, column=0, padx=5, pady=2, sticky="W")
     value_post_code_new = tk.StringVar(tab_new)
-    entry_post_code_new = ttk.Entry(tab_new, textvariable=value_post_code_new, width=20) \
+    entry_post_code_new = ttk.Entry(tab_new, textvariable=value_post_code_new, width=25) \
         .grid(row=6, column=1, padx=5, pady=2, sticky="W")
 
     label_telephone_number_new = ttk.Label(tab_new, text="Telefoonnummer:") \
         .grid(row=7, column=0, padx=5, pady=2, sticky="W")
     value_telephone_number_new = tk.StringVar(tab_new)
-    entry_telephone_number_new = ttk.Entry(tab_new, textvariable=value_telephone_number_new, width=20) \
+    entry_telephone_number_new = ttk.Entry(tab_new, textvariable=value_telephone_number_new, width=25) \
         .grid(row=7, column=1, padx=5, pady=2, sticky="W")
 
     label_email_address_new = ttk.Label(tab_new, text="Email Adres:").grid(row=8, column=0, padx=5, pady=2, sticky="W")
     value_email_address_new = tk.StringVar(tab_new)
-    entry_email_address_new = ttk.Entry(tab_new, textvariable=value_email_address_new, width=20) \
+    entry_email_address_new = ttk.Entry(tab_new, textvariable=value_email_address_new, width=25) \
         .grid(row=8, column=1, padx=5, pady=2, sticky="W")
 
     label_password_new = ttk.Label(tab_new, text="Wachtwoord:").grid(row=9, column=0, padx=5, pady=2, sticky="W")
     value_password_new = tk.StringVar(tab_new)
-    entry_password_new = ttk.Entry(tab_new, show="*", textvariable=value_password_new, width=20) \
+    entry_password_new = ttk.Entry(tab_new, show="*", textvariable=value_password_new, width=25) \
         .grid(row=9, column=1, padx=5, pady=2, sticky="W")
 
     label_knsa_licence_number_new = ttk.Label(tab_new, text="KNSA Licentienummer:") \
         .grid(row=10, column=0, padx=5, pady=2, sticky="W")
     value_knsa_licence_number_new = tk.StringVar(tab_new)
-    entry_knsa_licence_number_new = ttk.Entry(tab_new, textvariable=value_knsa_licence_number_new, width=20) \
+    entry_knsa_licence_number_new = ttk.Entry(tab_new, textvariable=value_knsa_licence_number_new, width=25) \
         .grid(row=10, column=1, padx=5, pady=2, sticky="W")
 
     label_date_of_membership_new = ttk.Label(tab_new, text="Datum van Lidmaatschap Ingang (YYYY-MM-DD):") \
         .grid(row=11, column=0, padx=5, pady=2, sticky="W")
     value_date_of_membership_new = tk.StringVar(tab_new)
-    entry_date_of_membership_new = ttk.Entry(tab_new, textvariable=value_date_of_membership_new, width=20) \
+    entry_date_of_membership_new = ttk.Entry(tab_new, textvariable=value_date_of_membership_new, width=25) \
         .grid(row=11, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
@@ -108,8 +138,9 @@ def popup_user_settings():
                          value_knsa_licence_number_new.get(),
                          value_date_of_membership_new.get()]
 
-        if data_list_new.count(None) > 0:
+        if data_list_new.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
+            popup.lift()
         else:
             result_new = database.execute_sql('''INSERT OR IGNORE INTO user (
                             type, 
@@ -150,12 +181,16 @@ def popup_user_settings():
                                                email_body)
 
                 if email_result:
+                    messagebox.showinfo(title="Information",
+                                        message="Het systeem heeft met succes een niewe lid aangemaakt")
                     popup.destroy()
                 else:
                     messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+                    popup.lift()
 
             else:
                 messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                popup.lift()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=12, column=1, padx=10, pady=15)
@@ -167,8 +202,9 @@ def popup_user_settings():
     users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
     value_user_edit = tk.StringVar(tab_edit)
     value_user_edit.set("Select")
-    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_user_edit, users[0], *users) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_user_edit, users[0], *users)
+    option_menu_user_edit.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+    option_menu_user_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     fields2 = {'Adres': 'address',
                'Woonplaats': 'city',
@@ -181,12 +217,13 @@ def popup_user_settings():
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_field_edit = tk.StringVar(tab_edit)
     value_field_edit.set("Select")
-    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields2)), *fields2.keys()) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields2)), *fields2.keys())
+    option_menu_user_edit.config(width=max([len(i) for i in fields2.keys()]) + 1)
+    option_menu_user_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_update_edit = tk.StringVar(tab_edit)
-    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=20) \
+    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=25) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Bewerken", command=lambda: clicked_edit()) \
@@ -195,8 +232,9 @@ def popup_user_settings():
     def clicked_edit():
         data_list_edit = [value_update_edit.get()]
 
-        if data_list_edit.count(None) > 0:
+        if data_list_edit.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
+            popup.lift()
         else:
             result_edit = database.execute_sql('UPDATE user SET ' + str(fields2.get(value_field_edit.get()))
                                                + ' = ? WHERE  knsa_licence_number = ?',
@@ -214,12 +252,16 @@ def popup_user_settings():
                 email_result = mail.send_email(user_data[0][0], 'Uw gegevens zijn veranderd', email_body)
 
                 if email_result:
+                    messagebox.showinfo(title="Information",
+                                        message="Het systeem heeft met succes een lid aangepast")
                     popup.destroy()
                 else:
                     messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+                    popup.lift()
 
             else:
                 messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                popup.lift()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -231,22 +273,31 @@ def popup_user_settings():
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_user_delete = tk.StringVar(tab_delete)
     value_user_delete.set("Select")
-    option_menu_user_delete = ttk.OptionMenu(tab_delete, value_user_delete, users[0], *users) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_user_delete = ttk.OptionMenu(tab_delete, value_user_delete, users[0], *users)
+    option_menu_user_delete.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+    option_menu_user_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
-        result_delete = database.execute_sql(
-            '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[2:8],))
+        ays = messagebox.askquestion('Warning', 'Weet jij zeker dat jij deze lid wil verwijderen?', icon="warning")
 
-        if result_delete == 'success':
-            popup.destroy()
+        if ays == 'yes':
+            result_delete = database.execute_sql(
+                '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[2:8],))
+
+            if result_delete == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes de lid verwijderd")
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error",
+                                     message="Er was een fout bij het verwijderen van deze lid")
+                popup.lift()
         else:
-            messagebox.showerror(title="Error",
-                                 message="Er was een fout bij het verwijderen van deze lid")
+            popup.lift()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -277,8 +328,9 @@ def popup_firearm_settings():
     users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
     value_users_new = tk.StringVar(tab_new)
     value_users_new.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_new, value_users_new, users[0], *users) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    option_menu_user_new = ttk.OptionMenu(tab_new, value_users_new, users[0], *users)
+    option_menu_user_new.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+    option_menu_user_new.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=2, column=0, padx=10, pady=15)
@@ -286,17 +338,20 @@ def popup_firearm_settings():
     def clicked_new():
         firearm_list_new = [value_type_new.get()]
 
-        if firearm_list_new.count(None) > 0:
+        if firearm_list_new.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
+            popup.lift()
         else:
             result_new = database.execute_sql('''INSERT OR IGNORE INTO firearm (
                     type, owner) VALUES (?, ?)''', (value_type_new.get().lower(), value_users_new.get()[2:8]))
 
             if result_new == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes een niewe vuurwapen aangemaakt")
                 popup.destroy()
             else:
                 messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-            popup.destroy()
+                popup.lift()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=2, column=1, padx=10, pady=15)
@@ -310,15 +365,17 @@ def popup_firearm_settings():
     firearms = database.execute_sql('''SELECT owner, type FROM firearm;''')
     value_existing_edit = tk.StringVar(tab_edit)
     value_existing_edit.set("Select")
-    option_menu_existing_edit = ttk.OptionMenu(tab_edit, value_existing_edit, firearms[0], *firearms) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_existing_edit = ttk.OptionMenu(tab_edit, value_existing_edit, firearms[0], *firearms)
+    option_menu_existing_edit.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 3)
+    option_menu_existing_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_users_edit = ttk.Label(tab_edit, text="Nieuwe Eigenaar:") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_users_edit = tk.StringVar(tab_edit)
     value_users_edit.set("Select")
-    option_menu_users_edit = ttk.OptionMenu(tab_edit, value_users_edit, users[0], *users) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    option_menu_users_edit = ttk.OptionMenu(tab_edit, value_users_edit, users[0], *users)
+    option_menu_users_edit.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+    option_menu_users_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Bewerken", command=lambda: clicked_edit()) \
         .grid(row=2, column=0, padx=10, pady=15)
@@ -328,9 +385,12 @@ def popup_firearm_settings():
                                            (value_users_edit.get()[2:8], value_existing_edit.get()[2:8]))
 
         if result_edit == 'success':
+            messagebox.showinfo(title="Information",
+                                message="Het systeem heeft met succes een vuurwapen aangepast")
             popup.destroy()
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+            popup.lift()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=2, column=1, padx=10, pady=15)
@@ -342,22 +402,32 @@ def popup_firearm_settings():
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, firearms[0], *firearms) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, firearms[0], *firearms)
+    option_menu_type_delete.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 3)
+    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=3, column=0, padx=10, pady=15, sticky="W")
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
-        result_delete = database.execute_sql(
-            '''DELETE FROM firearm WHERE type = ? AND owner = ?''',
-            (value_type_delete.get()[12:-2], value_type_delete.get()[2:8]))
+        ays = messagebox.askquestion('Warning',
+                                     'Weet jij zeker dat jij deze vuurwapen wil verwijderen?', icon="warning")
 
-        if result_delete == 'success':
-            popup.destroy()
+        if ays == 'yes':
+            result_delete = database.execute_sql(
+                '''DELETE FROM firearm WHERE type = ? AND owner = ?''',
+                (value_type_delete.get()[12:-2], value_type_delete.get()[2:8]))
+
+            if result_delete == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes een vuurwapen verwijderd")
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                popup.lift()
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+            popup.lift()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -385,12 +455,12 @@ def popup_ammunition_settings():
 
     label_price_new = ttk.Label(tab_new, text="Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_price_new = tk.DoubleVar(tab_new)
-    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=20) \
+    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=10) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_stock_new = ttk.Label(tab_new, text="Voorraad:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_stock_new = tk.IntVar(tab_new)
-    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=20) \
+    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=10) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
@@ -399,7 +469,7 @@ def popup_ammunition_settings():
     def clicked_new():
         ammunition_list_new = [value_type_new.get()]
 
-        if ammunition_list_new.count(None) > 0:
+        if ammunition_list_new.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
         else:
             result_new = database.execute_sql('''INSERT OR IGNORE INTO ammunition (
@@ -408,9 +478,12 @@ def popup_ammunition_settings():
                                                value_stock_new.get()))
 
             if result_new == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes een niewe munitie type aangemaakt")
                 popup.destroy()
             else:
                 messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                popup.lift()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -429,19 +502,21 @@ def popup_ammunition_settings():
     ammunition_types = database.execute_sql('''SELECT type FROM ammunition;''')
     value_type_edit = tk.StringVar(tab_edit)
     value_type_edit.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, ammunition_types[0], *ammunition_types) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, ammunition_types[0], *ammunition_types)
+    option_menu_type_edit.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
+    option_menu_type_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_field_edit = tk.StringVar(tab_edit)
     value_field_edit.set("Select")
-    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys()) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys())
+    option_menu_value_edit.config(width=max([len(i) for i in fields.keys()]) + 1)
+    option_menu_value_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_update_edit = tk.DoubleVar(tab_edit)
-    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=20) \
+    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=10) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
@@ -461,11 +536,11 @@ def popup_ammunition_settings():
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes nieuwe " + value_field_edit.get().lower()
-                                        + " in de database ingevoerd")
+                                message="Het systeem heeft met succes een munitie type aangepast")
+            popup.destroy()
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
+            popup.lift()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -477,24 +552,31 @@ def popup_ammunition_settings():
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, ammunition_types[0], *ammunition_types) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, ammunition_types[0], *ammunition_types)
+    option_menu_type_delete.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
+    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
-        result_delete = database.execute_sql('''DELETE FROM ammunition WHERE type = ?''',
-                                             (value_type_delete.get()[2:-3]), )
+        ays = messagebox.askquestion('Warning',
+                                     'Weet jij zeker dat jij deze munitie wil verwijderen?', icon="warning")
 
-        if result_delete == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes de ammunitie "
-                                        + value_type_delete.get().lower() + " verwijderd")
+        if ays == 'yes':
+            result_delete = database.execute_sql('''DELETE FROM ammunition WHERE type = ?''',
+                                                 (value_type_delete.get()[2:-3]), )
+
+            if result_delete == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes een lid verwijderd")
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
+                popup.lift()
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
-        popup.destroy()
+            popup.lift()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -522,12 +604,12 @@ def popup_scorecard_settings():
 
     label_price_new = ttk.Label(tab_new, text="Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_price_new = tk.DoubleVar(tab_new)
-    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=20) \
+    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=10) \
         .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_stock_new = ttk.Label(tab_new, text="Voorraad:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_stock_new = tk.IntVar(tab_new)
-    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=20) \
+    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=10) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
@@ -536,8 +618,9 @@ def popup_scorecard_settings():
     def clicked_new():
         scorecard_list_new = [value_type_new.get()]
 
-        if scorecard_list_new.count(None) > 0:
+        if scorecard_list_new.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
+            popup.lift()
         else:
             result_new = database.execute_sql('''INSERT OR IGNORE INTO scorecard (
                             type, price, stock) VALUES (?, ?, ?)''',
@@ -545,9 +628,12 @@ def popup_scorecard_settings():
                                                value_stock_new.get()))
 
             if result_new == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes een niewe scorecard aangemaakt")
                 popup.destroy()
             else:
                 messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                popup.lift()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -572,19 +658,21 @@ def popup_scorecard_settings():
     scorecard_types = database.execute_sql('''SELECT type FROM scorecard;''')
     value_type_edit = tk.StringVar(tab_edit)
     value_type_edit.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, next(iter(fields2)), *fields2.keys()) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, next(iter(fields2)), *fields2.keys())
+    option_menu_type_edit.config(width=max([len(i) for i in fields2.keys()]) + 1)
+    option_menu_type_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_field_edit = tk.StringVar(tab_edit)
     value_field_edit.set("Select")
-    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys()) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys())
+    option_menu_value_edit.config(width=max([len(i) for i in fields.keys()]) + 1)
+    option_menu_value_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_update_edit = tk.DoubleVar(tab_edit)
-    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=20) \
+    entry_update_edit = ttk.Entry(tab_edit, textvariable=value_update_edit, width=10) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_edit = ttk.Button(tab_edit, text="Invoeren", command=lambda: clicked_edit()) \
@@ -592,7 +680,6 @@ def popup_scorecard_settings():
 
     def clicked_edit():
         if fields.get(value_field_edit.get()) == 'stock':
-            print(fields2.get(value_type_edit.get()))
             current_stock = database.execute_sql('''SELECT stock from scorecard WHERE type = ?''',
                                                  (fields2.get(value_type_edit.get()),))
             new_value = int(current_stock[0][0] + value_update_edit.get())
@@ -605,11 +692,11 @@ def popup_scorecard_settings():
 
         if result_edit == 'success':
             messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes nieuwe " + value_field_edit.get().lower()
-                                        + " in de database ingevoerd")
+                                message="Het systeem heeft met succes een scorecard aangepast")
+            popup.destroy()
         else:
             messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-        popup.destroy()
+            popup.lift()
 
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -621,24 +708,31 @@ def popup_scorecard_settings():
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, scorecard_types[0], *scorecard_types) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, next(iter(fields2)), *fields2.keys())
+    option_menu_type_delete.config(width=max([len(i) for i in fields2.keys()]) + 1)
+    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=3, column=0, padx=10, pady=15)
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
-        result_delete = database.execute_sql('''DELETE FROM scorecard WHERE type = ?''',
-                                             (fields.get(value_type_delete.get()),))
+        ays = messagebox.askquestion('Warning',
+                                     'Weet jij zeker dat jij deze scorecard wil verwijderen?', icon="warning")
 
-        if result_delete == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes de scorecard " + value_type_delete.get().lower()
-                                        + " verwijderd")
+        if ays == 'yes':
+            result_delete = database.execute_sql('''DELETE FROM scorecard WHERE type = ?''',
+                                                 (fields.get(value_type_delete.get()),))
+
+            if result_delete == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes de scorecard verwijderd")
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
+                popup.lift()
         else:
-            messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
-        popup.destroy()
+            popup.lift()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
@@ -667,7 +761,7 @@ class ShootingClub(tk.Tk):
         file_menu.add_command(label="Munitie Instellingen", command=lambda: popup_ammunition_settings())
         file_menu.add_command(label="Score Kaart Instellingen", command=lambda: popup_scorecard_settings())
         file_menu.add_separator()
-        file_menu.add_command(label="Sluiten", command=quit, accelerator="Ctrl+Q")
+        file_menu.add_command(label="Sluiten", command=lambda: self.on_exit(), accelerator="Ctrl+Q")
         menu_bar.add_cascade(label="Instellingen", menu=file_menu)
 
         tk.Tk.config(self, menu=menu_bar)
@@ -683,9 +777,17 @@ class ShootingClub(tk.Tk):
 
         self.show_frame(MainMenu)
 
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
+        self.resizable(0, 0)
+
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
+
+    def on_exit(self):
+        if messagebox.askquestion('Warning',
+                                  'Weet jij zeker dat jij de applicatie wilt sluiten?', icon="warning") == 'yes':
+            self.quit()
 
 
 class MainMenu(tk.Frame):
@@ -723,31 +825,35 @@ class ScorePage(tk.Frame):
         frame_right = tk.Frame(self)
         frame_right.pack(side="right", fill='both', expand=True)
 
-        label_frame_left = tk.LabelFrame(frame_right, text="Submit Score")
-        label_frame_left.pack(side="left", fill="both", expand=True)
+        label_frame_top = tk.LabelFrame(frame_right, text="Submit Score")
+        label_frame_top.pack(side="top", fill="x", expand=True)
 
-        label_details = tk.Frame(label_frame_left)
-        label_details.pack(side="top", anchor="nw")
+        frame_top = tk.Frame(label_frame_top)
+        frame_top.pack(side="top", anchor="w")
 
-        label_user_left = ttk.Label(label_details, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        frame_details = tk.Frame(frame_top)
+        frame_details.pack(side="left", anchor="nw")
+
+        label_user_left = ttk.Label(frame_details, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
         users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
-        value_user_left = tk.StringVar(label_details)
+        value_user_left = tk.StringVar(frame_details)
         value_user_left.set("Select")
-        option_menu_user_left = ttk.OptionMenu(label_details, value_user_left, users[0], *users) \
-            .grid(row=0, column=1, padx=5, pady=5, sticky="W")
+        option_menu_user_left = ttk.OptionMenu(frame_details, value_user_left, users[0], *users)
+        option_menu_user_left.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+        option_menu_user_left.grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
-        label_firearm_left = ttk.Label(label_details, text="Vuurwapen:") \
+        label_firearm_left = ttk.Label(frame_details, text="Vuurwapen:") \
             .grid(row=1, column=0, padx=5, pady=5, sticky="W")
 
         firearms = database.execute_sql('''SELECT owner, type FROM firearm;''')
-        value_firearm_left = tk.StringVar(label_details)
+        value_firearm_left = tk.StringVar(frame_details)
         value_firearm_left.set("Select")
-        option_menu_scorecard_left = ttk.OptionMenu(
-            label_details, value_firearm_left, firearms[0], *firearms) \
-            .grid(row=1, column=1, padx=5, pady=5, sticky="W")
+        option_menu_scorecard_left = ttk.OptionMenu(frame_details, value_firearm_left, firearms[0], *firearms)
+        option_menu_scorecard_left.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 3)
+        option_menu_scorecard_left.grid(row=1, column=1, padx=5, pady=5, sticky="W")
 
-        frame_scores = tk.Frame(label_frame_left)
-        frame_scores.pack(anchor="w")
+        frame_scores = tk.Frame(frame_top)
+        frame_scores.pack(side="right", anchor="nw")
 
         label_scorecard1 = ttk.Label(frame_scores, text="1e Scorecard:") \
             .grid(row=2, column=0, padx=5, pady=5, sticky="W")
@@ -772,6 +878,13 @@ class ScorePage(tk.Frame):
         entry_scorecard1_shot5 = ttk.Entry(frame_scores, textvariable=value_scorecard1_shot5, width=5) \
             .grid(row=2, column=6, padx=5, pady=5, sticky="W")
 
+        label_scorecard1_valuation = ttk.Label(frame_scores, text="Totaal Scorecard 1:") \
+            .grid(row=2, column=7, padx=5, pady=5, sticky="W")
+        total_scorecard1 = tk.IntVar()
+        total_scorecard1.set(0)
+        label_ammunition_total = ttk.Label(frame_scores, textvariable=total_scorecard1) \
+            .grid(row=2, column=8, padx=5, pady=5, sticky="W")
+
         label_scorecard_2 = ttk.Label(frame_scores, text="2e Scorecard:") \
             .grid(row=3, column=0, padx=5, pady=5, sticky="W")
 
@@ -795,10 +908,17 @@ class ScorePage(tk.Frame):
         entry_scorecard2_shot5 = ttk.Entry(frame_scores, textvariable=value_scorecard2_shot5, width=5) \
             .grid(row=3, column=6, padx=5, pady=5, sticky="W")
 
-        frame_buttons_left = tk.Frame(label_frame_left)
-        frame_buttons_left.pack(anchor="w")
+        label_scorecard2_valuation = ttk.Label(frame_scores, text="Totaal Scorecard 2:") \
+            .grid(row=3, column=7, padx=5, pady=5, sticky="W")
+        total_scorecard2 = tk.IntVar()
+        total_scorecard2.set(0)
+        label_ammunition_total = ttk.Label(frame_scores, textvariable=total_scorecard2) \
+            .grid(row=3, column=8, padx=5, pady=5, sticky="W")
 
-        button_submit_left = ttk.Button(frame_buttons_left, text="Invoeren", command=lambda: clicked_submit_left()) \
+        frame_bottom = tk.Frame(label_frame_top)
+        frame_bottom.pack(anchor="nw")
+
+        button_submit = ttk.Button(frame_bottom, text="Invoeren", command=lambda: clicked_submit_left()) \
             .grid(row=0, column=0, padx=10, pady=15, sticky="W")
 
         def clicked_submit_left():
@@ -908,12 +1028,39 @@ class ScorePage(tk.Frame):
             value_scorecard2_shot3.set(0)
             value_scorecard2_shot4.set(0)
             value_scorecard2_shot5.set(0)
+            total_scorecard1.set(0)
+            total_scorecard2.set(0)
 
-        button_reset_left = ttk.Button(frame_buttons_left, text="Reset", command=lambda: clicked_reset()) \
+        button_reset = ttk.Button(frame_bottom, text="Reset", command=lambda: clicked_reset()) \
             .grid(row=0, column=1, padx=10, pady=15, sticky="W")
 
-        label_frame_right = tk.LabelFrame(frame_right, text="View Scores")
-        label_frame_right.pack(side="right", fill="both", expand=True)
+        def clicked_total():
+            total_scorecard1.set(value_scorecard1_shot1.get() +
+                                 value_scorecard1_shot2.get() +
+                                 value_scorecard1_shot3.get() +
+                                 value_scorecard1_shot4.get() +
+                                 value_scorecard1_shot5.get())
+
+            total_scorecard2.set(value_scorecard2_shot1.get() +
+                                 value_scorecard2_shot2.get() +
+                                 value_scorecard2_shot3.get() +
+                                 value_scorecard2_shot4.get() +
+                                 value_scorecard2_shot5.get())
+
+        button_total = ttk.Button(frame_bottom, text="Reken Totaal", command=lambda: clicked_total()) \
+            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
+
+        label_frame_bottom = tk.LabelFrame(frame_right, text="View Scores")
+        label_frame_bottom.pack(side="right", fill="both", expand=True)
+
+        # matplotlib graph starts here
+        canvas = FigureCanvasTkAgg(f, label_frame_bottom)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        toolbar = NavigationToolbar2Tk(canvas, label_frame_bottom)
+        toolbar.update()
+        canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
 
 # TODO add matplotlib functionality
@@ -939,7 +1086,7 @@ class FinancePage(tk.Frame):
         frame_top.pack(side="top", fill="both", expand=True)
 
         label_frame_top_left = tk.LabelFrame(frame_top, text="Ammunition Transaction")
-        label_frame_top_left.pack(side="left", fill="both", expand=True)
+        label_frame_top_left.pack(side="left", fill="x", expand=True)
 
         frame_ammunition_top = tk.Frame(label_frame_top_left)
         frame_ammunition_top.pack(side="top", anchor="nw")
@@ -949,8 +1096,9 @@ class FinancePage(tk.Frame):
         users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
         value_user_top_left = tk.StringVar(frame_ammunition_top)
         value_user_top_left.set("Select")
-        option_menu_user_top_left = ttk.OptionMenu(frame_ammunition_top, value_user_top_left, users[0], *users) \
-            .grid(row=0, column=1, padx=5, pady=5, sticky="W")
+        option_menu_user_top_left = ttk.OptionMenu(frame_ammunition_top, value_user_top_left, users[0], *users)
+        option_menu_user_top_left.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+        option_menu_user_top_left.grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
         frame_ammunition_middle = tk.Frame(label_frame_top_left)
         frame_ammunition_middle.pack(anchor="nw")
@@ -963,8 +1111,9 @@ class FinancePage(tk.Frame):
         option_menu_ammunition_type = ttk.OptionMenu(frame_ammunition_middle,
                                                      value_ammunition_type,
                                                      ammunition_types[0],
-                                                     *ammunition_types).grid(row=0, column=1, padx=5, pady=2,
-                                                                             sticky="W")
+                                                     *ammunition_types)
+        option_menu_ammunition_type.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
+        option_menu_ammunition_type.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
         label_ammunition_quantity = ttk.Label(frame_ammunition_middle, text="Aantal:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
@@ -1079,7 +1228,7 @@ class FinancePage(tk.Frame):
         }
 
         label_frame_top_right = tk.LabelFrame(frame_top, text="Scorecard Transaction")
-        label_frame_top_right.pack(side="right", fill="both", expand=True)
+        label_frame_top_right.pack(side="right", fill="x", expand=True)
 
         frame_scorecard_top = tk.Frame(label_frame_top_right)
         frame_scorecard_top.pack(side="top", anchor="nw")
@@ -1089,8 +1238,9 @@ class FinancePage(tk.Frame):
         users = database.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
         value_user_top_right = tk.StringVar(frame_scorecard_top)
         value_user_top_right.set("Select")
-        option_menu_user_top_right = ttk.OptionMenu(frame_scorecard_top, value_user_top_right, users[0], *users) \
-            .grid(row=0, column=1, padx=5, pady=5, sticky="W")
+        option_menu_user_top_right = ttk.OptionMenu(frame_scorecard_top, value_user_top_right, users[0], *users)
+        option_menu_user_top_right.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+        option_menu_user_top_right.grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
         frame_scorecard_middle = tk.Frame(label_frame_top_right)
         frame_scorecard_middle.pack(anchor="nw")
@@ -1103,7 +1253,9 @@ class FinancePage(tk.Frame):
         option_menu_scorecard_type = ttk.OptionMenu(frame_scorecard_middle,
                                                     value_scorecard_type,
                                                     next(iter(fields)),
-                                                    *fields.keys()).grid(row=0, column=1, padx=5, pady=2, sticky="W")
+                                                    *fields.keys())
+        option_menu_scorecard_type.config(width=max([len(i) for i in fields.keys()]) + 1)
+        option_menu_scorecard_type.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
         label_scorecard_quantity = ttk.Label(frame_scorecard_middle, text="Aantal:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
@@ -1217,10 +1369,20 @@ class FinancePage(tk.Frame):
         frame_bottom.pack(side="bottom", fill="both", expand=True)
 
         label_frame_bottom = tk.LabelFrame(frame_bottom, text="View Transactions")
-        label_frame_bottom.pack(side="bottom", fill="both", expand=True)
+        label_frame_bottom.pack(side="bottom", fill="x", expand=True)
+
+        # matplotlib graph starts here
+        canvas = FigureCanvasTkAgg(f, label_frame_bottom)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        toolbar = NavigationToolbar2Tk(canvas, label_frame_bottom)
+        toolbar.update()
+        canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
 
 app = ShootingClub()
-app.geometry("900x500")
-app.minsize(900, 500)
+app.geometry("820x720")
+app.minsize(820, 720)
+ani = animation.FuncAnimation(f, animate, interval=1000)
 app.mainloop()
