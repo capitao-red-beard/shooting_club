@@ -20,6 +20,8 @@ def close_connection(connection):
 
 
 def execute_sql(sql, *args):
+    print(sql)
+    print(args)
     connection = create_connection()
     try:
         cursor = connection.cursor()
