@@ -40,9 +40,20 @@ def animate(i):
     a.plot(x_list, y_list)
 
 
+def is_int(char):
+    if char.isdigit():
+        return True
+    elif char is '':
+        return True
+    else:
+        return False
+
+
 def popup_user_settings():
     popup = tk.Tk()
     popup.wm_title("Lid Instellingen")
+
+    reg_int = popup.register(is_int)
 
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
@@ -65,8 +76,8 @@ def popup_user_settings():
 
     label_first_name_new = ttk.Label(tab_new, text="Voornaam:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_first_name_new = tk.StringVar(tab_new)
-    entry_first_name_new = ttk.Entry(tab_new, textvariable=value_first_name_new, width=25) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    entry_first_name_new = ttk.Entry(tab_new, textvariable=value_first_name_new, width=25)
+    entry_first_name_new.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_last_name_new = ttk.Label(tab_new, text="Familienaam:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_last_name_new = tk.StringVar(tab_new)
@@ -97,8 +108,9 @@ def popup_user_settings():
     label_telephone_number_new = ttk.Label(tab_new, text="Telefoonnummer:") \
         .grid(row=7, column=0, padx=5, pady=2, sticky="W")
     value_telephone_number_new = tk.StringVar(tab_new)
-    entry_telephone_number_new = ttk.Entry(tab_new, textvariable=value_telephone_number_new, width=25) \
-        .grid(row=7, column=1, padx=5, pady=2, sticky="W")
+    entry_telephone_number_new = ttk.Entry(tab_new, textvariable=value_telephone_number_new, width=25)
+    entry_telephone_number_new.config(validate="key", validatecommand=(reg_int, '%P'))
+    entry_telephone_number_new.grid(row=7, column=1, padx=5, pady=2, sticky="W")
 
     label_email_address_new = ttk.Label(tab_new, text="Email Adres:").grid(row=8, column=0, padx=5, pady=2, sticky="W")
     value_email_address_new = tk.StringVar(tab_new)
@@ -113,8 +125,9 @@ def popup_user_settings():
     label_knsa_licence_number_new = ttk.Label(tab_new, text="KNSA Licentienummer:") \
         .grid(row=10, column=0, padx=5, pady=2, sticky="W")
     value_knsa_licence_number_new = tk.StringVar(tab_new)
-    entry_knsa_licence_number_new = ttk.Entry(tab_new, textvariable=value_knsa_licence_number_new, width=25) \
-        .grid(row=10, column=1, padx=5, pady=2, sticky="W")
+    entry_knsa_licence_number_new = ttk.Entry(tab_new, textvariable=value_knsa_licence_number_new, width=25)
+    entry_knsa_licence_number_new.config(validate="key", validatecommand=(reg_int, '%P'))
+    entry_knsa_licence_number_new.grid(row=10, column=1, padx=5, pady=2, sticky="W")
 
     label_date_of_membership_new = ttk.Label(tab_new, text="Datum van Lidmaatschap Ingang (YYYY-MM-DD):") \
         .grid(row=11, column=0, padx=5, pady=2, sticky="W")
@@ -440,6 +453,8 @@ def popup_ammunition_settings():
     popup = tk.Tk()
     popup.wm_title("Munitie Instellingen")
 
+    reg_int = popup.register(is_int)
+
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
     notebook.grid(row=1, column=0, columnspan=50, rowspan=49, sticky="nsew")
@@ -460,8 +475,9 @@ def popup_ammunition_settings():
 
     label_stock_new = ttk.Label(tab_new, text="Voorraad:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_stock_new = tk.IntVar(tab_new)
-    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=10) \
-        .grid(row=2, column=1, padx=5, pady=2, sticky="W")
+    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=10)
+    entry_stock_new.config(validate="key", validatecommand=(reg_int, '%P'))
+    entry_stock_new.grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=3, column=0, padx=10, pady=15)
@@ -589,6 +605,8 @@ def popup_scorecard_settings():
     popup = tk.Tk()
     popup.wm_title("Score Kaart Instellingen")
 
+    reg_int = popup.register(is_int)
+
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
     notebook.grid(row=1, column=0, columnspan=50, rowspan=49, sticky="nsew")
@@ -609,8 +627,9 @@ def popup_scorecard_settings():
 
     label_stock_new = ttk.Label(tab_new, text="Voorraad:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_stock_new = tk.IntVar(tab_new)
-    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=10) \
-        .grid(row=2, column=1, padx=5, pady=2, sticky="W")
+    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=10)
+    entry_stock_new.config(validate="key", validatecommand=(reg_int, '%P'))
+    entry_stock_new.grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=3, column=0, padx=10, pady=15)
@@ -1420,5 +1439,5 @@ app = ShootingClub()
 app.geometry("820x730")
 app.minsize(860, 730)
 app.maxsize(860, 730)
-ani = animation.FuncAnimation(f, animate, interval=1000)
+ani = animation.FuncAnimation(f, animate, interval=8000)
 app.mainloop()
