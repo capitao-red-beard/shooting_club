@@ -40,6 +40,10 @@ def execute_sql(sql, *args):
         close_connection(connection)
 
 
+def get_firearms():
+    return execute_sql('''SELECT type FROM firearm''')
+
+
 statement0 = '''INSERT INTO user (
 type, 
 first_name,

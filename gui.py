@@ -1074,10 +1074,10 @@ class ScorePage(tk.Frame):
                                                          (value_user_left.get()[2:8],))
 
                 email_body = 'Hallo ' + user_data[0][1] + \
-                             ', \n\n u scores zijn voor ' + \
+                             ', \n\n U scores zijn voor ' + \
                              str(date.today()) + \
                              ' in de database ingevoerd. U heeft met ' + value_firearm_left.get()[12:-2] + \
-                             ' geschoten. \n U heeft voor uw eerste kaart: \n schot 1: ' + str(sc1[0]) + \
+                             ' geschoten. \n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(sc1[0]) + \
                              '\n schot 2: ' + str(sc1[1]) + \
                              '\n schot 3: ' + str(sc1[2]) + \
                              '\n schot 4: ' + str(sc1[3]) + \
@@ -1146,6 +1146,14 @@ class ScorePage(tk.Frame):
         option_menu_user_matplot = ttk.OptionMenu(frame_menu, value_user_matplot, users[0], *users)
         option_menu_user_matplot.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
         option_menu_user_matplot.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+
+        label_firearm_matplot = ttk.Label(frame_menu, text="Vuurwapen:").grid(row=0, column=2, padx=5, pady=2, sticky="W")
+        value_firearm_matplot = tk.StringVar(frame_menu)
+        value_firearm_matplot.set("Select")
+        firearms = database_manager.get_firearms()
+        option_menu_firearm_matplot = ttk.OptionMenu(frame_menu, value_firearm_matplot, firearms[0], *firearms)
+        option_menu_firearm_matplot.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 2)
+        option_menu_firearm_matplot.grid(row=0, column=3, padx=5, pady=5, sticky="W")
 
         # matplotlib graph starts here
         frame_matplot = tk.Frame(label_frame_bottom)
