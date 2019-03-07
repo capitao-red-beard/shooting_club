@@ -2,7 +2,8 @@ import datetime
 
 
 def is_int(i):
-    return i.isdigit()
+    if int(i):
+        return True
 
 
 def is_float(i):
@@ -14,8 +15,9 @@ def is_string(i):
 
 
 def is_knsa(i):
-    if i.length() == 6:
-        return True
+    if is_int(i):
+        if i.length() == 6:
+            return True
 
 
 def is_date(i):
@@ -27,4 +29,9 @@ def is_date(i):
 
 def is_email(i):
     if '@' not in i:
+        return False
+
+
+def is_password(i):
+    if len(i) < 8:
         return False

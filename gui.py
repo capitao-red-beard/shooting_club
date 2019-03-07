@@ -3,17 +3,17 @@ from datetime import date
 from tkinter import messagebox
 from tkinter import ttk
 
-import matplotlib
-import matplotlib.animation as animation
-from matplotlib import style
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from matplotlib.figure import Figure
-
 import database_manager
 import email_manager
 import input_validation
 import matplot_manager
 import password_manager
+
+import matplotlib
+import matplotlib.animation as animation
+from matplotlib import style
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.figure import Figure
 
 LARGE_FONT = ("Verdana", 12)
 NORMAL_FONT = ("Verdana", 10)
@@ -24,6 +24,23 @@ style.use("ggplot")
 
 f = Figure(figsize=(5, 5), dpi=100)
 a = f.add_subplot(111)
+
+
+def animate(i):
+    pull_data = open("sample_data.txt", "r").read()
+    data_list = pull_data.split('\n')
+
+    x_list = []
+    y_list = []
+
+    for line in data_list:
+        if len(line) > 1:
+            x, y = line.split(',')
+            x_list.append(int(x))
+            y_list.append(int(y))
+
+    a.clear()
+    a.plot(x_list, y_list)
 
 
 def popup_user_settings():
@@ -112,80 +129,89 @@ def popup_user_settings():
         .grid(row=12, column=0, padx=10, pady=15)
 
     def clicked_new():
-        if input_validation.is_email(value_email_address_new.get()) is False:
+        data_list_new = [value_first_name_new.get(),
+                         value_last_name_new.get(),
+                         value_date_of_birth_new.get(),
+                         value_address_new.get(),
+                         value_city_new.get(),
+                         value_post_code_new.get(),
+                         value_telephone_number_new.get(),
+                         value_email_address_new.get(),
+                         value_password_new.get(),
+                         value_knsa_licence_number_new.get(),
+                         value_date_of_membership_new.get()]
+
+        if data_list_new.count('') > 0:
+            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
+            popup.lift()
+        elif input_validation.is_email(value_email_address_new.get()) is False:
             messagebox.showerror(title="Error", message="Vul aub een valide email adres in")
             popup.lift()
-        elif input_validation.is_date(value_date_of_birth_new.get()) is False:
+        elif input_validation.is_date(value_date_of_birth_new.get()) is False \
+                or input_validation.is_date(value_date_of_membership_new.get()) is False:
             messagebox.showerror(title="Error", message="Vul aub een valide datum in")
+            popup.lift()
+        elif input_validation.is_int(int(value_telephone_number_new.get())) is False:
+            messagebox.showerror(title="Error", message="Vul aub een valide telefoonnummer in")
+            popup.lift()
+        elif input_validation.is_password(value_password_new.get()) is False:
+            messagebox.showerror(title="Error", message="Vul aub een wachtwoord in met meer dan 8 zijvers")
+            popup.lift()
+        elif input_validation.is_knsa(value_knsa_licence_number_new.get()) is False:
+            messagebox.showerror(title="Error", message="Vul aub een valide KNSA licentie nummer in")
             popup.lift()
         else:
             hashed_password = password_manager.hash_password(value_password_new.get())
 
-            data_list_new = [value_first_name_new.get(),
-                             value_last_name_new.get(),
-                             value_date_of_birth_new.get(),
-                             value_address_new.get(),
-                             value_city_new.get(),
-                             value_post_code_new.get(),
-                             value_telephone_number_new.get(),
-                             value_email_address_new.get(),
-                             hashed_password,
-                             value_knsa_licence_number_new.get(),
-                             value_date_of_membership_new.get()]
+            result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO user (
+                                    type, 
+                                    first_name,
+                                    last_name, 
+                                    date_of_birth, 
+                                    address, 
+                                    city, 
+                                    post_code, 
+                                    telephone_number, 
+                                    email_address, 
+                                    password, 
+                                    knsa_licence_number, 
+                                    date_of_membership
+                                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
+                fields.get(value_user_type_new.get()),
+                value_first_name_new.get().lower(),
+                value_last_name_new.get().lower(),
+                value_date_of_birth_new.get(),
+                value_address_new.get().lower(),
+                value_city_new.get().lower(),
+                value_post_code_new.get().lower(),
+                value_telephone_number_new.get(),
+                value_email_address_new.get().lower(),
+                hashed_password,
+                value_knsa_licence_number_new.get(),
+                value_date_of_membership_new.get()))
 
-            if data_list_new.count('') > 0:
-                messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
-                popup.lift()
-            else:
-                result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO user (
-                                        type, 
-                                        first_name,
-                                        last_name, 
-                                        date_of_birth, 
-                                        address, 
-                                        city, 
-                                        post_code, 
-                                        telephone_number, 
-                                        email_address, 
-                                        password, 
-                                        knsa_licence_number, 
-                                        date_of_membership
-                                        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
-                    fields.get(value_user_type_new.get()),
-                    value_first_name_new.get().lower(),
-                    value_last_name_new.get().lower(),
-                    value_date_of_birth_new.get().lower(),
-                    value_address_new.get().lower(),
-                    value_city_new.get().lower(),
-                    value_post_code_new.get().lower(),
-                    value_telephone_number_new.get().lower(),
-                    value_email_address_new.get().lower(),
-                    value_password_new.get().lower(),
-                    value_knsa_licence_number_new.get().lower(),
-                    value_date_of_membership_new.get().lower()))
+            if result_new == 'success':
+                email_body = 'Gefeliciteerd ' + value_first_name_new.get() + \
+                             ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
+                             '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
+                             '\n\n Reageer aub niet op deze email.' \
+                             '\n\n Fijne dag!'
 
-                if result_new == 'success':
-                    email_body = 'Gefeliciteerd ' + value_first_name_new.get() + \
-                                 ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
-                                 '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
-                                 '\n\n Reageer aub niet op deze email.' \
-                                 '\n\n Fijne dag!'
+                email_result = email_manager.send_email(value_email_address_new.get(),
+                                                        'Welkom bij Schietvereniging Prinses Juliana',
+                                                        email_body)
 
-                    email_result = email_manager.send_email(value_email_address_new.get(),
-                                                            'Welkom bij Schietvereniging Prinses Juliana',
-                                                            email_body)
-
-                    if email_result:
-                        messagebox.showinfo(title="Information",
-                                            message="Het systeem heeft met succes een niewe lid aangemaakt")
-                        popup.destroy()
-                    else:
-                        messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
-                        popup.lift()
-
+                if email_result:
+                    messagebox.showinfo(title="Information",
+                                        message="Het systeem heeft met succes een niewe lid aangemaakt")
+                    popup.destroy()
                 else:
-                    messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                    messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
                     popup.lift()
+
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                popup.lift()
 
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=12, column=1, padx=10, pady=15)
@@ -230,6 +256,18 @@ def popup_user_settings():
         if data_list_edit.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
             popup.lift()
+        elif fields2.get(value_field_edit.get()) == fields2.get('telefoonnummer'):
+            if input_validation.is_int(value_update_edit.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide telefoonnummer in")
+                popup.lift()
+        elif fields2.get(value_field_edit.get()) == fields2.get('email_address'):
+            if input_validation.is_email(value_update_edit.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide email adres in")
+                popup.lift()
+        elif fields2.get(value_field_edit.get()) == fields2.get('knsa_licence_number'):
+            if input_validation.is_email(value_update_edit.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide KNSA licentie nummer in")
+                popup.lift()
         else:
             result_edit = database_manager.execute_sql('UPDATE user SET ' + str(fields2.get(value_field_edit.get()))
                                                        + ' = ? WHERE  knsa_licence_number = ?',
@@ -466,6 +504,13 @@ def popup_ammunition_settings():
 
         if ammunition_list_new.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
+            popup.lift()
+        elif input_validation.is_float(value_price_new.get()) is False:
+            messagebox.showerror(title="Error", message="Vul aub een valide prijs in")
+            popup.lift()
+        elif input_validation.is_int(value_stock_new.get()) is False:
+            messagebox.showerror(title="Error", message="Vul aub een valide voorraad in")
+            popup.lift()
         else:
             result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO ammunition (
                     type, price, stock) VALUES (?, ?, ?)''',
@@ -519,11 +564,19 @@ def popup_ammunition_settings():
 
     def clicked_edit():
         if fields.get(value_field_edit.get()) == 'stock':
-            current_stock = database_manager.execute_sql('''SELECT stock from ammunition WHERE type = ?''',
-                                                         (value_type_edit.get()[2:5],))
-            new_value = int(current_stock[0][0] + value_update_edit.get())
+            if input_validation.is_int(value_update_edit.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide voorraad in")
+                popup.lift()
+            else:
+                current_stock = database_manager.execute_sql('''SELECT stock from ammunition WHERE type = ?''',
+                                                             (value_type_edit.get()[2:5],))
+                new_value = int(current_stock[0][0] + value_update_edit.get())
         else:
-            new_value = value_update_edit.get()
+            if input_validation.is_float(value_update_edit.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide prijs in")
+                popup.lift()
+            else:
+                new_value = value_update_edit.get()
 
         result_edit = database_manager.execute_sql('UPDATE ammunition SET ' + fields.get(value_field_edit.get())
                                                    + ' = ? WHERE type = ?',
@@ -616,6 +669,12 @@ def popup_scorecard_settings():
         if scorecard_list_new.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
             popup.lift()
+        elif input_validation.is_float(value_price_new.get()) is False:
+            messagebox.showerror(title="Error", message="Vul aub een valide prijs in")
+            popup.lift()
+        elif input_validation.is_int(value_stock_new.get()) is False:
+            messagebox.showerror(title="Error", message="Vul aub een valide voorraad in")
+            popup.lift()
         else:
             result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO scorecard (
                             type, price, stock) VALUES (?, ?, ?)''',
@@ -675,11 +734,19 @@ def popup_scorecard_settings():
 
     def clicked_edit():
         if fields.get(value_field_edit.get()) == 'stock':
-            current_stock = database_manager.execute_sql('''SELECT stock from scorecard WHERE type = ?''',
-                                                         (fields2.get(value_type_edit.get()),))
-            new_value = int(current_stock[0][0] + value_update_edit.get())
+            if input_validation.is_int(value_update_edit.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide voorraad in")
+                popup.lift()
+            else:
+                current_stock = database_manager.execute_sql('''SELECT stock from scorecard WHERE type = ?''',
+                                                             (fields2.get(value_type_edit.get()),))
+                new_value = int(current_stock[0][0] + value_update_edit.get())
         else:
-            new_value = value_update_edit.get()
+            if input_validation.is_float(value_update_edit.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide prijs in")
+                popup.lift()
+            else:
+                new_value = value_update_edit.get()
 
         result_edit = database_manager.execute_sql('UPDATE scorecard SET ' + fields.get(value_field_edit.get())
                                                    + ' = ? WHERE type = ?',
@@ -1088,10 +1155,6 @@ class ScorePage(tk.Frame):
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
-        toolbar = NavigationToolbar2Tk(canvas, frame_matplot)
-        toolbar.update()
-        canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-
 
 # TODO add matplotlib functionality
 class FinancePage(tk.Frame):
@@ -1168,67 +1231,70 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=0, padx=10, pady=15, sticky="W")
 
         def clicked_submit_left():
-            ammunition_stock = database_manager.execute_sql('''SELECT stock FROM ammunition WHERE type = ?''',
-                                                            (value_ammunition_type.get()[2:-3],))
-
-            new_ammunition_stock = ammunition_stock[0][0] - value_ammunition_quantity.get()
-
-            if new_ammunition_stock < 0:
-                messagebox.showinfo(title="Error",
-                                    message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
-                                            str(ammunition_stock[0][0]) + " over en u probeert " +
-                                            str(value_ammunition_quantity.get()) + " te verkopen")
+            if input_validation.is_int(value_ammunition_quantity.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide munitie waarde in")
             else:
-                ammunition_price = database_manager.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
+                ammunition_stock = database_manager.execute_sql('''SELECT stock FROM ammunition WHERE type = ?''',
                                                                 (value_ammunition_type.get()[2:-3],))
+                new_ammunition_stock = ammunition_stock[0][0] - value_ammunition_quantity.get()
 
-                total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
-
-                result_submit_left = database_manager.execute_sql('''INSERT OR IGNORE INTO sale_ammunition (
-                                            date_sold,
-                                            quantity,
-                                            type,
-                                            seller,
-                                            buyer,
-                                            price) VALUES (?, ?, ?, ?, ?, ?)''', (
-                    str(date.today()),
-                    value_ammunition_quantity.get(),
-                    value_ammunition_type.get()[2:-3],
-                    '123456',
-                    value_user_top_left.get()[2:8],
-                    total_ammunition_price
-                ))
-
-                if result_submit_left == 'success':
-                    messagebox.showinfo(title="Information",
-                                        message="Het systeem heeft met succes munitie verkocht er is nu " +
-                                                str(new_ammunition_stock) + " voorraad van " +
-                                                value_ammunition_type.get()[2:-3] + " over")
-
-                    user_data = database_manager.execute_sql('''SELECT email_address, first_name 
-                                                     FROM user WHERE knsa_licence_number = ?''',
-                                                             (value_user_top_left.get()[2:8],))
-
-                    email_body = 'Hallo ' + user_data[0][1] + \
-                                 ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
-                                 + str(date.today()) + \
-                                 '. \n\n U heeft ' + str(value_ammunition_quantity.get()) + ' van ' + \
-                                 value_ammunition_type.get()[2:-3] + \
-                                 ' gekocht voor een prijs van totaal €' + str(total_price_left.get()) + \
-                                 '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
-
-                    email_result = email_manager.send_email(user_data[0][0],
-                                                            'U heeft iets gekocht op de schietvereniging',
-                                                            email_body)
-
-                    if email_result:
-                        clicked_reset_left()
-                    else:
-                        messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+                if new_ammunition_stock < 0:
+                    messagebox.showinfo(title="Error",
+                                        message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
+                                                str(ammunition_stock[0][0]) + " over en u probeert " +
+                                                str(value_ammunition_quantity.get()) + " te verkopen")
 
                 else:
-                    messagebox.showerror(title="Error",
-                                         message="Er was een fout bij het verkopen van de munitie")
+                    ammunition_price = database_manager.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
+                                                                    (value_ammunition_type.get()[2:-3],))
+
+                    total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
+
+                    result_submit_left = database_manager.execute_sql('''INSERT OR IGNORE INTO sale_ammunition (
+                                                date_sold,
+                                                quantity,
+                                                type,
+                                                seller,
+                                                buyer,
+                                                price) VALUES (?, ?, ?, ?, ?, ?)''', (
+                        str(date.today()),
+                        value_ammunition_quantity.get(),
+                        value_ammunition_type.get()[2:-3],
+                        '123456',
+                        value_user_top_left.get()[2:8],
+                        total_ammunition_price
+                    ))
+
+                    if result_submit_left == 'success':
+                        messagebox.showinfo(title="Information",
+                                            message="Het systeem heeft met succes munitie verkocht er is nu " +
+                                                    str(new_ammunition_stock) + " voorraad van " +
+                                                    value_ammunition_type.get()[2:-3] + " over")
+
+                        user_data = database_manager.execute_sql('''SELECT email_address, first_name 
+                                                         FROM user WHERE knsa_licence_number = ?''',
+                                                                 (value_user_top_left.get()[2:8],))
+
+                        email_body = 'Hallo ' + user_data[0][1] + \
+                                     ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
+                                     + str(date.today()) + \
+                                     '. \n\n U heeft ' + str(value_ammunition_quantity.get()) + ' van ' + \
+                                     value_ammunition_type.get()[2:-3] + \
+                                     ' gekocht voor een prijs van totaal €' + str(total_price_left.get()) + \
+                                     '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
+
+                        email_result = email_manager.send_email(user_data[0][0],
+                                                                'U heeft iets gekocht op de schietvereniging',
+                                                                email_body)
+
+                        if email_result:
+                            clicked_reset_left()
+                        else:
+                            messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
+                    else:
+                        messagebox.showerror(title="Error",
+                                             message="Er was een fout bij het verkopen van de munitie")
 
         button_reset_left = ttk.Button(frame_ammunition_bottom, text="Reset", command=lambda: clicked_reset_left()) \
             .grid(row=0, column=1, padx=10, pady=15, sticky="W")
@@ -1243,12 +1309,15 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=2, padx=10, pady=15, sticky="W")
 
         def clicked_total_left():
-            ammunition_price = database_manager.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
-                                                            (value_ammunition_type.get()[2:-3],))
+            if input_validation.is_int(value_ammunition_quantity.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide munitie waarde in")
+            else:
+                ammunition_price = database_manager.execute_sql('''SELECT price FROM ammunition WHERE type = ?''',
+                                                                (value_ammunition_type.get()[2:-3],))
 
-            total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
+                total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
 
-            total_price_left.set(total_ammunition_price)
+                total_price_left.set(total_ammunition_price)
 
         # scorecard sales starts here
 
@@ -1310,70 +1379,73 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=0, padx=10, pady=15, sticky="W")
 
         def clicked_submit_right():
-            scorecard_stock = database_manager.execute_sql('''SELECT stock FROM scorecard WHERE type = ?''',
-                                                           (fields.get(value_scorecard_type.get()),))
-
-            new_scorecard_stock = scorecard_stock[0][0] - value_scorecard_quantity.get()
-
-            if new_scorecard_stock < 0:
-                messagebox.showinfo(title="Error",
-                                    message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
-                                            str(scorecard_stock[0][0]) + " over en u probeert " +
-                                            str(value_scorecard_quantity.get()) + " te verkopen")
+            if input_validation.is_int(value_scorecard_quantity.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide scorecard waarde in")
             else:
-                scorecard_price = database_manager.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+                scorecard_stock = database_manager.execute_sql('''SELECT stock FROM scorecard WHERE type = ?''',
                                                                (fields.get(value_scorecard_type.get()),))
 
-                total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
+                new_scorecard_stock = scorecard_stock[0][0] - value_scorecard_quantity.get()
 
-                database_manager.execute_sql('''UPDATE scorecard SET stock = ? WHERE type = ?''',
-                                             (new_scorecard_stock, fields.get(value_scorecard_type.get()),))
-
-                result_submit_right = database_manager.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
-                                                    date_sold,
-                                                    quantity,
-                                                    type,
-                                                    seller,
-                                                    buyer,
-                                                    price) VALUES (?, ?, ?, ?, ?, ?)''', (
-                    str(date.today()),
-                    value_scorecard_quantity.get(),
-                    fields.get(value_scorecard_type.get()),
-                    '123456',
-                    value_user_top_right.get()[2:8],
-                    total_scorecard_price
-                ))
-
-                if result_submit_right == 'success':
-                    messagebox.showinfo(title="Information",
-                                        message="Het systeem heeft met succes scorecard verkocht u heeft nu " +
-                                                str(new_scorecard_stock) + " voorraad van " +
-                                                value_scorecard_type.get() + " over")
-
-                    user_data = database_manager.execute_sql('''SELECT email_address, first_name 
-                                                     FROM user WHERE knsa_licence_number = ?''',
-                                                             (value_user_top_right.get()[2:8],))
-
-                    email_body = 'Hallo ' + user_data[0][1] + \
-                                 ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
-                                 + str(date.today()) + \
-                                 '. \n\n U heeft ' + str(value_scorecard_quantity.get()) + ' van ' + \
-                                 value_scorecard_type.get() + \
-                                 ' gekocht voor een prijs van totaal €' + str(total_price_right.get()) + \
-                                 '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
-
-                    email_result = email_manager.send_email(user_data[0][0],
-                                                            'U heeft iets gekocht op de schietvereniging',
-                                                            email_body)
-
-                    if email_result:
-                        clicked_reset_right()
-                    else:
-                        messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
-
+                if new_scorecard_stock < 0:
+                    messagebox.showinfo(title="Error",
+                                        message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
+                                                str(scorecard_stock[0][0]) + " over en u probeert " +
+                                                str(value_scorecard_quantity.get()) + " te verkopen")
                 else:
-                    messagebox.showerror(title="Error",
-                                         message="Er was een fout bij het verkopen van de scorecard")
+                    scorecard_price = database_manager.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+                                                                   (fields.get(value_scorecard_type.get()),))
+
+                    total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
+
+                    database_manager.execute_sql('''UPDATE scorecard SET stock = ? WHERE type = ?''',
+                                                 (new_scorecard_stock, fields.get(value_scorecard_type.get()),))
+
+                    result_submit_right = database_manager.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
+                                                                    date_sold,
+                                                                    quantity,
+                                                                    type,
+                                                                    seller,
+                                                                    buyer,
+                                                                    price) VALUES (?, ?, ?, ?, ?, ?)''', (
+                        str(date.today()),
+                        value_scorecard_quantity.get(),
+                        fields.get(value_scorecard_type.get()),
+                        '123456',
+                        value_user_top_right.get()[2:8],
+                        total_scorecard_price
+                    ))
+
+                    if result_submit_right == 'success':
+                        messagebox.showinfo(title="Information",
+                                            message="Het systeem heeft met succes scorecard verkocht u heeft nu " +
+                                                    str(new_scorecard_stock) + " voorraad van " +
+                                                    value_scorecard_type.get() + " over")
+
+                        user_data = database_manager.execute_sql('''SELECT email_address, first_name 
+                                                                     FROM user WHERE knsa_licence_number = ?''',
+                                                                 (value_user_top_right.get()[2:8],))
+
+                        email_body = 'Hallo ' + user_data[0][1] + \
+                                     ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
+                                     + str(date.today()) + \
+                                     '. \n\n U heeft ' + str(value_scorecard_quantity.get()) + ' van ' + \
+                                     value_scorecard_type.get() + \
+                                     ' gekocht voor een prijs van totaal €' + str(total_price_right.get()) + \
+                                     '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
+
+                        email_result = email_manager.send_email(user_data[0][0],
+                                                                'U heeft iets gekocht op de schietvereniging',
+                                                                email_body)
+
+                        if email_result:
+                            clicked_reset_right()
+                        else:
+                            messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
+                    else:
+                        messagebox.showerror(title="Error",
+                                             message="Er was een fout bij het verkopen van de scorecard")
 
         button_reset_right = ttk.Button(frame_scorecard_bottom, text="Reset", command=lambda: clicked_reset_right()) \
             .grid(row=0, column=1, padx=10, pady=15, sticky="W")
@@ -1388,12 +1460,15 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=2, padx=10, pady=15, sticky="W")
 
         def clicked_total_right():
-            scorecard_price = database_manager.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
-                                                           (fields.get(value_scorecard_type.get()),))
+            if input_validation.is_int(value_scorecard_quantity.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide scorecard waarde in")
+            else:
+                scorecard_price = database_manager.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+                                                               (fields.get(value_scorecard_type.get()),))
 
-            total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
+                total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
 
-            total_price_right.set(total_scorecard_price)
+                total_price_right.set(total_scorecard_price)
 
         frame_bottom = tk.Frame(frame_right)
         frame_bottom.pack(side="bottom", fill="both", expand=True)
@@ -1402,18 +1477,17 @@ class FinancePage(tk.Frame):
         label_frame_bottom.pack(side="bottom", fill="x", expand=True)
 
         # matplotlib graph starts here
-        canvas = FigureCanvasTkAgg(f, label_frame_bottom)
+        frame_matplot = tk.Frame(label_frame_bottom)
+        frame_matplot.pack(side="bottom", fill="both")
+
+        canvas = FigureCanvasTkAgg(f, frame_matplot)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-
-        toolbar = NavigationToolbar2Tk(canvas, label_frame_bottom)
-        toolbar.update()
-        canvas._tkcanvas.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
 
 app = ShootingClub()
 app.geometry("820x730")
 app.minsize(860, 730)
 app.maxsize(860, 730)
-ani = animation.FuncAnimation(f, matplot_manager.animate, interval=8000)
+ani = animation.FuncAnimation(f, animate, interval=8000)
 app.mainloop()
