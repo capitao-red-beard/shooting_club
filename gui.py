@@ -3,17 +3,16 @@ from datetime import date
 from tkinter import messagebox
 from tkinter import ttk
 
-import database_manager
-import email_manager
-import input_validation
-import matplot_manager
-import password_manager
-
 import matplotlib
 import matplotlib.animation as animation
 from matplotlib import style
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+
+import database_manager
+import email_manager
+import input_validation
+import password_manager
 
 LARGE_FONT = ("Verdana", 12)
 NORMAL_FONT = ("Verdana", 10)
@@ -1138,7 +1137,7 @@ class ScorePage(tk.Frame):
         label_frame_bottom.pack(side="right", fill="both", expand=True)
 
         frame_menu = tk.Frame(label_frame_bottom)
-        frame_menu.pack(side="top", fill="x")
+        frame_menu.pack(side="bottom", fill="x")
 
         label_user_matplot = ttk.Label(frame_menu, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
         value_user_matplot = tk.StringVar(frame_menu)
@@ -1147,17 +1146,54 @@ class ScorePage(tk.Frame):
         option_menu_user_matplot.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
         option_menu_user_matplot.grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
-        label_firearm_matplot = ttk.Label(frame_menu, text="Vuurwapen:").grid(row=0, column=2, padx=5, pady=2, sticky="W")
+        label_firearm_matplot = ttk.Label(frame_menu, text="Vuurwapen:") \
+            .grid(row=0, column=2, padx=5, pady=2, sticky="W")
         value_firearm_matplot = tk.StringVar(frame_menu)
         value_firearm_matplot.set("Select")
-        firearms = database_manager.get_firearms()
+        firearms = database_manager.execute_sql('''SELECT type FROM firearm''')
         option_menu_firearm_matplot = ttk.OptionMenu(frame_menu, value_firearm_matplot, firearms[0], *firearms)
         option_menu_firearm_matplot.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 2)
         option_menu_firearm_matplot.grid(row=0, column=3, padx=5, pady=5, sticky="W")
 
+        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van:") \
+            .grid(row=0, column=4, padx=5, pady=2, sticky="W")
+        value_date_from_matplot = tk.StringVar(frame_menu)
+        entry_date_from_matplot = ttk.Entry(frame_menu, textvariable=value_date_from_matplot, width=10) \
+            .grid(row=0, column=5, padx=5, pady=2, sticky="W")
+
+        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot:") \
+            .grid(row=1, column=4, padx=5, pady=2, sticky="W")
+        value_date_to_matplot = tk.StringVar(frame_menu)
+        entry_date_to_matplot = ttk.Entry(frame_menu, textvariable=value_date_to_matplot, width=10) \
+            .grid(row=1, column=5, padx=5, pady=2, sticky="W")
+
+        def clicked_show():
+            if value_date_from_matplot.get() and value_date_to_matplot.get() == '':
+                result = database_manager.execute_sql('''SELECT date_score, card_one_total, card_two_total 
+                FROM score WHERE shooter = ? AND firearm_type= ? ORDER BY date_score''',
+                                                      (value_user_matplot.get()[2:8],
+                                                       value_firearm_matplot.get()[2:-3]))
+            else:
+                result = database_manager.execute_sql('''SELECT date_score, card_one_total, card_two_total 
+                                FROM score WHERE shooter = ? AND firearm_type = ? AND date_score BETWEEN ? AND ?''',
+                                                      (value_user_matplot.get()[2:8],
+                                                       value_firearm_matplot.get()[2:-3],
+                                                       value_date_from_matplot.get(),
+                                                       value_date_to_matplot.get()))
+
+        button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
+            .grid(row=0, column=6, padx=5, pady=2, sticky="W")
+
+        def clicked_reset_matplot():
+            value_date_from_matplot.set('')
+            value_date_to_matplot.set('')
+
+        button_reser_matplot = ttk.Button(frame_menu, text="Reset", command=lambda: clicked_reset_matplot()) \
+            .grid(row=1, column=6, padx=5, pady=2, sticky="W")
+
         # matplotlib graph starts here
         frame_matplot = tk.Frame(label_frame_bottom)
-        frame_matplot.pack(side="bottom", fill="both")
+        frame_matplot.pack(side="top", fill="both")
 
         canvas = FigureCanvasTkAgg(f, frame_matplot)
         canvas.draw()
@@ -1330,6 +1366,7 @@ class FinancePage(tk.Frame):
         # scorecard sales starts here
 
         fields = {
+            'None': 'None',
             'Standaard': 'regular',
             'Competitie': 'competition'
         }
@@ -1484,9 +1521,67 @@ class FinancePage(tk.Frame):
         label_frame_bottom = tk.LabelFrame(frame_bottom, text="View Transactions")
         label_frame_bottom.pack(side="bottom", fill="x", expand=True)
 
+        frame_menu = tk.Frame(label_frame_bottom)
+        frame_menu.pack(side="bottom", fill="x")
+
+        label_user_matplot = ttk.Label(frame_menu, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        value_user_matplot = tk.StringVar(frame_menu)
+        value_user_matplot.set("Select")
+        option_menu_user_matplot = ttk.OptionMenu(frame_menu, value_user_matplot, users[0], *users)
+        option_menu_user_matplot.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+        option_menu_user_matplot.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+
+        label_scorecard_matplot = ttk.Label(frame_menu, text="Scorecard Type:") \
+            .grid(row=0, column=2, padx=5, pady=2, sticky="W")
+        value_scorecard_matplot = tk.StringVar(frame_menu)
+        value_scorecard_matplot.set("Select")
+        scorecards = database_manager.execute_sql('''SELECT type FROM scorecard''')
+        option_menu_scorecard_matplot = ttk.OptionMenu(frame_menu,
+                                                       value_scorecard_matplot,
+                                                       next(iter(fields)),
+                                                       *fields.keys())
+        option_menu_scorecard_matplot.config(width=max([len(i) for i in fields.keys()]) + 1)
+        option_menu_scorecard_matplot.grid(row=0, column=3, padx=5, pady=5, sticky="W")
+
+        label_ammunition_matplot = ttk.Label(frame_menu, text="Munitie Type:") \
+            .grid(row=1, column=2, padx=5, pady=2, sticky="W")
+        value_ammunition_matplot = tk.StringVar(frame_menu)
+        value_ammunition_matplot.set("Select")
+        option_menu_ammunition_matplot = ttk.OptionMenu(frame_menu,
+                                                        value_ammunition_matplot,
+                                                        ammunition_types[0],
+                                                        *ammunition_types)
+        option_menu_ammunition_matplot.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
+        option_menu_ammunition_matplot.grid(row=1, column=3, padx=5, pady=5, sticky="W")
+
+        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van:") \
+            .grid(row=0, column=4, padx=5, pady=2, sticky="W")
+        value_date_from_matplot = tk.StringVar(frame_menu)
+        entry_date_from_matplot = ttk.Entry(frame_menu, textvariable=value_date_from_matplot, width=10) \
+            .grid(row=0, column=5, padx=5, pady=2, sticky="W")
+
+        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot:") \
+            .grid(row=1, column=4, padx=5, pady=2, sticky="W")
+        value_date_to_matplot = tk.StringVar(frame_menu)
+        entry_date_to_matplot = ttk.Entry(frame_menu, textvariable=value_date_to_matplot, width=10) \
+            .grid(row=1, column=5, padx=5, pady=2, sticky="W")
+
+        def clicked_show():
+            print('clicked')
+
+        button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
+            .grid(row=0, column=6, padx=5, pady=2, sticky="W")
+
+        def clicked_reset_matplot():
+            value_date_from_matplot.set('')
+            value_date_to_matplot.set('')
+
+        button_reser_matplot = ttk.Button(frame_menu, text="Reset", command=lambda: clicked_reset_matplot()) \
+            .grid(row=1, column=6, padx=5, pady=2, sticky="W")
+
         # matplotlib graph starts here
         frame_matplot = tk.Frame(label_frame_bottom)
-        frame_matplot.pack(side="bottom", fill="both")
+        frame_matplot.pack(side="top", fill="both")
 
         canvas = FigureCanvasTkAgg(f, frame_matplot)
         canvas.draw()
