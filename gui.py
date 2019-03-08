@@ -1155,13 +1155,13 @@ class ScorePage(tk.Frame):
         option_menu_firearm_matplot.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 2)
         option_menu_firearm_matplot.grid(row=0, column=3, padx=5, pady=5, sticky="W")
 
-        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van:") \
+        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van (YYYY-MM-DD):") \
             .grid(row=0, column=4, padx=5, pady=2, sticky="W")
         value_date_from_matplot = tk.StringVar(frame_menu)
         entry_date_from_matplot = ttk.Entry(frame_menu, textvariable=value_date_from_matplot, width=10) \
             .grid(row=0, column=5, padx=5, pady=2, sticky="W")
 
-        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot:") \
+        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot (YYYY-MM-DD):") \
             .grid(row=1, column=4, padx=5, pady=2, sticky="W")
         value_date_to_matplot = tk.StringVar(frame_menu)
         entry_date_to_matplot = ttk.Entry(frame_menu, textvariable=value_date_to_matplot, width=10) \
@@ -1554,13 +1554,13 @@ class FinancePage(tk.Frame):
         option_menu_ammunition_matplot.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
         option_menu_ammunition_matplot.grid(row=1, column=3, padx=5, pady=5, sticky="W")
 
-        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van:") \
+        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van (YYYY-MM-DD):") \
             .grid(row=0, column=4, padx=5, pady=2, sticky="W")
         value_date_from_matplot = tk.StringVar(frame_menu)
         entry_date_from_matplot = ttk.Entry(frame_menu, textvariable=value_date_from_matplot, width=10) \
             .grid(row=0, column=5, padx=5, pady=2, sticky="W")
 
-        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot:") \
+        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot (YYYY-MM-DD):") \
             .grid(row=1, column=4, padx=5, pady=2, sticky="W")
         value_date_to_matplot = tk.StringVar(frame_menu)
         entry_date_to_matplot = ttk.Entry(frame_menu, textvariable=value_date_to_matplot, width=10) \
@@ -1589,7 +1589,7 @@ class FinancePage(tk.Frame):
 
 
 app = ShootingClub()
-app.geometry("820x730")
+app.geometry("860x730")
 app.minsize(860, 730)
 app.maxsize(860, 730)
 ani = animation.FuncAnimation(f, animate, interval=8000)
