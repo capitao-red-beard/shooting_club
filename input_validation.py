@@ -1,4 +1,5 @@
 import datetime
+import re
 
 
 def is_int(i):
@@ -16,7 +17,7 @@ def is_string(i):
 
 def is_knsa(i):
     if is_int(i):
-        if i.length() == 6:
+        if len(i) == 6:
             return True
 
 
@@ -28,7 +29,7 @@ def is_date(i):
 
 
 def is_email(i):
-    if '@' not in i:
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", i):
         return False
 
 

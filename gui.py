@@ -1168,18 +1168,25 @@ class ScorePage(tk.Frame):
             .grid(row=1, column=5, padx=5, pady=2, sticky="W")
 
         def clicked_show():
-            if value_date_from_matplot.get() and value_date_to_matplot.get() == '':
-                result = database_manager.execute_sql('''SELECT date_score, card_one_total, card_two_total 
-                FROM score WHERE shooter = ? AND firearm_type= ? ORDER BY date_score''',
-                                                      (value_user_matplot.get()[2:8],
-                                                       value_firearm_matplot.get()[2:-3]))
+            if input_validation.is_date(value_date_from_matplot.get()) is False \
+                    and input_validation.is_date(value_date_to_matplot.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide datum in")
+                value_date_from_matplot.set('')
+                value_date_to_matplot.set('')
             else:
-                result = database_manager.execute_sql('''SELECT date_score, card_one_total, card_two_total 
-                                FROM score WHERE shooter = ? AND firearm_type = ? AND date_score BETWEEN ? AND ?''',
-                                                      (value_user_matplot.get()[2:8],
-                                                       value_firearm_matplot.get()[2:-3],
-                                                       value_date_from_matplot.get(),
-                                                       value_date_to_matplot.get()))
+                if value_date_from_matplot.get() and value_date_to_matplot.get() == '':
+                    result = database_manager.execute_sql('''SELECT date_score, card_one_total, card_two_total 
+                    FROM score WHERE shooter = ? AND firearm_type= ? ORDER BY date_score''',
+                                                          (value_user_matplot.get()[2:8],
+                                                           value_firearm_matplot.get()[2:-3]))
+                else:
+                    result = database_manager.execute_sql('''SELECT date_score, card_one_total, card_two_total 
+                                    FROM score WHERE shooter = ? AND firearm_type = ? AND date_score BETWEEN ? AND ? 
+                                    ORDER BY date_score''',
+                                                          (value_user_matplot.get()[2:8],
+                                                           value_firearm_matplot.get()[2:-3],
+                                                           value_date_from_matplot.get(),
+                                                           value_date_to_matplot.get()))
 
         button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
             .grid(row=0, column=6, padx=5, pady=2, sticky="W")
@@ -1366,7 +1373,6 @@ class FinancePage(tk.Frame):
         # scorecard sales starts here
 
         fields = {
-            'None': 'None',
             'Standaard': 'regular',
             'Competitie': 'competition'
         }
@@ -1531,16 +1537,19 @@ class FinancePage(tk.Frame):
         option_menu_user_matplot.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
         option_menu_user_matplot.grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
+        matplot_scorecard_types = ['Niets', 'Alles']
+        scorecards = database_manager.execute_sql('''SELECT type FROM scorecard''')
+        for s in scorecards:
+            matplot_scorecard_types.append(s)
         label_scorecard_matplot = ttk.Label(frame_menu, text="Scorecard Type:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
         value_scorecard_matplot = tk.StringVar(frame_menu)
         value_scorecard_matplot.set("Select")
-        scorecards = database_manager.execute_sql('''SELECT type FROM scorecard''')
         option_menu_scorecard_matplot = ttk.OptionMenu(frame_menu,
                                                        value_scorecard_matplot,
-                                                       next(iter(fields)),
-                                                       *fields.keys())
-        option_menu_scorecard_matplot.config(width=max([len(i) for i in fields.keys()]) + 1)
+                                                       next(iter(matplot_scorecard_types)),
+                                                       *matplot_scorecard_types)
+        option_menu_scorecard_matplot.config(width=max([len(i) for i in matplot_scorecard_types]) + 1)
         option_menu_scorecard_matplot.grid(row=0, column=3, padx=5, pady=5, sticky="W")
 
         label_ammunition_matplot = ttk.Label(frame_menu, text="Munitie Type:") \
@@ -1567,7 +1576,13 @@ class FinancePage(tk.Frame):
             .grid(row=1, column=5, padx=5, pady=2, sticky="W")
 
         def clicked_show():
-            print('clicked')
+            if input_validation.is_date(value_date_from_matplot.get()) is False \
+                    and input_validation.is_date(value_date_to_matplot.get()) is False:
+                messagebox.showerror(title="Error", message="Vul aub een valide datum in")
+                value_date_from_matplot.set('')
+                value_date_to_matplot.set('')
+            else:
+                print('Clicked')
 
         button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
             .grid(row=0, column=6, padx=5, pady=2, sticky="W")
