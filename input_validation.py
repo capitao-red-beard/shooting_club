@@ -17,7 +17,7 @@ def is_string(i):
 
 def is_knsa(i):
     if is_int(i):
-        if len(i) == 6:
+        if len(i) == 5 or len(i) == 6:
             return True
 
 

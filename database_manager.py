@@ -5,6 +5,7 @@ from sqlite3 import Error
 def create_connection():
     try:
         connection = sqlite3.connect('shooting_club')
+        connection.execute('PRAGMA foreign_keys = 1')
         print('Connected to database. SQLite: ' + sqlite3.version)
         return connection
     except Error as e:
@@ -49,17 +50,26 @@ statement1 = '''CREATE TABLE IF NOT EXISTS user (
                             city TEXT NOT NULL,
                             post_code TEXT NOT NULL,
                             telephone_number TEXT NOT NULL,
-                            email_address TEXT UNIQUE NOT NULL,
-                            password TEXT NOT NULL,
-                            knsa_licence_number TEXT PRIMARY KEY,
+                            email_address TEXT UNIQUE,
+                            password TEXT,
+                            knsa_licence_number INTEGER PRIMARY KEY,
                             date_of_membership INTEGER NOT NULL);'''
 
 statement2 = '''CREATE TABLE IF NOT EXISTS firearm (
-                            type TEXT NOT NULL,
-                            owner TEXT NOT NULL,
-                            PRIMARY KEY (type, owner),
-                            FOREIGN KEY (owner) REFERENCES user (knsa_licence_number)
-                            ON DELETE CASCADE ON UPDATE CASCADE);'''
+                            type TEXT PRIMARY KEY);'''
+
+statement8 = '''CREATE TABLE IF NOT EXISTS discipline (
+                            type TEXT PRIMARY KEY);'''
+
+statement9 = '''CREATE TABLE IF NOT EXISTS rank (
+                            user INTEGER NOT NULL,
+                            discipline TEXT NOT NULL,
+                            class TEXT NOT NULL,
+                            FOREIGN KEY (user) REFERENCES user (knsa_licence_number)
+                            ON DELETE NO ACTION ON UPDATE CASCADE,
+                            FOREIGN KEY (discipline) REFERENCES discipline (type)
+                            ON DELETE NO ACTION ON UPDATE CASCADE,
+                            PRIMARY KEY (user, discipline, class));'''
 
 statement3 = '''CREATE TABLE IF NOT EXISTS ammunition (
                             type TEXT PRIMARY KEY,
@@ -86,20 +96,22 @@ statement5 = '''CREATE TABLE IF NOT EXISTS score (
                             card_two_shot_five INTEGER NOT NULL,
                             card_two_total INTEGER NOT NULL,
                             date_score INTEGER NOT NULL,                           
-                            shooter TEXT NOT NULL,                            
-                            firearm_type TEXT NOT NULL,                           
+                            shooter INTEGER NOT NULL,                            
+                            firearm_type TEXT NOT NULL,
+                            discipline_type TEXT NOT NULL,                           
                             FOREIGN KEY (shooter) REFERENCES user (knsa_licence_number)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (firearm_type) REFERENCES firearm (type)
-                            ON DELETE NO ACTION ON UPDATE CASCADE);'''
+                            ON DELETE NO ACTION ON UPDATE CASCADE,
+                            FOREIGN KEY (discipline_type) REFERENCES discipline (type));'''
 
 statement6 = '''CREATE TABLE IF NOT EXISTS sale_scorecard (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             date_sold INTEGER NOT NULL,
                             quantity INTEGER NOT NULL,
                             type TEXT NOT NULL,
-                            seller TEXT NOT NULL,
-                            buyer TEXT NOT NULL,
+                            seller INTEGER NOT NULL,
+                            buyer INTEGER NOT NULL,
                             price REAL NOT NULL,                            
                             FOREIGN KEY (type) REFERENCES scorecard (type)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
@@ -115,8 +127,8 @@ statement7 = '''CREATE TABLE IF NOT EXISTS sale_ammunition (
                             date_sold INTEGER NOT NULL,
                             quantity INTEGER NOT NULL,
                             type TEXT NOT NULL,
-                            seller TEXT NOT NULL,
-                            buyer TEXT NOT NULL,
+                            seller INTEGER NOT NULL,
+                            buyer INTEGER NOT NULL,
                             price REAL NOT NULL,
                             FOREIGN KEY (type) REFERENCES ammunition (type)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
