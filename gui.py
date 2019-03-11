@@ -1,5 +1,7 @@
 import tkinter as tk
 from datetime import date
+import datetime
+from datetime import timedelta
 from tkinter import messagebox
 from tkinter import ttk
 
@@ -128,23 +130,31 @@ def popup_user_settings():
         .grid(row=12, column=0, padx=10, pady=15)
 
     def clicked_new():
-        data_list_new = [value_first_name_new.get(),
-                         value_last_name_new.get(),
-                         value_date_of_birth_new.get(),
-                         value_address_new.get(),
-                         value_city_new.get(),
-                         value_post_code_new.get(),
-                         value_telephone_number_new.get(),
-                         value_email_address_new.get(),
-                         value_password_new.get(),
-                         value_knsa_licence_number_new.get(),
-                         value_date_of_membership_new.get()]
+        if fields.get(value_user_type_new.get()) == 2:
+            data_list_new = [value_first_name_new.get(),
+                             value_last_name_new.get(),
+                             value_date_of_birth_new.get(),
+                             value_address_new.get(),
+                             value_city_new.get(),
+                             value_post_code_new.get(),
+                             value_telephone_number_new.get(),
+                             value_email_address_new.get(),
+                             value_password_new.get(),
+                             value_knsa_licence_number_new.get(),
+                             value_date_of_membership_new.get()]
+        else:
+            data_list_new = [value_first_name_new.get(),
+                             value_last_name_new.get(),
+                             value_date_of_birth_new.get(),
+                             value_address_new.get(),
+                             value_city_new.get(),
+                             value_post_code_new.get(),
+                             value_telephone_number_new.get(),
+                             value_knsa_licence_number_new.get(),
+                             value_date_of_membership_new.get()]
 
         if data_list_new.count('') > 0:
             messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
-            popup.lift()
-        elif input_validation.is_email(value_email_address_new.get()) is False:
-            messagebox.showerror(title="Error", message="Vul aub een valide email adres in")
             popup.lift()
         elif input_validation.is_date(value_date_of_birth_new.get()) is False \
                 or input_validation.is_date(value_date_of_membership_new.get()) is False:
@@ -153,54 +163,93 @@ def popup_user_settings():
         elif input_validation.is_int(int(value_telephone_number_new.get())) is False:
             messagebox.showerror(title="Error", message="Vul aub een valide telefoonnummer in")
             popup.lift()
-        elif input_validation.is_password(value_password_new.get()) is False:
-            messagebox.showerror(title="Error", message="Vul aub een wachtwoord in met meer dan 8 zijvers")
-            popup.lift()
         elif input_validation.is_knsa(value_knsa_licence_number_new.get()) is False:
             messagebox.showerror(title="Error", message="Vul aub een valide KNSA licentie nummer in")
             popup.lift()
         else:
-            hashed_password = password_manager.hash_password(value_password_new.get())
+            if fields.get(value_user_type_new.get()) == 2:
+                if input_validation.is_email(value_email_address_new.get()) is False:
+                    messagebox.showerror(title="Error", message="Vul aub een valide email adres in")
+                    popup.lift()
+                elif input_validation.is_password(value_password_new.get()) is False:
+                    messagebox.showerror(title="Error", message="Vul aub een wachtwoord in met meer dan 8 zijvers")
+                    popup.lift()
 
-            result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO user (
-                                    type, 
-                                    first_name,
-                                    last_name, 
-                                    date_of_birth, 
-                                    address, 
-                                    city, 
-                                    post_code, 
-                                    telephone_number, 
-                                    email_address, 
-                                    password, 
-                                    knsa_licence_number, 
-                                    date_of_membership
-                                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
-                fields.get(value_user_type_new.get()),
-                value_first_name_new.get().lower(),
-                value_last_name_new.get().lower(),
-                value_date_of_birth_new.get(),
-                value_address_new.get().lower(),
-                value_city_new.get().lower(),
-                value_post_code_new.get().lower(),
-                value_telephone_number_new.get(),
-                value_email_address_new.get().lower(),
-                hashed_password,
-                value_knsa_licence_number_new.get(),
-                value_date_of_membership_new.get()))
+                hashed_password = password_manager.hash_password(value_password_new.get())
+
+                result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO user (
+                                                    type, 
+                                                    first_name,
+                                                    last_name, 
+                                                    date_of_birth, 
+                                                    address, 
+                                                    city, 
+                                                    post_code, 
+                                                    telephone_number, 
+                                                    email_address, 
+                                                    password, 
+                                                    knsa_licence_number, 
+                                                    date_of_membership
+                                                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);''', (
+                    fields.get(value_user_type_new.get()),
+                    value_first_name_new.get().lower(),
+                    value_last_name_new.get().lower(),
+                    value_date_of_birth_new.get(),
+                    value_address_new.get().lower(),
+                    value_city_new.get().lower(),
+                    value_post_code_new.get().lower(),
+                    value_telephone_number_new.get(),
+                    value_email_address_new.get().lower(),
+                    hashed_password,
+                    value_knsa_licence_number_new.get(),
+                    value_date_of_membership_new.get()))
+            else:
+                result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO user (
+                                                                    type, 
+                                                                    first_name,
+                                                                    last_name, 
+                                                                    date_of_birth, 
+                                                                    address, 
+                                                                    city, 
+                                                                    post_code, 
+                                                                    telephone_number, 
+                                                                    knsa_licence_number, 
+                                                                    date_of_membership
+                                                                    ) VALUES (?,?,?,?,?,?,?,?,?,?);''', (
+                    fields.get(value_user_type_new.get()),
+                    value_first_name_new.get().lower(),
+                    value_last_name_new.get().lower(),
+                    value_date_of_birth_new.get(),
+                    value_address_new.get().lower(),
+                    value_city_new.get().lower(),
+                    value_post_code_new.get().lower(),
+                    value_telephone_number_new.get(),
+                    value_knsa_licence_number_new.get(),
+                    value_date_of_membership_new.get()))
 
             if result_new == 'success':
-                email_body = 'Gefeliciteerd ' + value_first_name_new.get() + \
-                             ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
-                             '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
-                             '\n\n Reageer aub niet op deze email.' \
-                             '\n\n Fijne dag!'
+                email_body_user = 'Gefeliciteerd ' + value_first_name_new.get() + \
+                                  ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
+                                  '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
+                                  '\n\n Reageer aub niet op deze email.' \
+                                  '\n\n Fijne dag!'
 
-                email_result = email_manager.send_email(value_email_address_new.get(),
-                                                        'Welkom bij Schietvereniging Prinses Juliana',
-                                                        email_body)
+                email_result_user = email_manager.send_email(value_email_address_new.get(),
+                                                             'Welkom bij Schietvereniging Prinses Juliana',
+                                                             email_body_user)
 
-                if email_result:
+                email_body_admin = 'Beheerder, \n\n Er is een nieuwe lid in het schietvereniging systeem. ' \
+                                   '\n\n Reageer aub niet op deze email.' \
+                                   '\n\n Fijne dag!'
+
+                # TODO test multiple email recipients
+                admins = database_manager.execute_sql('''SELECT email_address FROM user WHERE type = ?''', (2,))
+
+                email_result_admin = email_manager.send_email(admins,
+                                                              'Nieuwe Lid bij Schietvereniging Prinses Juliana',
+                                                              email_body_admin)
+
+                if email_result_user and email_result_admin:
                     messagebox.showinfo(title="Information",
                                         message="Het systeem heeft met succes een niewe lid aangemaakt")
                     popup.destroy()
@@ -334,6 +383,116 @@ def popup_user_settings():
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
 
+    tab_view = ttk.Frame(notebook)
+    notebook.add(tab_view, text="Bekijk Lid")
+
+    label_user_view = ttk.Label(tab_view, text="Lid te Bekijken:") \
+        .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+    value_user_view = tk.StringVar(tab_view)
+    option_menu_user_view = ttk.OptionMenu(tab_view, value_user_view, users[0], *users)
+    option_menu_user_view.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
+    option_menu_user_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+    label_user_type_view = ttk.Label(tab_view, text="Gebruikerstype:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
+    value_user_type_view = tk.StringVar(tab_view)
+    label_user_type = ttk.Label(tab_view, textvariable=value_user_type_view) \
+        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+
+    label_first_name_view = ttk.Label(tab_view, text="Voornaam:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
+    value_first_name_view = tk.StringVar(tab_view)
+    label_user_first_name = ttk.Label(tab_view, textvariable=value_first_name_view) \
+        .grid(row=2, column=1, padx=5, pady=2, sticky="W")
+
+    label_last_name_view = ttk.Label(tab_view, text="Familienaam:").grid(row=3, column=0, padx=5, pady=2, sticky="W")
+    value_last_name_view = tk.StringVar(tab_view)
+    label_user_last_name = ttk.Label(tab_view, textvariable=value_last_name_view) \
+        .grid(row=3, column=1, padx=5, pady=2, sticky="W")
+
+    label_date_of_birth_view = ttk.Label(tab_view, text="Geboorte Datum (YYYY-MM-DD):") \
+        .grid(row=4, column=0, padx=5, pady=2, sticky="W")
+    value_date_of_birth_view = tk.StringVar(tab_view)
+    label_date_of_birth = ttk.Label(tab_view, textvariable=value_date_of_birth_view) \
+        .grid(row=4, column=1, padx=5, pady=2, sticky="W")
+
+    label_address_view = ttk.Label(tab_view, text="Adres:").grid(row=5, column=0, padx=5, pady=2, sticky="W")
+    value_address_view = tk.StringVar(tab_view)
+    label_address = ttk.Label(tab_view, textvariable=value_address_view) \
+        .grid(row=5, column=1, padx=5, pady=2, sticky="W")
+
+    label_city_view = ttk.Label(tab_view, text="Woonplaats:").grid(row=6, column=0, padx=5, pady=5, sticky="W")
+    value_city_view = tk.StringVar(tab_view)
+    label_city = ttk.Label(tab_view, textvariable=value_city_view) \
+        .grid(row=6, column=1, padx=5, pady=2, sticky="W")
+
+    label_post_code_view = ttk.Label(tab_view, text="Postcode:").grid(row=7, column=0, padx=5, pady=2, sticky="W")
+    value_post_code_view = tk.StringVar(tab_view)
+    label_post_code = ttk.Label(tab_view, textvariable=value_post_code_view) \
+        .grid(row=7, column=1, padx=5, pady=2, sticky="W")
+
+    label_telephone_number_view = ttk.Label(tab_view, text="Telefoonnummer:") \
+        .grid(row=8, column=0, padx=5, pady=2, sticky="W")
+    value_telephone_number_view = tk.StringVar(tab_view)
+    label_telephone_number = ttk.Label(tab_view, textvariable=value_telephone_number_view) \
+        .grid(row=8, column=1, padx=5, pady=2, sticky="W")
+
+    label_email_address_view = ttk.Label(tab_view, text="Email Adres:") \
+        .grid(row=9, column=0, padx=5, pady=2, sticky="W")
+    value_email_address_view = tk.StringVar(tab_view)
+    label_email_address = ttk.Label(tab_view, textvariable=value_email_address_view) \
+        .grid(row=9, column=1, padx=5, pady=2, sticky="W")
+
+    label_knsa_licence_number_view = ttk.Label(tab_view, text="KNSA Licentienummer:") \
+        .grid(row=10, column=0, padx=5, pady=2, sticky="W")
+    value_knsa_licence_number_view = tk.StringVar(tab_view)
+    label_knsa_licence_number = ttk.Label(tab_view, textvariable=value_knsa_licence_number_view) \
+        .grid(row=10, column=1, padx=5, pady=2, sticky="W")
+
+    label_date_of_membership_view = ttk.Label(tab_view, text="Datum van Lidmaatschap Ingang (YYYY-MM-DD):") \
+        .grid(row=11, column=0, padx=5, pady=2, sticky="W")
+    value_date_of_membership_view = tk.StringVar(tab_view)
+    label_date_of_membership = ttk.Label(tab_view, textvariable=value_date_of_membership_view) \
+        .grid(row=11, column=1, padx=5, pady=2, sticky="W")
+
+    button_submit_view = ttk.Button(tab_view, text="Bekijk", command=lambda: clicked_view()) \
+        .grid(row=12, column=0, padx=10, pady=15)
+
+    # this should delete the record in the dropdown menu
+    def clicked_view():
+
+        fields3 = {
+            1: 'Standaard',
+            2: 'Beheerder'
+        }
+
+        result_view = database_manager.execute_sql(
+            '''SELECT type, 
+            first_name, 
+            last_name, 
+            date_of_birth, 
+            address, 
+            city, 
+            post_code, 
+            telephone_number, 
+            email_address, 
+            knsa_licence_number, 
+            date_of_membership  
+            FROM user WHERE knsa_licence_number = ?''', (value_user_view.get()[2:8],))
+
+        value_user_type_view.set(fields3.get(result_view[0][0]))
+        value_first_name_view.set(result_view[0][1])
+        value_last_name_view.set(result_view[0][2])
+        value_date_of_birth_view.set(result_view[0][3])
+        value_address_view.set(result_view[0][4])
+        value_city_view.set(result_view[0][5])
+        value_post_code_view.set(result_view[0][6])
+        value_telephone_number_view.set(result_view[0][7])
+        value_email_address_view.set(result_view[0][8])
+        value_knsa_licence_number_view.set(result_view[0][9])
+        value_date_of_membership_view.set(result_view[0][10])
+
+    button_cancel_view = ttk.Button(tab_view, text="Annuleren", command=popup.destroy) \
+        .grid(row=12, column=1, padx=10, pady=15)
+
     popup.mainloop()
 
 
@@ -355,15 +514,6 @@ def popup_firearm_settings():
     entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20) \
         .grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-    label_users_new = ttk.Label(tab_new, text="Eigenaar:") \
-        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    users = database_manager.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
-    value_users_new = tk.StringVar(tab_new)
-    value_users_new.set("Select")
-    option_menu_user_new = ttk.OptionMenu(tab_new, value_users_new, users[0], *users)
-    option_menu_user_new.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
-    option_menu_user_new.grid(row=1, column=1, padx=5, pady=2, sticky="W")
-
     button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
         .grid(row=2, column=0, padx=10, pady=15)
 
@@ -375,7 +525,7 @@ def popup_firearm_settings():
             popup.lift()
         else:
             result_new = database_manager.execute_sql('''INSERT OR IGNORE INTO firearm (
-                    type, owner) VALUES (?, ?)''', (value_type_new.get().lower(), value_users_new.get()[2:8]))
+                    type) VALUES (?)''', (value_type_new.get().lower(),))
 
             if result_new == 'success':
                 messagebox.showinfo(title="Information",
@@ -388,47 +538,10 @@ def popup_firearm_settings():
     button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
         .grid(row=2, column=1, padx=10, pady=15)
 
-    # creation of the edit tab
-    tab_edit = ttk.Frame(notebook)
-    notebook.add(tab_edit, text="Bewerk Vuurwapen")
-
-    label_existing_edit = ttk.Label(tab_edit, text="Vuurwapen te Bewerken:") \
-        .grid(row=0, column=0, padx=5, pady=2, sticky="W")
-    firearms = database_manager.execute_sql('''SELECT owner, type FROM firearm;''')
-    value_existing_edit = tk.StringVar(tab_edit)
-    value_existing_edit.set("Select")
-    option_menu_existing_edit = ttk.OptionMenu(tab_edit, value_existing_edit, firearms[0], *firearms)
-    option_menu_existing_edit.config(width=max([sum([len(q) for q in i]) for i in firearms]) + 3)
-    option_menu_existing_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
-
-    label_users_edit = ttk.Label(tab_edit, text="Nieuwe Eigenaar:") \
-        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_users_edit = tk.StringVar(tab_edit)
-    value_users_edit.set("Select")
-    option_menu_users_edit = ttk.OptionMenu(tab_edit, value_users_edit, users[0], *users)
-    option_menu_users_edit.config(width=max([sum([len(q) for q in i]) for i in users]) + 1)
-    option_menu_users_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
-
-    button_submit_edit = ttk.Button(tab_edit, text="Bewerken", command=lambda: clicked_edit()) \
-        .grid(row=2, column=0, padx=10, pady=15)
-
-    def clicked_edit():
-        result_edit = database_manager.execute_sql('''UPDATE firearm SET owner = ? WHERE owner = ?''',
-                                                   (value_users_edit.get()[2:8], value_existing_edit.get()[2:8]))
-
-        if result_edit == 'success':
-            messagebox.showinfo(title="Information",
-                                message="Het systeem heeft met succes een vuurwapen aangepast")
-            popup.destroy()
-        else:
-            messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-            popup.lift()
-
-    button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
-        .grid(row=2, column=1, padx=10, pady=15)
-
     tab_delete = ttk.Frame(notebook)
     notebook.add(tab_delete, text="Verwijder Vuurwapen")
+
+    firearms = database_manager.execute_sql('''SELECT type FROM firearm;''')
 
     label_type_delete = ttk.Label(tab_delete, text="Vuurwapen te Verwijderen:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
@@ -447,9 +560,8 @@ def popup_firearm_settings():
                                      'Weet jij zeker dat jij deze vuurwapen wil verwijderen?', icon="warning")
 
         if ays == 'yes':
-            result_delete = database_manager.execute_sql(
-                '''DELETE FROM firearm WHERE type = ? AND owner = ?''',
-                (value_type_delete.get()[12:-2], value_type_delete.get()[2:8]))
+            result_delete = database_manager.execute_sql('''DELETE FROM firearm WHERE type = ?''',
+                                                         (value_type_delete.get()[2:-3],))
 
             if result_delete == 'success':
                 messagebox.showinfo(title="Information",
@@ -613,7 +725,7 @@ def popup_ammunition_settings():
 
         if ays == 'yes':
             result_delete = database_manager.execute_sql('''DELETE FROM ammunition WHERE type = ?''',
-                                                         (value_type_delete.get()[2:-3]), )
+                                                         ((value_type_delete.get()[2:-3]),))
 
             if result_delete == 'success':
                 messagebox.showinfo(title="Information",
@@ -626,6 +738,43 @@ def popup_ammunition_settings():
             popup.lift()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
+        .grid(row=3, column=1, padx=10, pady=15)
+
+    tab_view = ttk.Frame(notebook)
+    notebook.add(tab_view, text="Bekijk Munitie")
+
+    label_type_view = ttk.Label(tab_view, text="Munitie te bekijken:") \
+        .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+    value_type_view = tk.StringVar(tab_view)
+    value_type_view.set("Select")
+    option_menu_type_view = ttk.OptionMenu(tab_view, value_type_view, ammunition_types[0], *ammunition_types)
+    option_menu_type_view.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
+    option_menu_type_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+    label_price_view = ttk.Label(tab_view, text="Prijs (EUR):") \
+        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+    value_price_view = tk.StringVar(tab_view)
+    label_price = ttk.Label(tab_view, textvariable=value_price_view) \
+        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+
+    label_stock_view = ttk.Label(tab_view, text="Voorraad:") \
+        .grid(row=2, column=0, padx=5, pady=2, sticky="W")
+    value_stock_view = tk.StringVar(tab_view)
+    label_stock = ttk.Label(tab_view, textvariable=value_stock_view) \
+        .grid(row=2, column=1, padx=5, pady=2, sticky="W")
+
+    button_submit_view = ttk.Button(tab_view, text="Bekijk", command=lambda: clicked_view()) \
+        .grid(row=3, column=0, padx=10, pady=15)
+
+    # this should delete the record in the dropdown menu
+    def clicked_view():
+        result_view = database_manager.execute_sql('''SELECT price, stock FROM ammunition WHERE type = ?''',
+                                                   ((value_type_view.get()[2:-3]),))
+
+        value_price_view.set(result_view[0][0])
+        value_stock_view.set(result_view[0][1])
+
+    button_cancel_view = ttk.Button(tab_view, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
 
     popup.mainloop()
@@ -798,16 +947,141 @@ def popup_scorecard_settings():
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
 
+    tab_view = ttk.Frame(notebook)
+    notebook.add(tab_view, text="Bekijk Scorecards")
+
+    label_type_view = ttk.Label(tab_view, text="Scorecard te bekijken:") \
+        .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+    value_type_view = tk.StringVar(tab_view)
+    value_type_view.set("Select")
+    option_menu_type_view = ttk.OptionMenu(tab_view, value_type_view, next(iter(fields2))[0], *fields2.keys())
+    option_menu_type_view.config(width=max([sum([len(q) for q in i]) for i in fields2.keys()]) + 1)
+    option_menu_type_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+    label_price_view = ttk.Label(tab_view, text="Prijs (EUR):") \
+        .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+    value_price_view = tk.StringVar(tab_view)
+    label_price = ttk.Label(tab_view, textvariable=value_price_view) \
+        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+
+    label_stock_view = ttk.Label(tab_view, text="Voorraad:") \
+        .grid(row=2, column=0, padx=5, pady=2, sticky="W")
+    value_stock_view = tk.StringVar(tab_view)
+    label_stock = ttk.Label(tab_view, textvariable=value_stock_view) \
+        .grid(row=2, column=1, padx=5, pady=2, sticky="W")
+
+    button_submit_view = ttk.Button(tab_view, text="Bekijk", command=lambda: clicked_view()) \
+        .grid(row=3, column=0, padx=10, pady=15)
+
+    def clicked_view():
+        result_view = database_manager.execute_sql('''SELECT price, stock FROM scorecard WHERE type = ?''',
+                                                   (fields2.get(value_type_view.get()),))
+
+        value_price_view.set(result_view[0][0])
+        value_stock_view.set(result_view[0][1])
+
+    button_cancel_view = ttk.Button(tab_view, text="Annuleren", command=popup.destroy) \
+        .grid(row=3, column=1, padx=10, pady=15)
+
     popup.mainloop()
 
 
+def popup_discipline_settings():
+    # main window holding all elements
+    popup = tk.Tk()
+    popup.wm_title("Discipline Instellingen")
+
+    # notebook holding the tabs
+    notebook = ttk.Notebook(popup)
+    notebook.grid(row=1, column=0, columnspan=50, rowspan=49, sticky="nsew")
+
+    # creation of the new tab
+    tab_new = ttk.Frame(notebook)
+    notebook.add(tab_new, text="Nieuwe")
+
+    label_type_new = ttk.Label(tab_new, text="Type Discipline:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
+    value_type_new = tk.StringVar(tab_new)
+    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20) \
+        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
+        .grid(row=1, column=0, padx=10, pady=15)
+
+    def clicked_new():
+        discipline_list_new = [value_type_new.get()]
+
+        if discipline_list_new.count('') > 0:
+            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
+            popup.lift()
+        else:
+            result_new = database_manager.execute_sql('''INSERT INTO discipline (discipline) VALUES (?)''',
+                                                      value_type_new.get())
+
+            if result_new == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes een niewe discipline aangemaakt")
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
+                popup.lift()
+
+    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
+        .grid(row=1, column=1, padx=10, pady=15)
+
+    tab_delete = ttk.Frame(notebook)
+    notebook.add(tab_delete, text="Verwijder")
+
+    disciplines = database_manager.execute_sql('''SELECT type from discipline;''')
+
+    label_type_delete = ttk.Label(tab_delete, text="Discipline te verwijderen:") \
+        .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+    value_type_delete = tk.StringVar(tab_delete)
+    value_type_delete.set("Select")
+    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, disciplines[0], *disciplines)
+    option_menu_type_delete.config(width=max([sum([len(q) for q in i]) for i in disciplines]) + 1)
+    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+    button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
+        .grid(row=1, column=0, padx=10, pady=15)
+
+    # this should delete the record in the dropdown menu
+    def clicked_delete():
+        ays = messagebox.askquestion('Warning',
+                                     'Weet jij zeker dat jij deze discipline wil verwijderen?', icon="warning")
+
+        if ays == 'yes':
+            result_delete = database_manager.execute_sql('''DELETE FROM discipline WHERE type = ?''',
+                                                         (value_type_delete.get()[2:-3],))
+
+            if result_delete == 'success':
+                messagebox.showinfo(title="Information",
+                                    message="Het systeem heeft met succes het discipline verwijderd")
+                popup.destroy()
+            else:
+                messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
+                popup.lift()
+        else:
+            popup.lift()
+
+    button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
+        .grid(row=1, column=1, padx=10, pady=15)
+
+    popup.mainloop()
+
+
+# TODO add feature to ensure a user submits a score at least once every 10 weeks
 class ShootingClub(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user_session, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        self.user_session = user_session
+
+        result = database_manager.execute_sql('''SELECT first_name FROM user WHERE knsa_licence_number = ?''',
+                                              (user_session,))
 
         # tk.Tk.iconbitmap(self, default="logo_16_16.ico")
-        tk.Tk.wm_title(self, "Schietvereniging - Prinses Juliana")
+        tk.Tk.wm_title(self, "Schietvereniging - Prinses Juliana: " + "(" + user_session + ")" +
+                       " " + result[0][0])
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -819,6 +1093,7 @@ class ShootingClub(tk.Tk):
 
         file_menu.add_command(label="Lid Instellingen", command=lambda: popup_user_settings())
         file_menu.add_command(label="Vuurapen Instellingen", command=lambda: popup_firearm_settings())
+        file_menu.add_command(label="Discipline Instellingen", command=lambda: popup_discipline_settings())
         file_menu.add_command(label="Munitie Instellingen", command=lambda: popup_ammunition_settings())
         file_menu.add_command(label="Score Kaart Instellingen", command=lambda: popup_scorecard_settings())
         file_menu.add_separator()
@@ -830,14 +1105,11 @@ class ShootingClub(tk.Tk):
         self.frames = {}
 
         for F in (MainMenu, ScorePage, FinancePage):
-            frame = F(container, self)
-
+            frame = F(container, self, user_session)
             self.frames[F] = frame
-
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame(MainMenu)
-
         self.protocol("WM_DELETE_WINDOW", self.on_exit)
         self.resizable(0, 0)
 
@@ -847,14 +1119,78 @@ class ShootingClub(tk.Tk):
 
     def on_exit(self):
         if messagebox.askquestion('Warning',
-                                  'Weet jij zeker dat jij de applicatie wilt sluiten?', icon="warning") == 'yes':
+                                  'Weet je zeker dat je de applicatie wilt sluiten?', icon="warning") == 'yes':
+            self.destroy()
             self.quit()
 
 
+class LoginPage(tk.Tk):
+
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
+        self.resizable(0, 0)
+
+        # tk.Tk.iconbitmap(self, default="logo_16_16.ico")
+        tk.Tk.wm_title(self, "Schietvereniging - Prinses Juliana")
+
+        container = tk.Frame(self)
+        container.pack(side="top", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        label_username = ttk.Label(container, text="KNSA Licentie Nummer:") \
+            .grid(row=0, column=0, padx=5, pady=2, sticky="W")
+        value_username = tk.StringVar(container)
+        entry_username = ttk.Entry(container, textvariable=value_username) \
+            .grid(row=0, column=1, padx=5, pady=2, sticky="W")
+
+        label_password = ttk.Label(container, text="Wachtwoord:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
+        value_password = tk.StringVar(container)
+        entry_password = ttk.Entry(container, textvariable=value_password, show='*') \
+            .grid(row=1, column=1, padx=5, pady=2, sticky="W")
+
+        button_login = ttk.Button(container, text="Login", command=lambda: login_clicked()) \
+            .grid(row=2, column=0, padx=10, pady=15)
+        button_reset = ttk.Button(container, text="Reset", command=lambda: reset_clicked()) \
+            .grid(row=2, column=1, padx=10, pady=15)
+
+        def login_clicked():
+            stored_password = database_manager.execute_sql('''SELECT password FROM user WHERE knsa_licence_number = ?'''
+                                                           , (value_username.get(),))
+
+            valid = password_manager.verify_password(value_password.get(), stored_password[0][0])
+
+            if valid:
+                app2.quit()
+                app2.destroy()
+
+                app = ShootingClub(value_username.get())
+                app.geometry("860x730")
+                app.minsize(860, 730)
+                app.maxsize(860, 730)
+
+                ani = animation.FuncAnimation(f, animate, interval=8000)
+
+                app.mainloop()
+            else:
+                messagebox.showerror(title="Error", message="Verkeerde KNSA en wachtwoord combinatie")
+                reset_clicked()
+                self.lift()
+
+        def reset_clicked():
+            value_username.set('')
+            value_password.set('')
+
+
+# TODO add feature to track users, classes and stock
+# TODO add feature to allow sending of data to EXCEL
 class MainMenu(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, user_session):
+        self.user_session = user_session
+        print(user_session)
         tk.Frame.__init__(self, parent)
+
         label = ttk.Label(self, text="Main Menu", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
@@ -866,12 +1202,15 @@ class MainMenu(tk.Frame):
 
 
 # TODO add matplotlib functionality
+# TODO add feature to ensure a user can only submit 1 score per week per discipline
+# TODO change score input back to entry field and add a check to ensure more than 10 can't be entered (((MAYBE)))
 class ScorePage(tk.Frame):
 
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
+    def __init__(self, parent, controller, user_session):
+        self.user_session = user_session
 
         tk.Frame.__init__(self, parent)
+
         frame_left = tk.Frame(self)
         frame_left.pack(side="left")
 
@@ -1001,10 +1340,27 @@ class ScorePage(tk.Frame):
         frame_bottom = tk.Frame(label_frame_top)
         frame_bottom.pack(anchor="nw")
 
+        disciplines = database_manager.execute_sql('''SELECT type FROM discipline;''')
+
+        label_discipline = ttk.Label(frame_bottom, text="Discipline:") \
+            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
+        value_discipline = tk.StringVar(frame_bottom)
+        option_menu_discipline = ttk.OptionMenu(frame_bottom, value_discipline, disciplines[0], *disciplines)
+        option_menu_discipline.config(width=max([sum([len(q) for q in i]) for i in disciplines]) + 1)
+        option_menu_discipline.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+
         button_submit = ttk.Button(frame_bottom, text="Invoeren", command=lambda: clicked_submit_left()) \
-            .grid(row=0, column=0, padx=10, pady=15, sticky="W")
+            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
 
         def clicked_submit_left():
+            last_entries = database_manager.execute_sql('''SELECT date_score FROM score WHERE shooter = ? 
+                                                        AND discipline = ?''',
+                                                        (value_user_left.get()[2:8], value_discipline.get()[2:-3]))
+
+            date_list = input_validation.date_range(1)
+
+            # TODO fix this date thing so a user cannot submit more than one per week!
+
             total_card1 = int(value_scorecard1_shot1.get()
                               + value_scorecard1_shot2.get()
                               + value_scorecard1_shot3.get()
@@ -1032,7 +1388,9 @@ class ScorePage(tk.Frame):
             card_two_total,
             date_score,
             shooter,
-            firearm_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
+            firearm_type,
+            discipline_type,
+            submitter) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
                 value_scorecard1_shot1.get(),
                 value_scorecard1_shot2.get(),
                 value_scorecard1_shot3.get(),
@@ -1047,7 +1405,9 @@ class ScorePage(tk.Frame):
                 total_card2,
                 str(date.today()),
                 value_user_left.get()[2:8],
-                value_firearm_left.get()[12:-2]))
+                value_firearm_left.get()[12:-2],
+                value_discipline.get()[2:-3],
+                user_session))
 
             if result_submit_left == 'success':
                 messagebox.showinfo(title="Information",
@@ -1115,7 +1475,7 @@ class ScorePage(tk.Frame):
             total_scorecard2.set(0)
 
         button_reset = ttk.Button(frame_bottom, text="Reset", command=lambda: clicked_reset()) \
-            .grid(row=0, column=1, padx=10, pady=15, sticky="W")
+            .grid(row=0, column=3, padx=10, pady=15, sticky="W")
 
         def clicked_total():
             total_scorecard1.set(value_scorecard1_shot1.get() +
@@ -1131,7 +1491,7 @@ class ScorePage(tk.Frame):
                                  value_scorecard2_shot5.get())
 
         button_total = ttk.Button(frame_bottom, text="Reken Totaal", command=lambda: clicked_total()) \
-            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
+            .grid(row=0, column=4, padx=10, pady=15, sticky="W")
 
         label_frame_bottom = tk.LabelFrame(frame_right, text="View Scores")
         label_frame_bottom.pack(side="right", fill="both", expand=True)
@@ -1210,16 +1570,17 @@ class ScorePage(tk.Frame):
 # TODO add matplotlib functionality
 class FinancePage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, user_session):
+        self.user_session = user_session
         tk.Frame.__init__(self, parent)
         frame_left = tk.Frame(self)
         frame_left.pack(side="left")
 
-        button_main_menu = ttk.Button(frame_left, text="Main Menu",
-                                      command=lambda: controller.show_frame(MainMenu))
+        button_main_menu = ttk.Button(frame_left, text="Main Menu", command=lambda: controller.show_frame(MainMenu))
         button_main_menu.pack()
 
-        button_finance_page = ttk.Button(frame_left, text="Score Page",
+        button_finance_page = ttk.Button(frame_left,
+                                         text="Score Page",
                                          command=lambda: controller.show_frame(ScorePage))
         button_finance_page.pack()
 
@@ -1229,7 +1590,7 @@ class FinancePage(tk.Frame):
         frame_top = tk.Frame(frame_right)
         frame_top.pack(side="top", fill="both", expand=True)
 
-        label_frame_top_left = tk.LabelFrame(frame_top, text="Ammunition Transaction")
+        label_frame_top_left = tk.LabelFrame(frame_top, text="Munitie")
         label_frame_top_left.pack(side="left", fill="x", expand=True)
 
         frame_ammunition_top = tk.Frame(label_frame_top_left)
@@ -1273,14 +1634,6 @@ class FinancePage(tk.Frame):
         label_ammunition_total = ttk.Label(frame_ammunition_middle, textvariable=total_price_left) \
             .grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
-        frame_ammunition_bottom = tk.Frame(label_frame_top_left)
-        frame_ammunition_bottom.pack(anchor="w")
-
-        button_submit_left = ttk.Button(frame_ammunition_bottom,
-                                        text="Verkopen",
-                                        command=lambda: clicked_submit_left()) \
-            .grid(row=0, column=0, padx=10, pady=15, sticky="W")
-
         def clicked_submit_left():
             if input_validation.is_int(value_ammunition_quantity.get()) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide munitie waarde in")
@@ -1311,7 +1664,7 @@ class FinancePage(tk.Frame):
                         str(date.today()),
                         value_ammunition_quantity.get(),
                         value_ammunition_type.get()[2:-3],
-                        '123456',
+                        user_session,
                         value_user_top_left.get()[2:8],
                         total_ammunition_price
                     ))
@@ -1347,17 +1700,9 @@ class FinancePage(tk.Frame):
                         messagebox.showerror(title="Error",
                                              message="Er was een fout bij het verkopen van de munitie")
 
-        button_reset_left = ttk.Button(frame_ammunition_bottom, text="Reset", command=lambda: clicked_reset_left()) \
-            .grid(row=0, column=1, padx=10, pady=15, sticky="W")
-
         def clicked_reset_left():
             value_ammunition_quantity.set(0)
             total_price_left.set(0.0)
-
-        button_ammunition_total = ttk.Button(frame_ammunition_bottom,
-                                             text="Reken Totaal",
-                                             command=lambda: clicked_total_left()) \
-            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
 
         def clicked_total_left():
             if input_validation.is_int(value_ammunition_quantity.get()) is False:
@@ -1370,8 +1715,9 @@ class FinancePage(tk.Frame):
 
                 total_price_left.set(total_ammunition_price)
 
-        # scorecard sales starts here
+                return total_ammunition_price
 
+        # scorecard sales starts here
         fields = {
             'Standaard': 'regular',
             'Competitie': 'competition'
@@ -1395,95 +1741,129 @@ class FinancePage(tk.Frame):
         frame_scorecard_middle = tk.Frame(label_frame_top_right)
         frame_scorecard_middle.pack(anchor="nw")
 
-        label_scorecard_type = ttk.Label(frame_scorecard_middle, text="Scorecard type:") \
+        label_scorecard_regular = ttk.Label(frame_scorecard_middle, text="Aantal Standaard Kaarten:") \
             .grid(row=0, column=0, padx=5, pady=2, sticky="W")
-        scorecard_types = database_manager.execute_sql('''SELECT type FROM scorecard;''')
-        value_scorecard_type = tk.StringVar(frame_scorecard_middle)
-        value_scorecard_type.set("Select")
-        option_menu_scorecard_type = ttk.OptionMenu(frame_scorecard_middle,
-                                                    value_scorecard_type,
-                                                    next(iter(fields)),
-                                                    *fields.keys())
-        option_menu_scorecard_type.config(width=max([len(i) for i in fields.keys()]) + 1)
-        option_menu_scorecard_type.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+        value_scorecard_regular_quantity = tk.IntVar(frame_scorecard_middle)
+        entry_scorecard_regular_quantity = ttk.Entry(frame_scorecard_middle,
+                                                     textvariable=value_scorecard_regular_quantity,
+                                                     width=5).grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
-        label_scorecard_quantity = ttk.Label(frame_scorecard_middle, text="Aantal:") \
+        label_scorecard_competition = ttk.Label(frame_scorecard_middle, text="Competitie Kaarten:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
-        value_scorecard_quantity = tk.IntVar(frame_scorecard_middle)
-        entry_scorecard_quantity = ttk.Entry(frame_scorecard_middle,
-                                             textvariable=value_scorecard_quantity,
-                                             width=5).grid(row=0, column=3, padx=5, pady=5, sticky="W")
+        value_scorecard_competition = tk.IntVar(frame_scorecard_middle)
+        value_scorecard_competition.set(0)
+        checkbutton_scorecard_competition = ttk.Checkbutton(frame_scorecard_middle,
+                                                            variable=value_scorecard_competition) \
+            .grid(row=0, column=3, padx=5, pady=2, sticky="W")
 
         label_scorecard_valuation = ttk.Label(frame_scorecard_middle, text="Totaal (EUR):") \
-            .grid(row=1, column=0, padx=5, pady=2, sticky="W")
+            .grid(row=2, column=0, padx=5, pady=2, sticky="W")
         total_price_right = tk.DoubleVar()
         total_price_right.set(0.0)
         label_scorecard_total = ttk.Label(frame_scorecard_middle, textvariable=total_price_right) \
-            .grid(row=1, column=1, padx=5, pady=2, sticky="W")
-
-        frame_scorecard_bottom = tk.Frame(label_frame_top_right)
-        frame_scorecard_bottom.pack(anchor="w")
-
-        button_submit_right = ttk.Button(frame_scorecard_bottom,
-                                         text="Verkopen",
-                                         command=lambda: clicked_submit_right()) \
-            .grid(row=0, column=0, padx=10, pady=15, sticky="W")
+            .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
         def clicked_submit_right():
-            if input_validation.is_int(value_scorecard_quantity.get()) is False:
+            if input_validation.is_int(value_scorecard_regular_quantity.get()) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide scorecard waarde in")
             else:
-                scorecard_stock = database_manager.execute_sql('''SELECT stock FROM scorecard WHERE type = ?''',
-                                                               (fields.get(value_scorecard_type.get()),))
+                if value_scorecard_competition.get() == 1:
+                    value_scorecard_competition_quantity = 2
+                    scorecard_stock_competition = database_manager.execute_sql('''SELECT stock
+                                     FROM scorecard WHERE type = ?''', ('competition',))
 
-                new_scorecard_stock = scorecard_stock[0][0] - value_scorecard_quantity.get()
+                    new_scorecard_stock_competition = scorecard_stock_competition[0][0] - \
+                                                      value_scorecard_competition_quantity
 
-                if new_scorecard_stock < 0:
+                    if new_scorecard_stock_competition < 0:
+                        messagebox.showinfo(title="Error",
+                                            message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
+                                                    str(new_scorecard_stock_competition[0][0]) +
+                                                    " over en u probeert 2 te verkopen")
+                else:
+                    value_scorecard_competition_quantity = 0
+
+                scorecard_stock_regular = database_manager.execute_sql('''SELECT stock FROM scorecard WHERE type = ?''',
+                                                                       ('regular',))
+
+                new_scorecard_stock_regular = scorecard_stock_regular[0][0] - value_scorecard_regular_quantity.get()
+
+                if new_scorecard_stock_regular < 0:
                     messagebox.showinfo(title="Error",
                                         message="Er is niet genoeg voorraad om zo veel te verkopen er is slechts " +
-                                                str(scorecard_stock[0][0]) + " over en u probeert " +
-                                                str(value_scorecard_quantity.get()) + " te verkopen")
+                                                str(scorecard_stock_regular[0][0]) + " over en u probeert " +
+                                                str(value_scorecard_regular_quantity.get()) + " te verkopen")
                 else:
-                    scorecard_price = database_manager.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
-                                                                   (fields.get(value_scorecard_type.get()),))
+                    scorecard_price = database_manager.execute_sql('''SELECT price FROM scorecard;''')
 
-                    total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
+                    if value_scorecard_competition == 1:
+                        database_manager.execute_sql('''UPDATE scorecard SET stock = ? WHERE type = ?''',
+                                                     (new_scorecard_stock_competition, 'competition',))
+
+                        total_scorecard_price_competition = round(value_scorecard_competition_quantity *
+                                                                  scorecard_price[1][0], 2)
+
+                    total_scorecard_price_regular = round(value_scorecard_regular_quantity.get() *
+                                                          scorecard_price[0][0], 2)
 
                     database_manager.execute_sql('''UPDATE scorecard SET stock = ? WHERE type = ?''',
-                                                 (new_scorecard_stock, fields.get(value_scorecard_type.get()),))
+                                                 (new_scorecard_stock_regular, 'regular',))
 
-                    result_submit_right = database_manager.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
-                                                                    date_sold,
-                                                                    quantity,
-                                                                    type,
-                                                                    seller,
-                                                                    buyer,
-                                                                    price) VALUES (?, ?, ?, ?, ?, ?)''', (
-                        str(date.today()),
-                        value_scorecard_quantity.get(),
-                        fields.get(value_scorecard_type.get()),
-                        '123456',
-                        value_user_top_right.get()[2:8],
-                        total_scorecard_price
-                    ))
+                    result_submit_competition = 'success'
+                    result_submit_regular = 'success'
 
-                    if result_submit_right == 'success':
+                    if value_scorecard_competition == 1:
+                        result_submit_competition = \
+                            database_manager.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
+                                                                                            date_sold,
+                                                                                            quantity,
+                                                                                            type,
+                                                                                            seller,
+                                                                                            buyer,
+                                                                                            price) VALUES (
+                                                                                            ?, ?, ?, ?, ?, ?)''',
+                                                         (
+                                                             str(date.today()),
+                                                             value_scorecard_competition_quantity,
+                                                             'competition',
+                                                             user_session,
+                                                             value_user_top_right.get()[2:8],
+                                                             total_scorecard_price_competition
+                                                         ))
+
+                    if value_scorecard_regular_quantity.get() > 0:
+                        result_submit_regular = database_manager.execute_sql('''INSERT OR IGNORE INTO sale_scorecard (
+                                                                                                date_sold,
+                                                                                                quantity,
+                                                                                                type,
+                                                                                                seller,
+                                                                                                buyer,
+                                                                                                price) VALUES (
+                                                                                                ?, ?, ?, ?, ?, ?)''',
+                                                                             (
+                                                                                 str(date.today()),
+                                                                                 value_scorecard_regular_quantity.get(),
+                                                                                 'regular',
+                                                                                 user_session,
+                                                                                 value_user_top_right.get()[2:8],
+                                                                                 total_scorecard_price_regular
+                                                                             ))
+
+                    if result_submit_competition == 'success' and result_submit_regular == 'success':
                         messagebox.showinfo(title="Information",
                                             message="Het systeem heeft met succes scorecard verkocht u heeft nu " +
-                                                    str(new_scorecard_stock) + " voorraad van " +
-                                                    value_scorecard_type.get() + " over")
+                                                    str(new_scorecard_stock_regular) + " voorraad van standaard over en"
+                                                    + str(new_scorecard_stock_competition) + " van competitie over.")
 
                         user_data = database_manager.execute_sql('''SELECT email_address, first_name 
                                                                      FROM user WHERE knsa_licence_number = ?''',
                                                                  (value_user_top_right.get()[2:8],))
 
+                        total_scorecard_price = total_scorecard_price_regular + total_scorecard_price_competition
+
                         email_body = 'Hallo ' + user_data[0][1] + \
                                      ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
-                                     + str(date.today()) + \
-                                     '. \n\n U heeft ' + str(value_scorecard_quantity.get()) + ' van ' + \
-                                     value_scorecard_type.get() + \
-                                     ' gekocht voor een prijs van totaal €' + str(total_price_right.get()) + \
-                                     '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
+                                     + str(date.today()) + ' u totaal bedrag was €' + total_scorecard_price
 
                         email_result = email_manager.send_email(user_data[0][0],
                                                                 'U heeft iets gekocht op de schietvereniging',
@@ -1498,28 +1878,69 @@ class FinancePage(tk.Frame):
                         messagebox.showerror(title="Error",
                                              message="Er was een fout bij het verkopen van de scorecard")
 
-        button_reset_right = ttk.Button(frame_scorecard_bottom, text="Reset", command=lambda: clicked_reset_right()) \
-            .grid(row=0, column=1, padx=10, pady=15, sticky="W")
-
         def clicked_reset_right():
-            value_scorecard_quantity.set(0)
+            value_scorecard_regular_quantity.set(0)
             total_price_right.set(0.0)
-
-        button_scorecard_total = ttk.Button(frame_scorecard_bottom,
-                                            text="Reken Totaal",
-                                            command=lambda: clicked_total_right()) \
-            .grid(row=0, column=2, padx=10, pady=15, sticky="W")
+            value_scorecard_competition.set(0)
 
         def clicked_total_right():
-            if input_validation.is_int(value_scorecard_quantity.get()) is False:
+            if input_validation.is_int(value_scorecard_regular_quantity.get()) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide scorecard waarde in")
             else:
-                scorecard_price = database_manager.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
-                                                               (fields.get(value_scorecard_type.get()),))
+                if value_scorecard_competition.get() == 1:
+                    value_scorecard_competition_quantity = 2
 
-                total_scorecard_price = round(value_scorecard_quantity.get() * scorecard_price[0][0], 2)
+                    scorecard_price_competition = database_manager.execute_sql('''SELECT price 
+                                    FROM scorecard WHERE type = ?''', ('competition',))
 
-                total_price_right.set(total_scorecard_price)
+                    total_scorecard_price_competition = round(value_scorecard_competition_quantity *
+                                                              scorecard_price_competition[0][0], 2)
+                else:
+                    value_scorecard_competition_quantity = 0
+                    total_scorecard_price_competition = 0
+
+                scorecard_price_regular = database_manager.execute_sql('''SELECT price FROM scorecard WHERE type = ?''',
+                                                                       ('regular',))
+
+                total_scorecard_price_regular = round(value_scorecard_regular_quantity.get() *
+                                                      scorecard_price_regular[0][0], 2)
+
+                total_price_right.set(round(total_scorecard_price_regular + total_scorecard_price_competition, 2))
+
+                return round(total_scorecard_price_regular + total_scorecard_price_competition, 2)
+
+        frame_middle = tk.Frame(frame_right)
+        frame_middle.pack()
+
+        label_middle_price = ttk.Label(frame_middle, text="Totaal (EUR):") \
+            .grid(row=0, column=0, padx=5, pady=2, sticky="E")
+        total_price = tk.DoubleVar()
+        total_price.set(0.0)
+        label_total_price = ttk.Label(frame_middle, textvariable=total_price) \
+            .grid(row=0, column=1, padx=5, pady=2, sticky="E")
+
+        def clicked_submit():
+            if value_ammunition_quantity.get() > 0:
+                clicked_submit_right()
+            if value_scorecard_competition == 1 or int(value_scorecard_regular_quantity) > 0:
+                clicked_submit_left()
+
+        button_middle_submit = ttk.Button(frame_middle, text="Verkopen", command=lambda: clicked_submit()) \
+            .grid(row=0, column=2, padx=5, pady=2, sticky="W")
+
+        def clicked_reset():
+            clicked_reset_left()
+            clicked_reset_right()
+            total_price.set(0.0)
+
+        button_middle_reset = ttk.Button(frame_middle, text="Reset", command=lambda: clicked_reset()) \
+            .grid(row=0, column=3, padx=5, pady=2, sticky="W")
+
+        def clicked_total():
+            total_price.set(clicked_total_left() + clicked_total_right())
+
+        button_middle_total = ttk.Button(frame_middle, text="Reken Totaal", command=lambda: clicked_total()) \
+            .grid(row=0, column=4, padx=5, pady=2, sticky="W")
 
         frame_bottom = tk.Frame(frame_right)
         frame_bottom.pack(side="bottom", fill="both", expand=True)
@@ -1603,9 +2024,8 @@ class FinancePage(tk.Frame):
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
 
-app = ShootingClub()
-app.geometry("860x730")
-app.minsize(860, 730)
-app.maxsize(860, 730)
-ani = animation.FuncAnimation(f, animate, interval=8000)
-app.mainloop()
+app2 = LoginPage()
+app2.geometry("270x100")
+app2.minsize(285, 120)
+app2.maxsize(285, 120)
+app2.mainloop()

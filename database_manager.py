@@ -41,6 +41,8 @@ def execute_sql(sql, *args):
         close_connection(connection)
 
 
+# TODO fix the database format and layout for a final version
+
 statement1 = '''CREATE TABLE IF NOT EXISTS user (
                             type INTEGER NOT NULL,
                             first_name TEXT NOT NULL,
@@ -95,15 +97,20 @@ statement5 = '''CREATE TABLE IF NOT EXISTS score (
                             card_two_shot_four INTEGER NOT NULL,
                             card_two_shot_five INTEGER NOT NULL,
                             card_two_total INTEGER NOT NULL,
-                            date_score INTEGER NOT NULL,                           
+                            date_score INTEGER NOT NULL,
+                            own_firearm INTEGER NOT NULL,                           
                             shooter INTEGER NOT NULL,                            
                             firearm_type TEXT NOT NULL,
-                            discipline_type TEXT NOT NULL,                           
+                            discipline TEXT NOT NULL,
+                            submitter INTEGER NOT NULL,                           
                             FOREIGN KEY (shooter) REFERENCES user (knsa_licence_number)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (firearm_type) REFERENCES firearm (type)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
-                            FOREIGN KEY (discipline_type) REFERENCES discipline (type));'''
+                            FOREIGN KEY (discipline) REFERENCES discipline (type)
+                            ON DELETE NO ACTION ON UPDATE CASCADE,
+                            FOREIGN KEY (submitter) REFERENCES user (knsa_licence_number)
+                            ON DELETE NO ACTION ON UPDATE CASCADE);'''
 
 statement6 = '''CREATE TABLE IF NOT EXISTS sale_scorecard (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,5 +1,16 @@
 import datetime
+from datetime import date
+import datetime
+from datetime import timedelta
 import re
+
+
+# TODO add a date formatter function
+def date_range(i):
+    start_date = date.today() + datetime.timedelta(-date.today().weekday() - 1)
+    end_date = date.today() + datetime.timedelta(-date.today().weekday(), weeks=i)
+
+    return [str(start_date + timedelta(days=x)) for x in range((end_date-start_date).days + 1)]
 
 
 def is_int(i):
