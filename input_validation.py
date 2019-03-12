@@ -1,16 +1,23 @@
 import datetime
-from datetime import date
-import datetime
-from datetime import timedelta
 import re
+from datetime import date
+from datetime import timedelta
 
 
-# TODO add a date formatter function
-def date_range(i):
+def dates_in_range(i):
     start_date = date.today() + datetime.timedelta(-date.today().weekday() - 1)
     end_date = date.today() + datetime.timedelta(-date.today().weekday(), weeks=i)
 
-    return [str(start_date + timedelta(days=x)) for x in range((end_date-start_date).days + 1)]
+    return [start_date + timedelta(days=x) for x in range((end_date - start_date).days + 1)]
+
+
+def date_range(i):
+    return [date.today() + datetime.timedelta(-date.today().weekday() - 1),
+            date.today() + datetime.timedelta(-date.today().weekday(), weeks=i)]
+
+
+def convert_date(i):
+    return datetime.datetime.strptime(i, '%d-%m-%Y').date()
 
 
 def is_int(i):
@@ -28,7 +35,7 @@ def is_string(i):
 
 def is_knsa(i):
     if is_int(i):
-        if len(i) == 5 or len(i) == 6:
+        if len(str(i)) == 5 or len(str(i)) == 6:
             return True
 
 

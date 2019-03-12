@@ -4,7 +4,7 @@ from sqlite3 import Error
 
 def create_connection():
     try:
-        connection = sqlite3.connect('shooting_club')
+        connection = sqlite3.connect('shooting_club', detect_types=sqlite3.PARSE_DECLTYPES)
         connection.execute('PRAGMA foreign_keys = 1')
         print('Connected to database. SQLite: ' + sqlite3.version)
         return connection
@@ -29,19 +29,22 @@ def execute_sql(sql, *args):
         cursor.execute(sql, *args)
         if sql.lstrip().upper().startswith('SELECT'):
             rows = cursor.fetchall()
+            print('Successfully executed SQL')
             close_connection(connection)
             return rows
         else:
             connection.commit()
             print('Successfully executed and committed SQL')
         close_connection(connection)
-        return 'success'
+        return True
     except Error as e:
         print(e)
+        connection.rollback()
+        print('Rolled back entry')
+        print('Rolled back entry')
         close_connection(connection)
+        return False
 
-
-# TODO fix the database format and layout for a final version
 
 statement1 = '''CREATE TABLE IF NOT EXISTS user (
                             type INTEGER NOT NULL,
@@ -97,15 +100,15 @@ statement5 = '''CREATE TABLE IF NOT EXISTS score (
                             card_two_shot_four INTEGER NOT NULL,
                             card_two_shot_five INTEGER NOT NULL,
                             card_two_total INTEGER NOT NULL,
-                            date_score INTEGER NOT NULL,
-                            own_firearm INTEGER NOT NULL,                           
-                            shooter INTEGER NOT NULL,                            
-                            firearm_type TEXT NOT NULL,
+                            date INTEGER NOT NULL,
+                            shooter INTEGER NOT NULL,
+                            submitter INTEGER NOT NULL,
                             discipline TEXT NOT NULL,
-                            submitter INTEGER NOT NULL,                           
+                            firearm TEXT NOT NULL,
+                            own_firearm INTEGER NOT NULL,                           
                             FOREIGN KEY (shooter) REFERENCES user (knsa_licence_number)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
-                            FOREIGN KEY (firearm_type) REFERENCES firearm (type)
+                            FOREIGN KEY (firearm) REFERENCES firearm (type)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (discipline) REFERENCES discipline (type)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
@@ -114,7 +117,7 @@ statement5 = '''CREATE TABLE IF NOT EXISTS score (
 
 statement6 = '''CREATE TABLE IF NOT EXISTS sale_scorecard (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            date_sold INTEGER NOT NULL,
+                            date INTEGER NOT NULL,
                             quantity INTEGER NOT NULL,
                             type TEXT NOT NULL,
                             seller INTEGER NOT NULL,
@@ -131,7 +134,7 @@ statement6 = '''CREATE TABLE IF NOT EXISTS sale_scorecard (
 
 statement7 = '''CREATE TABLE IF NOT EXISTS sale_ammunition (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            date_sold INTEGER NOT NULL,
+                            date INTEGER NOT NULL,
                             quantity INTEGER NOT NULL,
                             type TEXT NOT NULL,
                             seller INTEGER NOT NULL,
@@ -145,13 +148,3 @@ statement7 = '''CREATE TABLE IF NOT EXISTS sale_ammunition (
                             ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (price) REFERENCES ammunition (price)
                             ON DELETE NO ACTION ON UPDATE NO ACTION);'''
-
-'''
-execute_sql(statement1)
-execute_sql(statement2)
-execute_sql(statement3)
-execute_sql(statement4)
-execute_sql(statement5)
-execute_sql(statement6)
-execute_sql(statement7)
-'''

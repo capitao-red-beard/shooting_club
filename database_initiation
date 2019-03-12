@@ -1,0 +1,49 @@
+execute_sql(statement1)
+execute_sql(statement2)
+execute_sql(statement3)
+execute_sql(statement4)
+execute_sql(statement5)
+execute_sql(statement6)
+execute_sql(statement7)
+execute_sql(statement8)
+execute_sql(statement9)
+
+password = password_manager.hash_password('admin123')
+
+execute_sql('''INSERT INTO user (
+type,
+first_name,
+last_name,
+date_of_birth,
+address,
+city,
+post_code,
+telephone_number,
+email_address,
+password,
+knsa_licence_number,
+date_of_membership) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+            (2,
+             'admin',
+             'admin',
+             date(1970, 1, 1),
+             'in a basement',
+             'somewhere',
+             '000000',
+             '00000000000',
+             'jasper.v.d.valk@gmail.com',
+             password,
+             100001,
+             date(1970, 1, 1)))
+
+execute_sql('''INSERT INTO firearm (type) VALUES (?)''', ('pistol',))
+execute_sql('''INSERT INTO firearm (type) VALUES (?)''', ('carbine',))
+execute_sql('''INSERT INTO discipline (type) VALUES (?)''', ('pistol',))
+execute_sql('''INSERT INTO discipline (type) VALUES (?)''', ('carbine',))
+
+execute_sql('''INSERT INTO ammunition (type, price, stock) VALUES (?, ?, ?)''', ('cci', 0.12, 100))
+execute_sql('''INSERT INTO ammunition (type, price, stock) VALUES (?, ?, ?)''', ('eley', 0.14, 100))
+execute_sql('''INSERT INTO ammunition (type, price, stock) VALUES (?, ?, ?)''', ('rws', 0.13, 100))
+
+execute_sql('''INSERT INTO scorecard (type, price, stock) VALUES (?, ?, ?)''', ('regular', 0.30, 100))
+execute_sql('''INSERT INTO scorecard (type, price, stock) VALUES (?, ?, ?)''', ('competition', 0.50, 100))
