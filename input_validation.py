@@ -2,6 +2,7 @@ import datetime
 import re
 from datetime import date
 from datetime import timedelta
+from geopy.geocoders import Nominatim
 
 
 def dates_in_range(i):
@@ -16,13 +17,27 @@ def date_range(i):
             date.today() + datetime.timedelta(-date.today().weekday(), weeks=i)]
 
 
-def convert_date(i):
-    return datetime.datetime.strptime(i, '%d-%m-%Y').date()
+def convert_input_date(i):
+    try:
+        return datetime.datetime.strptime(i, '%d-%m-%Y').date()
+    except ValueError:
+        return False
+
+
+def convert_output_date(i):
+    return datetime.datetime.strptime(i, '%Y-%m-%d').date().strftime('%d-%m-%Y')
+
+
+def is_date(i):
+    try:
+        datetime.datetime.strptime(i, '%Y-%m-%d')
+    except ValueError:
+        return False
 
 
 def is_int(i):
-    if int(i):
-        return True
+    if not int(i):
+        return False
 
 
 def is_float(i):
@@ -35,15 +50,8 @@ def is_string(i):
 
 def is_knsa(i):
     if is_int(i):
-        if len(str(i)) == 5 or len(str(i)) == 6:
-            return True
-
-
-def is_date(i):
-    try:
-        datetime.datetime.strptime(i, '%Y-%m-%d')
-    except ValueError:
-        return False
+        if len(str(i)) != 5 or len(str(i)) != 6:
+            return False
 
 
 def is_email(i):
@@ -51,6 +59,18 @@ def is_email(i):
         return False
 
 
+def is_phone_number(i):
+    if len(i) != 10:
+        return False
+
+
 def is_password(i):
     if len(i) < 8:
         return False
+
+
+def is_address(address, city, post_code):
+    details = '{}, {}, {}'.format(address, city, post_code)
+    geolocator = Nominatim(user_agent='shooting_club')
+    location = geolocator.geocode(details)
+    return location

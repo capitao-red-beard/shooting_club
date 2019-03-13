@@ -42,10 +42,9 @@ def animate(i):
     a.plot(x_list, y_list)
 
 
-# TODO fix view member details
-def popup_user_settings():
+def popup_user_settings(user_session):
     popup = tk.Tk()
-    popup.wm_title("Lid Instellingen")
+    popup.wm_title("Lid Instellingen: " + "(" + user_session + ") ")
 
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
@@ -76,7 +75,7 @@ def popup_user_settings():
     entry_last_name_new = ttk.Entry(tab_new, textvariable=value_last_name_new, width=25) \
         .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
-    label_date_of_birth_new = ttk.Label(tab_new, text="Geboorte Datum (YYYY-MM-DD):") \
+    label_date_of_birth_new = ttk.Label(tab_new, text="Geboorte Datum (DD-MM-YYYY):") \
         .grid(row=3, column=0, padx=5, pady=2, sticky="W")
     value_date_of_birth_new = tk.StringVar(tab_new)
     entry_date_of_birth_new = ttk.Entry(tab_new, textvariable=value_date_of_birth_new, width=25) \
@@ -119,7 +118,7 @@ def popup_user_settings():
     entry_knsa_licence_number_new = ttk.Entry(tab_new, textvariable=value_knsa_licence_number_new, width=25)
     entry_knsa_licence_number_new.grid(row=10, column=1, padx=5, pady=2, sticky="W")
 
-    label_date_of_membership_new = ttk.Label(tab_new, text="Datum van Lidmaatschap Ingang (YYYY-MM-DD):") \
+    label_date_of_membership_new = ttk.Label(tab_new, text="Datum van Lidmaatschap Ingang (DD-MM-YYYY):") \
         .grid(row=11, column=0, padx=5, pady=2, sticky="W")
     value_date_of_membership_new = tk.StringVar(tab_new)
     entry_date_of_membership_new = ttk.Entry(tab_new, textvariable=value_date_of_membership_new, width=25) \
@@ -129,121 +128,96 @@ def popup_user_settings():
         .grid(row=12, column=0, padx=10, pady=15)
 
     def clicked_new():
-        if fields.get(value_user_type_new.get()) == 2:
-            data_list_new = [value_first_name_new.get(),
-                             value_last_name_new.get(),
-                             input_validation.convert_date(value_date_of_birth_new.get()),
-                             value_address_new.get(),
-                             value_city_new.get(),
-                             value_post_code_new.get(),
-                             value_telephone_number_new.get(),
-                             value_email_address_new.get(),
-                             value_password_new.get(),
-                             value_knsa_licence_number_new.get(),
-                             input_validation.convert_date(value_date_of_membership_new.get())]
-        else:
-            data_list_new = [value_first_name_new.get(),
-                             value_last_name_new.get(),
-                             input_validation.convert_date(value_date_of_birth_new.get()),
-                             value_address_new.get(),
-                             value_city_new.get(),
-                             value_post_code_new.get(),
-                             value_telephone_number_new.get(),
-                             value_knsa_licence_number_new.get(),
-                             input_validation.convert_date(value_date_of_membership_new.get())]
+        data = [fields.get(value_user_type_new.get()),
+                value_first_name_new.get().lower().strip(),
+                value_last_name_new.get().lower().strip(),
+                value_date_of_birth_new.get().strip(),
+                value_address_new.get().lower().strip(),
+                value_city_new.get().lower().strip(),
+                value_post_code_new.get().replace(' ', '').lower(),
+                value_telephone_number_new.get(),
+                value_email_address_new.get().lower().strip(),
+                value_password_new.get().strip(),
+                value_knsa_licence_number_new.get().lower().strip(),
+                value_date_of_membership_new.get().strip()]
 
-        if data_list_new.count('') > 0:
-            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
-            popup.lift()
-        elif input_validation.is_date(value_date_of_birth_new.get()) is False \
-                or input_validation.is_date(value_date_of_membership_new.get()) is False:
-            messagebox.showerror(title="Error", message="Vul aub een valide datum in")
-            popup.lift()
-        elif input_validation.is_int(int(value_telephone_number_new.get())) is False:
-            messagebox.showerror(title="Error", message="Vul aub een valide telefoonnummer in")
-            popup.lift()
-        elif input_validation.is_knsa(value_knsa_licence_number_new.get()) is False:
-            messagebox.showerror(title="Error", message="Vul aub een valide KNSA licentie nummer in")
-            popup.lift()
-        else:
-            if fields.get(value_user_type_new.get()) == 2:
-                if input_validation.is_email(value_email_address_new.get()) is False:
-                    messagebox.showerror(title="Error", message="Vul aub een valide email adres in")
-                    popup.lift()
-                elif input_validation.is_password(value_password_new.get()) is False:
-                    messagebox.showerror(title="Error", message="Vul aub een wachtwoord in met meer dan 8 zijvers")
-                    popup.lift()
+        error_message = []
 
-                hashed_password = password_manager.hash_password(value_password_new.get())
+        if data[1] == '':
+            error_message.append('Vul aub een voornaam in voordat je verder gaat\n')
+        elif data[2] == '':
+            error_message.append('Vul aub een familienaam in voordat je verder gaat\n')
+        elif input_validation.is_date(str(input_validation.convert_input_date(data[3]))) is False:
+            error_message.append('Vul aub een valide gebortedatum in voordat je verder gaat\n')
+        elif input_validation.is_address(data[4], data[5], data[6]) is False:
+            error_message.append('Vul aub een valide adres in in voordat je verder gaat\n')
+        elif input_validation.is_phone_number(data[7]) is False:
+            error_message.append('Vul aub een valide telefoonnummer in voor dat je verder gaat\n')
+        elif input_validation.is_knsa(data[10]) is False:
+            error_message.append('Vul aub een valide KNSA licentienummer in voordat je verder gaat\n')
+        elif input_validation.is_date(str(input_validation.convert_input_date(data[11]))) is False:
+            error_message.append('Vul aub een valide datum van litmaatschap ingang in voordat je verder gaat\n')
 
-                result_new = database_manager.execute_sql(
-                    '''INSERT INTO user (type, first_name,last_name, date_of_birth, address, city, post_code, 
-                    telephone_number, email_address, password, knsa_licence_number, date_of_membership) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
-                        fields.get(value_user_type_new.get()),
-                        value_first_name_new.get().lower(),
-                        value_last_name_new.get().lower(),
-                        input_validation.convert_date(value_date_of_birth_new.get()),
-                        value_address_new.get().lower(),
-                        value_city_new.get().lower(),
-                        value_post_code_new.get().lower(),
-                        value_telephone_number_new.get(),
-                        value_email_address_new.get().lower(),
-                        hashed_password,
-                        value_knsa_licence_number_new.get(),
-                        input_validation.convert_date(value_date_of_membership_new.get())))
-            elif value_email_address_new.get() != '':
-                result_new = database_manager.execute_sql(
-                    '''INSERT INTO user (type, first_name, last_name, date_of_birth, address, city, post_code, 
-                    telephone_number, email_address, knsa_licence_number, date_of_membership) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
-                        fields.get(value_user_type_new.get()),
-                        value_first_name_new.get().lower(),
-                        value_last_name_new.get().lower(),
-                        input_validation.convert_date(value_date_of_birth_new.get()),
-                        value_address_new.get().lower(),
-                        value_city_new.get().lower(),
-                        value_post_code_new.get().lower(),
-                        value_telephone_number_new.get(),
-                        value_email_address_new.get(),
-                        value_knsa_licence_number_new.get(),
-                        input_validation.convert_date(value_date_of_membership_new.get())))
+        if data[0] == 2:
+            if input_validation.is_email(data[8]) is False:
+                error_message.append('Vul aub een valide email adres in voor dat je verder gaat\n')
+            elif input_validation.is_password(data[9]) is False:
+                error_message.append('Vul aub een valide wachtwoord in voor dat je verder gaat\n')
             else:
-                result_new = database_manager.execute_sql(
-                    '''INSERT INTO user (type, first_name, last_name, date_of_birth, address, city, post_code, 
-                    telephone_number, knsa_licence_number, date_of_membership) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
-                        fields.get(value_user_type_new.get()),
-                        value_first_name_new.get().lower(),
-                        value_last_name_new.get().lower(),
-                        input_validation.convert_date(value_date_of_birth_new.get()),
-                        value_address_new.get().lower(),
-                        value_city_new.get().lower(),
-                        value_post_code_new.get().lower(),
-                        value_telephone_number_new.get(),
-                        value_knsa_licence_number_new.get(),
-                        input_validation.convert_date(value_date_of_membership_new.get())))
+                hashed_password = password_manager.hash_password(data[9])
+        elif data[0] == 1:
+            if len(data[8]) > 0:
+                if input_validation.is_email(data[8]) is False:
+                    error_message.append('Vul aub een valide email adres in voor dat je verder gaat\n')
+            else:
+                data[8] = None
+
+            hashed_password = None
+
+        if error_message:
+            for m in error_message:
+                messagebox.showerror(title="Error", message=m)
+            popup.lift()
+        else:
+            result_new = database_manager.execute_sql(
+                '''INSERT INTO user (type, first_name,last_name, date_of_birth, address, city, post_code, 
+                telephone_number, email_address, password, knsa_licence_number, date_of_membership) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
+                    data[0],
+                    data[1],
+                    data[2],
+                    input_validation.convert_input_date(data[3]),
+                    data[4],
+                    data[5],
+                    data[6],
+                    data[7],
+                    data[8],
+                    hashed_password,
+                    data[10],
+                    input_validation.convert_input_date(data[11])))
 
             if result_new:
                 email_body_user = 'Gefeliciteerd ' + value_first_name_new.get() + \
                                   ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
-                                  '\n\n U kunt nu scores opslaan, terug kijken, munitie en kaarten copen en veel meer!' \
-                                  '\n\n Reageer aub niet op deze email.' \
-                                  '\n\n Fijne dag!'
+                                  '\n\n U kunt nu scores opslaan, terug kijken, ' \
+                                  'munitie en kaarten copen en veel meer! ' \
+                                  '\n\n Reageer aub niet op deze email. \n\n Fijne dag!'
 
                 email_result_user = email_manager.send_email(value_email_address_new.get(),
                                                              'Welkom bij Schietvereniging Prinses Juliana',
                                                              email_body_user)
 
-                email_body_admin = 'Beheerder, \n\n Er is een nieuwe lid in het schietvereniging systeem. ' \
-                                   '\n\n Reageer aub niet op deze email.' \
-                                   '\n\n Fijne dag!'
+                email_body_admin = 'Beheerder, \n\n Er is een nieuwe lid in het schietvereniging systeem, ' \
+                                   'het lid was ingevoerd door ' + user_session + \
+                                   '\n\n Reageer aub niet op deze email. \n\n Fijne dag!'
 
-                # TODO test multiple email recipients
                 admins = database_manager.execute_sql('''SELECT email_address FROM user WHERE type = ?''', (2,))
 
-                email_result_admin = email_manager.send_email(admins,
-                                                              'Nieuwe Lid bij Schietvereniging Prinses Juliana',
+                recipients = []
+                for x in admins:
+                    recipients.append(x[0])
+
+                email_result_admin = email_manager.send_email(recipients,'Nieuwe Lid bij Schietvereniging Prinses Juliana',
                                                               email_body_admin)
 
                 if email_result_user and email_result_admin:
@@ -253,7 +227,6 @@ def popup_user_settings():
                 else:
                     messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
                     popup.lift()
-
             else:
                 messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
                 popup.lift()
@@ -406,7 +379,7 @@ def popup_user_settings():
     label_user_last_name = ttk.Label(tab_view, textvariable=value_last_name_view) \
         .grid(row=3, column=1, padx=5, pady=2, sticky="W")
 
-    label_date_of_birth_view = ttk.Label(tab_view, text="Geboorte Datum (YYYY-MM-DD):") \
+    label_date_of_birth_view = ttk.Label(tab_view, text="Geboorte Datum (DD-MM-YYYY):") \
         .grid(row=4, column=0, padx=5, pady=2, sticky="W")
     value_date_of_birth_view = tk.StringVar(tab_view)
     label_date_of_birth = ttk.Label(tab_view, textvariable=value_date_of_birth_view) \
@@ -445,7 +418,7 @@ def popup_user_settings():
     label_knsa_licence_number = ttk.Label(tab_view, textvariable=value_knsa_licence_number_view) \
         .grid(row=10, column=1, padx=5, pady=2, sticky="W")
 
-    label_date_of_membership_view = ttk.Label(tab_view, text="Datum van Lidmaatschap Ingang (YYYY-MM-DD):") \
+    label_date_of_membership_view = ttk.Label(tab_view, text="Datum van Lidmaatschap Ingang (DD-MM-YYYY):") \
         .grid(row=11, column=0, padx=5, pady=2, sticky="W")
     value_date_of_membership_view = tk.StringVar(tab_view)
     label_date_of_membership = ttk.Label(tab_view, textvariable=value_date_of_membership_view) \
@@ -468,17 +441,17 @@ def popup_user_settings():
             (value_user_view.get()[1:7],))
 
         # May need to convert date formats here if this fails
-        value_user_type_view.set(fields3.get(int(result_view[0][0])))
+        value_user_type_view.set(fields3.get(result_view[0][0]))
         value_first_name_view.set(result_view[0][1])
         value_last_name_view.set(result_view[0][2])
-        value_date_of_birth_view.set(result_view[0][3])
+        value_date_of_birth_view.set(input_validation.convert_output_date(result_view[0][3]))
         value_address_view.set(result_view[0][4])
         value_city_view.set(result_view[0][5])
         value_post_code_view.set(result_view[0][6])
         value_telephone_number_view.set(result_view[0][7])
         value_email_address_view.set(result_view[0][8])
         value_knsa_licence_number_view.set(result_view[0][9])
-        value_date_of_membership_view.set(result_view[0][10])
+        value_date_of_membership_view.set(input_validation.convert_output_date(result_view[0][10]))
 
     button_cancel_view = ttk.Button(tab_view, text="Annuleren", command=popup.destroy) \
         .grid(row=12, column=1, padx=10, pady=15)
@@ -486,10 +459,10 @@ def popup_user_settings():
     popup.mainloop()
 
 
-def popup_firearm_settings():
+def popup_firearm_settings(user_session):
     # main window holding all elements
     popup = tk.Tk()
-    popup.wm_title("Vuurwapen Instellingen")
+    popup.wm_title("Vuurwapen Instellingen: " + "(" + user_session + ") ")
 
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
@@ -569,10 +542,10 @@ def popup_firearm_settings():
     popup.mainloop()
 
 
-def popup_ammunition_settings():
+def popup_ammunition_settings(user_session):
     # main window holding all elements
     popup = tk.Tk()
-    popup.wm_title("Munitie Instellingen")
+    popup.wm_title("Munitie Instellingen: " + "(" + user_session + ") ")
 
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
@@ -772,10 +745,10 @@ def popup_ammunition_settings():
     popup.mainloop()
 
 
-def popup_scorecard_settings():
+def popup_scorecard_settings(user_session):
     # main window holding all elements
     popup = tk.Tk()
-    popup.wm_title("Score Kaart Instellingen")
+    popup.wm_title("Score Kaart Instellingen: " + "(" + user_session + ") ")
 
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
@@ -979,10 +952,10 @@ def popup_scorecard_settings():
     popup.mainloop()
 
 
-def popup_discipline_settings():
+def popup_discipline_settings(user_session):
     # main window holding all elements
     popup = tk.Tk()
-    popup.wm_title("Discipline Instellingen")
+    popup.wm_title("Discipline Instellingen: " + "(" + user_session + ") ")
 
     # notebook holding the tabs
     notebook = ttk.Notebook(popup)
@@ -1073,8 +1046,7 @@ class ShootingClub(tk.Tk):
             '''SELECT first_name FROM user WHERE knsa_licence_number = ?''', (user_session,))
 
         # tk.Tk.iconbitmap(self, default="logo_16_16.ico")
-        tk.Tk.wm_title(self, "Schietvereniging - Prinses Juliana: " + "(" + user_session + ")" +
-                       " " + result[0][0])
+        tk.Tk.wm_title(self, "Schietvereniging - Prinses Juliana: " + "(" + user_session + ") " + result[0][0])
 
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -1084,11 +1056,11 @@ class ShootingClub(tk.Tk):
         menu_bar = tk.Menu(container)
         file_menu = tk.Menu(menu_bar, tearoff=0)
 
-        file_menu.add_command(label="Lid Instellingen", command=lambda: popup_user_settings())
-        file_menu.add_command(label="Vuurapen Instellingen", command=lambda: popup_firearm_settings())
-        file_menu.add_command(label="Discipline Instellingen", command=lambda: popup_discipline_settings())
-        file_menu.add_command(label="Munitie Instellingen", command=lambda: popup_ammunition_settings())
-        file_menu.add_command(label="Score Kaart Instellingen", command=lambda: popup_scorecard_settings())
+        file_menu.add_command(label="Lid Instellingen", command=lambda: popup_user_settings(user_session))
+        file_menu.add_command(label="Vuurapen Instellingen", command=lambda: popup_firearm_settings(user_session))
+        file_menu.add_command(label="Discipline Instellingen", command=lambda: popup_discipline_settings(user_session))
+        file_menu.add_command(label="Munitie Instellingen", command=lambda: popup_ammunition_settings(user_session))
+        file_menu.add_command(label="Score Kaart Instellingen", command=lambda: popup_scorecard_settings(user_session))
         file_menu.add_separator()
         file_menu.add_command(label="Sluiten", command=lambda: self.on_exit(), accelerator="Ctrl+Q")
         menu_bar.add_cascade(label="Instellingen", menu=file_menu)
