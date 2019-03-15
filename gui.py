@@ -61,9 +61,10 @@ def popup_user_settings(user_session):
     label_user_type_new = ttk.Label(tab_new, text="Gebruikerstype:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_user_type_new = tk.StringVar(tab_new)
     value_user_type_new.set("Select")
-    option_menu_user_type_new = ttk.OptionMenu(tab_new, value_user_type_new, next(iter(fields)), *fields.keys())
-    option_menu_user_type_new.config(width=max([len(i) for i in fields.keys()]) + 1)
-    option_menu_user_type_new.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_new = AutocompleteCombobox(tab_new, textvariable=value_user_type_new)
+    autocomplete_combobox_new.set_completion_list(fields.keys())
+    autocomplete_combobox_new.config(width=max([len(i) for i in fields.keys()]) + 1)
+    autocomplete_combobox_new.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_first_name_new = ttk.Label(tab_new, text="Voornaam:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_first_name_new = tk.StringVar(tab_new)
@@ -149,7 +150,7 @@ def popup_user_settings(user_session):
             error_message.append('Vul aub een familienaam in voordat je verder gaat\n')
         elif input_validation.is_date(str(input_validation.convert_input_date(data[3]))) is False:
             error_message.append('Vul aub een valide gebortedatum in voordat je verder gaat\n')
-        elif input_validation.is_address(data[4], data[5], data[6]) is False:
+        elif input_validation.is_address(data[4], data[5], data[6]) is None:
             error_message.append('Vul aub een valide adres in in voordat je verder gaat\n')
         elif input_validation.is_phone_number(data[7]) is False:
             error_message.append('Vul aub een valide telefoonnummer in voor dat je verder gaat\n')
@@ -197,15 +198,18 @@ def popup_user_settings(user_session):
                     input_validation.convert_input_date(data[11])))
 
             if result_new:
-                email_body_user = 'Gefeliciteerd ' + value_first_name_new.get() + \
-                                  ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
-                                  '\n\n U kunt nu scores opslaan, terug kijken, ' \
-                                  'munitie en kaarten copen en veel meer! ' \
-                                  '\n\n Reageer aub niet op deze email. \n\n Fijne dag!'
+                email_result_user = True
 
-                email_result_user = email_manager.send_email(value_email_address_new.get(),
-                                                             'Welkom bij Schietvereniging Prinses Juliana',
-                                                             email_body_user)
+                if data[8] is not None:
+                    email_body_user = 'Gefeliciteerd ' + value_first_name_new.get() + \
+                                      ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
+                                      '\n\n U kunt nu scores opslaan, terug kijken, ' \
+                                      'munitie en kaarten copen en veel meer! ' \
+                                      '\n\n Reageer aub niet op deze email. \n\n Fijne dag!'
+
+                    email_result_user = email_manager.send_email(value_email_address_new.get(),
+                                                                 'Welkom bij Schietvereniging Prinses Juliana',
+                                                                 email_body_user)
 
                 email_body_admin = 'Beheerder, \n\n Er is een nieuwe lid in het schietvereniging systeem, ' \
                                    'het lid was ingevoerd door ' + user_session + \
@@ -217,7 +221,8 @@ def popup_user_settings(user_session):
                 for x in admins:
                     recipients.append(x[0])
 
-                email_result_admin = email_manager.send_email(recipients,'Nieuwe Lid bij Schietvereniging Prinses Juliana',
+                email_result_admin = email_manager.send_email(recipients,
+                                                              'Nieuwe Lid bij Schietvereniging Prinses Juliana',
                                                               email_body_admin)
 
                 if email_result_user and email_result_admin:
@@ -239,11 +244,14 @@ def popup_user_settings(user_session):
 
     label_users_edit = ttk.Label(tab_edit, text="Lid te Berwerken:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
     users = database_manager.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
+    user_list = [str(u[2]) + ' ' + str(u[1]) + ' - ' + str(u[0]) for u in users]
+
     value_user_edit = tk.StringVar(tab_edit)
     value_user_edit.set("Select")
-    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_user_edit, users[0], *users)
-    option_menu_user_edit.config(width=max([sum([len(str(q)) for q in i]) for i in users]) + 3)
-    option_menu_user_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_edit = AutocompleteCombobox(tab_edit, textvariable=value_user_edit)
+    autocomplete_combobox_edit.set_completion_list(user_list)
+    autocomplete_combobox_edit.config(width=max([sum([len(str(q)) for q in i]) for i in user_list]))
+    autocomplete_combobox_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     fields2 = {'Adres': 'address',
                'Woonplaats': 'city',
@@ -256,9 +264,10 @@ def popup_user_settings(user_session):
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_field_edit = tk.StringVar(tab_edit)
     value_field_edit.set("Select")
-    option_menu_user_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields2)), *fields2.keys())
-    option_menu_user_edit.config(width=max([len(i) for i in fields2.keys()]) + 1)
-    option_menu_user_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_edit2 = AutocompleteCombobox(tab_edit, textvariable=value_field_edit)
+    autocomplete_combobox_edit2.set_completion_list(fields2.keys())
+    autocomplete_combobox_edit2.config(width=max([len(i) for i in fields2.keys()]) + 2)
+    autocomplete_combobox_edit2.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_update_edit = tk.StringVar(tab_edit)
@@ -287,18 +296,18 @@ def popup_user_settings(user_session):
                 messagebox.showerror(title="Error", message="Vul aub een valide KNSA licentie nummer in")
                 popup.lift()
         else:
-            result_edit = database_manager.execute_sql('UPDATE user SET ' + str(fields2.get(value_field_edit.get()))
-                                                       + ' = ? WHERE  knsa_licence_number = ?',
-                                                       (value_update_edit.get().lower(), value_user_edit.get()[1:7]))
+            result_edit = database_manager.execute_sql(
+                'UPDATE user SET ' + str(fields2.get(value_field_edit.get())) + ' = ? WHERE  knsa_licence_number = ?',
+                (value_update_edit.get().lower(), int(value_user_edit.get()[-6:])))
 
             if result_edit:
                 user_data = database_manager.execute_sql(
                     '''SELECT email_address, first_name FROM user WHERE knsa_licence_number = ?''',
-                    (value_user_edit.get()[1:7],))
+                    (int(value_user_edit.get()[-6:]),))
 
                 email_body = 'Hallo ' + user_data[0][1] + \
                              ', \n\n Uw ' + value_field_edit.get() + \
-                             ' is met succes veranderd in het systeem.' \
+                             ' bent met succes veranderd in het systeem.' \
                              ' \n\n Reageer aub niet op deze email. \n\n Fijne dag!'
 
                 email_result = email_manager.send_email(user_data[0][0], 'Uw gegevens zijn veranderd', email_body)
@@ -325,9 +334,10 @@ def popup_user_settings(user_session):
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_user_delete = tk.StringVar(tab_delete)
     value_user_delete.set("Select")
-    option_menu_user_delete = ttk.OptionMenu(tab_delete, value_user_delete, users[0], *users)
-    option_menu_user_delete.config(width=max([sum([len(str(q)) for q in i]) for i in users]) + 3)
-    option_menu_user_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_delete = AutocompleteCombobox(tab_delete, textvariable=value_user_delete)
+    autocomplete_combobox_delete.set_completion_list(user_list)
+    autocomplete_combobox_delete.config(width=max([sum([len(str(q)) for q in i]) for i in user_list]))
+    autocomplete_combobox_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=3, column=0, padx=10, pady=15)
@@ -338,7 +348,7 @@ def popup_user_settings(user_session):
 
         if ays == 'yes':
             result_delete = database_manager.execute_sql(
-                '''DELETE FROM user WHERE knsa_licence_number = ?;''', (value_user_delete.get()[1:7],))
+                '''DELETE FROM user WHERE knsa_licence_number = ?;''', (int(value_user_delete.get()[-6:]),))
 
             if result_delete:
                 messagebox.showinfo(title="Information",
@@ -360,9 +370,11 @@ def popup_user_settings(user_session):
     label_user_view = ttk.Label(tab_view, text="Lid te Bekijken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_user_view = tk.StringVar(tab_view)
-    option_menu_user_view = ttk.OptionMenu(tab_view, value_user_view, users[0], *users)
-    option_menu_user_view.config(width=max([sum([len(str(q)) for q in i]) for i in users]) + 3)
-    option_menu_user_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    value_user_view.set('Select')
+    autocomplete_combobox_view = AutocompleteCombobox(tab_view, textvariable=value_user_view)
+    autocomplete_combobox_view.set_completion_list(user_list)
+    autocomplete_combobox_view.config(width=max([sum([len(str(q)) for q in i]) for i in user_list]))
+    autocomplete_combobox_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_user_type_view = ttk.Label(tab_view, text="Gebruikerstype:").grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_user_type_view = tk.StringVar(tab_view)
@@ -427,9 +439,7 @@ def popup_user_settings(user_session):
     button_submit_view = ttk.Button(tab_view, text="Bekijk", command=lambda: clicked_view()) \
         .grid(row=12, column=0, padx=10, pady=15)
 
-    # this should delete the record in the dropdown menu
     def clicked_view():
-
         fields3 = {
             1: 'Standaard',
             2: 'Beheerder'
@@ -438,7 +448,7 @@ def popup_user_settings(user_session):
         result_view = database_manager.execute_sql(
             '''SELECT type, first_name, last_name, date_of_birth, address, city, post_code, telephone_number,
              email_address, knsa_licence_number, date_of_membership FROM user WHERE knsa_licence_number = ?''',
-            (value_user_view.get()[1:7],))
+            (int(value_user_view.get()[-6:]),))
 
         # May need to convert date formats here if this fails
         value_user_type_view.set(fields3.get(result_view[0][0]))
@@ -505,17 +515,19 @@ def popup_firearm_settings(user_session):
     notebook.add(tab_delete, text="Verwijder Vuurwapen")
 
     firearms = database_manager.execute_sql('''SELECT type FROM firearm;''')
+    firearm_list = [str(f[0]) for f in firearms]
 
     label_type_delete = ttk.Label(tab_delete, text="Vuurwapen te Verwijderen:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, firearms[0], *firearms)
-    option_menu_type_delete.config(width=max([sum([len(q) for q in i]) for i in firearms]))
-    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_delete = AutocompleteCombobox(tab_delete, textvariable=value_type_delete)
+    autocomplete_combobox_delete.set_completion_list(firearm_list)
+    autocomplete_combobox_delete.config(width=max([sum([len(str(q)) for q in i]) for i in firearm_list]) + 1)
+    autocomplete_combobox_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
-        .grid(row=3, column=0, padx=10, pady=15, sticky="W")
+        .grid(row=2, column=0, padx=10, pady=15, sticky="W")
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
@@ -524,7 +536,7 @@ def popup_firearm_settings(user_session):
 
         if ays == 'yes':
             result_delete = database_manager.execute_sql(
-                '''DELETE FROM firearm WHERE type = ?''', (value_type_delete.get()[2:-3],))
+                '''DELETE FROM firearm WHERE type = ?''', (value_type_delete.get(),))
 
             if result_delete:
                 messagebox.showinfo(title="Information",
@@ -537,7 +549,7 @@ def popup_firearm_settings(user_session):
             popup.lift()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
-        .grid(row=3, column=1, padx=10, pady=15)
+        .grid(row=2, column=1, padx=10, pady=15)
 
     popup.mainloop()
 
@@ -613,19 +625,22 @@ def popup_ammunition_settings(user_session):
     label_type_edit = ttk.Label(tab_edit, text="Munitie te bewerken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     ammunition_types = database_manager.execute_sql('''SELECT type FROM ammunition;''')
+    ammunition_list = [str(a[0]) for a in ammunition_types]
     value_type_edit = tk.StringVar(tab_edit)
     value_type_edit.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, ammunition_types[0], *ammunition_types)
-    option_menu_type_edit.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
-    option_menu_type_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_edit = AutocompleteCombobox(tab_edit, textvariable=value_type_edit)
+    autocomplete_combobox_edit.set_completion_list(ammunition_list)
+    autocomplete_combobox_edit.config(width=max([sum([len(str(q)) for q in i]) for i in ammunition_list]) + 2)
+    autocomplete_combobox_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_field_edit = tk.StringVar(tab_edit)
     value_field_edit.set("Select")
-    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys())
-    option_menu_value_edit.config(width=max([len(i) for i in fields.keys()]) + 1)
-    option_menu_value_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_edit2 = AutocompleteCombobox(tab_edit, textvariable=value_field_edit)
+    autocomplete_combobox_edit2.set_completion_list(fields.keys())
+    autocomplete_combobox_edit2.config(width=max([sum([len(str(q)) for q in i]) for i in fields.keys()]) + 1)
+    autocomplete_combobox_edit2.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_update_edit = tk.DoubleVar(tab_edit)
@@ -642,7 +657,7 @@ def popup_ammunition_settings(user_session):
                 popup.lift()
             else:
                 current_stock = database_manager.execute_sql(
-                    '''SELECT stock from ammunition WHERE type = ?''', (value_type_edit.get()[2:5],))
+                    '''SELECT stock from ammunition WHERE type = ?''', (value_type_edit.get(),))
                 new_value = int(current_stock[0][0] + value_update_edit.get())
         else:
             if input_validation.is_float(value_update_edit.get()) is False:
@@ -653,10 +668,10 @@ def popup_ammunition_settings(user_session):
 
         if fields.get(value_field_edit.get()) == 'price':
             result_edit = database_manager.execute_sql(
-                '''UPDATE ammunition SET price = ? WHERE type = ?''', (new_value, value_type_edit.get()[2:5]))
+                '''UPDATE ammunition SET price = ? WHERE type = ?''', (new_value, value_type_edit.get()))
         else:
             result_edit = database_manager.execute_sql(
-                '''UPDATE ammunition SET stock = ? WHERE type = ?''', (new_value, value_type_edit.get()[2:5]))
+                '''UPDATE ammunition SET stock = ? WHERE type = ?''', (new_value, value_type_edit.get()))
 
         if result_edit:
             messagebox.showinfo(title="Information",
@@ -676,12 +691,13 @@ def popup_ammunition_settings(user_session):
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, ammunition_types[0], *ammunition_types)
-    option_menu_type_delete.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
-    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_delete = AutocompleteCombobox(tab_delete, textvariable=value_type_delete)
+    autocomplete_combobox_delete.set_completion_list(ammunition_list)
+    autocomplete_combobox_delete.config(width=max([sum([len(str(q)) for q in i]) for i in ammunition_list]) + 1)
+    autocomplete_combobox_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
-        .grid(row=3, column=0, padx=10, pady=15)
+        .grid(row=1, column=0, padx=10, pady=15)
 
     # this should delete the record in the dropdown menu
     def clicked_delete():
@@ -690,7 +706,7 @@ def popup_ammunition_settings(user_session):
 
         if ays == 'yes':
             result_delete = database_manager.execute_sql(
-                '''DELETE FROM ammunition WHERE type = ?''', ((value_type_delete.get()[2:-3]),))
+                '''DELETE FROM ammunition WHERE type = ?''', ((value_type_delete.get()),))
 
             if result_delete:
                 messagebox.showinfo(title="Information",
@@ -703,18 +719,19 @@ def popup_ammunition_settings(user_session):
             popup.lift()
 
     button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
-        .grid(row=3, column=1, padx=10, pady=15)
+        .grid(row=1, column=1, padx=10, pady=15)
 
     tab_view = ttk.Frame(notebook)
-    notebook.add(tab_view, text="Bekijk Munitie")
+    notebook.add(tab_view, text="Bekijk")
 
     label_type_view = ttk.Label(tab_view, text="Munitie te bekijken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_view = tk.StringVar(tab_view)
     value_type_view.set("Select")
-    option_menu_type_view = ttk.OptionMenu(tab_view, value_type_view, ammunition_types[0], *ammunition_types)
-    option_menu_type_view.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
-    option_menu_type_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_view = AutocompleteCombobox(tab_view, textvariable=value_type_view)
+    autocomplete_combobox_view.set_completion_list(ammunition_list)
+    autocomplete_combobox_view.config(width=max([sum([len(str(q)) for q in i]) for i in ammunition_list]) + 2)
+    autocomplete_combobox_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_price_view = ttk.Label(tab_view, text="Prijs (EUR):") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
@@ -734,7 +751,7 @@ def popup_ammunition_settings(user_session):
     # this should delete the record in the dropdown menu
     def clicked_view():
         result_view = database_manager.execute_sql(
-            '''SELECT price, stock FROM ammunition WHERE type = ?''', ((value_type_view.get()[2:-3]),))
+            '''SELECT price, stock FROM ammunition WHERE type = ?''', (value_type_view.get(),))
 
         value_price_view.set(result_view[0][0])
         value_stock_view.set(result_view[0][1])
@@ -754,56 +771,6 @@ def popup_scorecard_settings(user_session):
     notebook = ttk.Notebook(popup)
     notebook.grid(row=1, column=0, columnspan=50, rowspan=49, sticky="nsew")
 
-    # creation of the new tab
-    tab_new = ttk.Frame(notebook)
-    notebook.add(tab_new, text="Nieuwe")
-
-    label_type_new = ttk.Label(tab_new, text="Type kaart:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
-    value_type_new = tk.StringVar(tab_new)
-    entry_type_new = ttk.Entry(tab_new, textvariable=value_type_new, width=20) \
-        .grid(row=0, column=1, padx=5, pady=2, sticky="W")
-
-    label_price_new = ttk.Label(tab_new, text="Prijs (EUR):").grid(row=1, column=0, padx=5, pady=2, sticky="W")
-    value_price_new = tk.DoubleVar(tab_new)
-    entry_price_new = ttk.Entry(tab_new, textvariable=value_price_new, width=10) \
-        .grid(row=1, column=1, padx=5, pady=2, sticky="W")
-
-    label_stock_new = ttk.Label(tab_new, text="Voorraad:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
-    value_stock_new = tk.IntVar(tab_new)
-    entry_stock_new = ttk.Entry(tab_new, textvariable=value_stock_new, width=10)
-    entry_stock_new.grid(row=2, column=1, padx=5, pady=2, sticky="W")
-
-    button_submit_new = ttk.Button(tab_new, text="Invoeren", command=lambda: clicked_new()) \
-        .grid(row=3, column=0, padx=10, pady=15)
-
-    def clicked_new():
-        scorecard_list_new = [value_type_new.get()]
-
-        if scorecard_list_new.count('') > 0:
-            messagebox.showerror(title="Error", message="Vul aub alle velden in voordat je verdergaat")
-            popup.lift()
-        elif input_validation.is_float(value_price_new.get()) is False:
-            messagebox.showerror(title="Error", message="Vul aub een valide prijs in")
-            popup.lift()
-        elif input_validation.is_int(value_stock_new.get()) is False:
-            messagebox.showerror(title="Error", message="Vul aub een valide voorraad in")
-            popup.lift()
-        else:
-            result_new = database_manager.execute_sql(
-                '''INSERT INTO scorecard (type, price, stock) VALUES (?, ?, ?)''',
-                (value_type_new.get().lower(), value_price_new.get(), value_stock_new.get()))
-
-            if result_new:
-                messagebox.showinfo(title="Information",
-                                    message="Het systeem heeft met succes een niewe scorecard aangemaakt")
-                popup.destroy()
-            else:
-                messagebox.showerror(title="Error", message="Er was een fout met invoeren van de data")
-                popup.lift()
-
-    button_cancel_new = ttk.Button(tab_new, text="Annuleren", command=popup.destroy) \
-        .grid(row=3, column=1, padx=10, pady=15)
-
     # creation of the edit tab
     tab_edit = ttk.Frame(notebook)
     notebook.add(tab_edit, text="Bewerk")
@@ -821,20 +788,23 @@ def popup_scorecard_settings(user_session):
     label_type_edit = ttk.Label(tab_edit, text="Score kaart te bewerken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
 
-    scorecard_types = database_manager.execute_sql('''SELECT type FROM scorecard;''')
+    scorecards = database_manager.execute_sql('''SELECT type FROM scorecard;''')
+    scorecard_list = [s[0] for s in scorecards]
     value_type_edit = tk.StringVar(tab_edit)
     value_type_edit.set("Select")
-    option_menu_type_edit = ttk.OptionMenu(tab_edit, value_type_edit, next(iter(fields2)), *fields2.keys())
-    option_menu_type_edit.config(width=max([len(i) for i in fields2.keys()]) + 1)
-    option_menu_type_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_edit = AutocompleteCombobox(tab_edit, textvariable=value_type_edit)
+    autocomplete_combobox_edit.set_completion_list(fields2.keys())
+    autocomplete_combobox_edit.config(width=max([len(i) for i in fields2.keys()]) + 1)
+    autocomplete_combobox_edit.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_field_edit = ttk.Label(tab_edit, text="Gegeven te Bewerken:") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
     value_field_edit = tk.StringVar(tab_edit)
     value_field_edit.set("Select")
-    option_menu_value_edit = ttk.OptionMenu(tab_edit, value_field_edit, next(iter(fields)), *fields.keys())
-    option_menu_value_edit.config(width=max([len(i) for i in fields.keys()]) + 1)
-    option_menu_value_edit.grid(row=1, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_edit2 = AutocompleteCombobox(tab_edit, textvariable=value_field_edit)
+    autocomplete_combobox_edit2.set_completion_list(fields.keys())
+    autocomplete_combobox_edit2.config(width=max([len(i) for i in fields.keys()]) + 1)
+    autocomplete_combobox_edit2.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
     label_update_edit = ttk.Label(tab_edit, text="Nieuwe Waarde:").grid(row=2, column=0, padx=5, pady=2, sticky="W")
     value_update_edit = tk.DoubleVar(tab_edit)
@@ -862,10 +832,10 @@ def popup_scorecard_settings(user_session):
 
         if fields.get(value_field_edit.get()) == 'price':
             result_edit = database_manager.execute_sql(
-                '''UPDATE scorecard SET price = ? WHERE type = ?''', (new_value, value_type_edit.get()[2:5]))
+                '''UPDATE scorecard SET price = ? WHERE type = ?''', (new_value, fields2.get(value_type_edit.get())))
         else:
             result_edit = database_manager.execute_sql(
-                '''UPDATE scorecard SET stock = ? WHERE type = ?''', (new_value, value_type_edit.get()[2:5]))
+                '''UPDATE scorecard SET stock = ? WHERE type = ?''', (new_value, fields2.get(value_type_edit.get())))
 
         if result_edit:
             messagebox.showinfo(title="Information",
@@ -878,51 +848,16 @@ def popup_scorecard_settings(user_session):
     button_cancel_edit = ttk.Button(tab_edit, text="Annuleren", command=popup.destroy) \
         .grid(row=3, column=1, padx=10, pady=15)
 
-    tab_delete = ttk.Frame(notebook)
-    notebook.add(tab_delete, text="Verwijder")
-
-    label_type_delete = ttk.Label(tab_delete, text="Score kaart te verwijderen:") \
-        .grid(row=0, column=0, padx=5, pady=2, sticky="W")
-    value_type_delete = tk.StringVar(tab_delete)
-    value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, next(iter(fields2)), *fields2.keys())
-    option_menu_type_delete.config(width=max([len(i) for i in fields2.keys()]) + 1)
-    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
-
-    button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
-        .grid(row=3, column=0, padx=10, pady=15)
-
-    # this should delete the record in the dropdown menu
-    def clicked_delete():
-        ays = messagebox.askquestion('Warning',
-                                     'Weet jij zeker dat jij deze scorecard wil verwijderen?', icon="warning")
-
-        if ays == 'yes':
-            result_delete = database_manager.execute_sql(
-                '''DELETE FROM scorecard WHERE type = ?''', (fields.get(value_type_delete.get()),))
-
-            if result_delete:
-                messagebox.showinfo(title="Information",
-                                    message="Het systeem heeft met succes de scorecard verwijderd")
-                popup.destroy()
-            else:
-                messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
-                popup.lift()
-        else:
-            popup.lift()
-
-    button_cancel_delete = ttk.Button(tab_delete, text="Annuleren", command=popup.destroy) \
-        .grid(row=3, column=1, padx=10, pady=15)
-
     tab_view = ttk.Frame(notebook)
-    notebook.add(tab_view, text="Bekijk Scorecards")
+    notebook.add(tab_view, text="Bekijk")
 
     label_type_view = ttk.Label(tab_view, text="Scorecard te bekijken:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_view = tk.StringVar(tab_view)
-    option_menu_type_view = ttk.OptionMenu(tab_view, value_type_view, next(iter(fields2))[0], *fields2.keys())
-    option_menu_type_view.config(width=max([sum([len(q) for q in i]) for i in fields2.keys()]) + 1)
-    option_menu_type_view.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_edit2 = AutocompleteCombobox(tab_view, textvariable=value_type_view)
+    autocomplete_combobox_edit2.set_completion_list(fields2.keys())
+    autocomplete_combobox_edit2.config(width=max([len(i) for i in fields2.keys()]) + 1)
+    autocomplete_combobox_edit2.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     label_price_view = ttk.Label(tab_view, text="Prijs (EUR):") \
         .grid(row=1, column=0, padx=5, pady=2, sticky="W")
@@ -998,14 +933,16 @@ def popup_discipline_settings(user_session):
     notebook.add(tab_delete, text="Verwijder")
 
     disciplines = database_manager.execute_sql('''SELECT type from discipline;''')
+    discipline_list = [d[0] for d in disciplines]
 
     label_type_delete = ttk.Label(tab_delete, text="Discipline te verwijderen:") \
         .grid(row=0, column=0, padx=5, pady=2, sticky="W")
     value_type_delete = tk.StringVar(tab_delete)
     value_type_delete.set("Select")
-    option_menu_type_delete = ttk.OptionMenu(tab_delete, value_type_delete, disciplines[0], *disciplines)
-    option_menu_type_delete.config(width=max([sum([len(q) for q in i]) for i in disciplines]) + 1)
-    option_menu_type_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+    autocomplete_combobox_delete = AutocompleteCombobox(tab_delete, textvariable=value_type_delete)
+    autocomplete_combobox_delete.set_completion_list(discipline_list)
+    autocomplete_combobox_delete.config(width=max([sum([len(str(q)) for q in i]) for i in discipline_list]) + 1)
+    autocomplete_combobox_delete.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
     button_submit_delete = ttk.Button(tab_delete, text="Verwijder", command=lambda: clicked_delete()) \
         .grid(row=1, column=0, padx=10, pady=15)
@@ -1017,7 +954,7 @@ def popup_discipline_settings(user_session):
 
         if ays == 'yes':
             result_delete = database_manager.execute_sql(
-                '''DELETE FROM discipline WHERE type = ?''', (value_type_delete.get()[2:-3],))
+                '''DELETE FROM discipline WHERE type = ?''', (value_type_delete.get(),))
 
             if result_delete:
                 messagebox.showinfo(title="Information",
@@ -1153,7 +1090,6 @@ class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller, user_session):
         self.user_session = user_session
-        print(user_session)
         tk.Frame.__init__(self, parent)
 
         label = ttk.Label(self, text="Main Menu", font=LARGE_FONT)
@@ -1197,30 +1133,37 @@ class ScorePage(tk.Frame):
 
         label_user_left = ttk.Label(frame_top_left, text="Lid:").grid(row=0, column=0, padx=5, pady=5, sticky="W")
         users = database_manager.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
+        user_list = [str(u[2]) + ' ' + str(u[1]) + ' - ' + str(u[0]) for u in users]
         value_user_left = tk.StringVar(frame_top_left)
         value_user_left.set("Select")
-        option_menu_user_left = ttk.OptionMenu(frame_top_left, value_user_left, users[0], *users)
-        option_menu_user_left.config(width=max([sum([len(str(q)) for q in i]) for i in users]) + 3)
-        option_menu_user_left.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+        autocomplete_combobox_user = AutocompleteCombobox(frame_top_left, textvariable=value_user_left)
+        autocomplete_combobox_user.set_completion_list(user_list)
+        autocomplete_combobox_user.config(width=max([sum([len(str(q)) for q in i]) for i in user_list]) - 3)
+        autocomplete_combobox_user.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
         label_firearm_left = ttk.Label(frame_top_left, text="Vuurwapen:") \
             .grid(row=1, column=0, padx=5, pady=5, sticky="W")
 
         firearms = database_manager.execute_sql('''SELECT type FROM firearm;''')
+        firearm_list = [firearm[0] for firearm in firearms]
         value_firearm_left = tk.StringVar(frame_top_left)
         value_firearm_left.set("Select")
-        option_menu_firearm_left = ttk.OptionMenu(frame_top_left, value_firearm_left, firearms[0], *firearms)
-        option_menu_firearm_left.config(width=max([sum([len(q) for q in i]) for i in firearms]))
-        option_menu_firearm_left.grid(row=1, column=1, padx=5, pady=5, sticky="W")
+        autocomplete_combobox_user = AutocompleteCombobox(frame_top_left, textvariable=value_firearm_left)
+        autocomplete_combobox_user.set_completion_list(firearm_list)
+        autocomplete_combobox_user.config(width=max([sum([len(str(q)) for q in i]) for i in firearm_list]) + 1)
+        autocomplete_combobox_user.grid(row=1, column=1, padx=5, pady=2, sticky="W")
 
         disciplines = database_manager.execute_sql('''SELECT type FROM discipline;''')
+        discipline_list = [d[0] for d in disciplines]
 
         label_discipline = ttk.Label(frame_top_left, text="Discipline:") \
             .grid(row=2, column=0, padx=5, pady=5, sticky="W")
         value_discipline = tk.StringVar(frame_top_left)
-        option_menu_discipline = ttk.OptionMenu(frame_top_left, value_discipline, disciplines[0], *disciplines)
-        option_menu_discipline.config(width=max([sum([len(q) for q in i]) for i in disciplines]))
-        option_menu_discipline.grid(row=2, column=1, padx=5, pady=5, sticky="W")
+        value_discipline.set('Select')
+        autocomplete_combobox_firearm = AutocompleteCombobox(frame_top_left, textvariable=value_discipline)
+        autocomplete_combobox_firearm.set_completion_list(discipline_list)
+        autocomplete_combobox_firearm.config(width=max([sum([len(str(q)) for q in i]) for i in discipline_list]) + 1)
+        autocomplete_combobox_firearm.grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
         label_own_firearm = ttk.Label(frame_top_left, text="Eigen Wapen:") \
             .grid(row=3, column=0, padx=5, pady=5, sticky="W")
@@ -1235,51 +1178,39 @@ class ScorePage(tk.Frame):
         frame_inner_top_right = tk.Frame(frame_top_right)
         frame_inner_top_right.pack(side="top", anchor="nw")
 
-        list_score = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-
         label_scorecard1 = ttk.Label(frame_inner_top_right, text="1e Scorecard:") \
             .grid(row=2, column=0, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot1 = tk.IntVar(frame_inner_top_right)
         value_scorecard1_shot1.set(0)
-        option_menu_scorecard1_shot1 = ttk.OptionMenu(frame_inner_top_right, value_scorecard1_shot1, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard1_shot1.config(width=2)
-        option_menu_scorecard1_shot1.grid(row=2, column=1, padx=5, pady=5, sticky="W")
+        entry_scorecard1_shot1 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard1_shot1, width=3)
+        entry_scorecard1_shot1.grid(row=2, column=1, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot2 = tk.IntVar(frame_inner_top_right)
         value_scorecard1_shot2.set(0)
-        option_menu_scorecard1_shot2 = ttk.OptionMenu(frame_inner_top_right, value_scorecard1_shot2, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard1_shot2.config(width=2)
-        option_menu_scorecard1_shot2.grid(row=2, column=2, padx=5, pady=5, sticky="W")
+        entry_scorecard1_shot2 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard1_shot2, width=3)
+        entry_scorecard1_shot2.grid(row=2, column=2, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot3 = tk.IntVar(frame_inner_top_right)
         value_scorecard1_shot3.set(0)
-        option_menu_scorecard1_shot3 = ttk.OptionMenu(frame_inner_top_right, value_scorecard1_shot3, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard1_shot3.config(width=2)
-        option_menu_scorecard1_shot3.grid(row=2, column=3, padx=5, pady=5, sticky="W")
+        entry_scorecard1_shot3 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard1_shot3, width=3)
+        entry_scorecard1_shot3.grid(row=2, column=3, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot4 = tk.IntVar(frame_inner_top_right)
         value_scorecard1_shot4.set(0)
-        option_menu_scorecard1_shot4 = ttk.OptionMenu(frame_inner_top_right, value_scorecard1_shot4, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard1_shot4.config(width=2)
-        option_menu_scorecard1_shot4.grid(row=2, column=4, padx=5, pady=5, sticky="W")
+        entry_scorecard1_shot4 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard1_shot4, width=3)
+        entry_scorecard1_shot4.grid(row=2, column=4, padx=5, pady=5, sticky="W")
 
         value_scorecard1_shot5 = tk.IntVar(frame_inner_top_right)
         value_scorecard1_shot5.set(0)
-        option_menu_scorecard1_shot5 = ttk.OptionMenu(frame_inner_top_right, value_scorecard1_shot5, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard1_shot5.config(width=2)
-        option_menu_scorecard1_shot5.grid(row=2, column=5, padx=5, pady=5, sticky="W")
+        entry_scorecard1_shot5 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard1_shot5, width=3)
+        entry_scorecard1_shot5.grid(row=2, column=5, padx=5, pady=5, sticky="W")
 
         label_scorecard1_valuation = ttk.Label(frame_inner_top_right, text="Totaal Scorecard 1:") \
             .grid(row=2, column=6, padx=5, pady=5, sticky="W")
         total_scorecard1 = tk.IntVar()
         total_scorecard1.set(0)
-        label_ammunition_total = ttk.Label(frame_inner_top_right, textvariable=total_scorecard1) \
+        label_scorecard1_total = ttk.Label(frame_inner_top_right, textvariable=total_scorecard1) \
             .grid(row=2, column=7, padx=5, pady=5, sticky="W")
 
         label_scorecard_2 = ttk.Label(frame_inner_top_right, text="2e Scorecard:") \
@@ -1287,38 +1218,28 @@ class ScorePage(tk.Frame):
 
         value_scorecard2_shot1 = tk.IntVar(frame_inner_top_right)
         value_scorecard2_shot1.set(0)
-        option_menu_scorecard2_shot1 = ttk.OptionMenu(frame_inner_top_right, value_scorecard2_shot1, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard2_shot1.config(width=2)
-        option_menu_scorecard2_shot1.grid(row=3, column=1, padx=5, pady=5, sticky="W")
+        entry_scorecard2_shot1 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard2_shot1, width=3)
+        entry_scorecard2_shot1.grid(row=3, column=1, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot2 = tk.IntVar(frame_inner_top_right)
         value_scorecard2_shot2.set(0)
-        option_menu_scorecard2_shot2 = ttk.OptionMenu(frame_inner_top_right, value_scorecard2_shot2, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard2_shot2.config(width=2)
-        option_menu_scorecard2_shot2.grid(row=3, column=2, padx=5, pady=5, sticky="W")
+        entry_scorecard2_shot2 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard2_shot2, width=3)
+        entry_scorecard2_shot2.grid(row=3, column=2, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot3 = tk.IntVar(frame_inner_top_right)
         value_scorecard2_shot3.set(0)
-        option_menu_scorecard2_shot3 = ttk.OptionMenu(frame_inner_top_right, value_scorecard2_shot3, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard2_shot3.config(width=2)
-        option_menu_scorecard2_shot3.grid(row=3, column=3, padx=5, pady=5, sticky="W")
+        entry_scorecard2_shot3 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard2_shot3, width=3)
+        entry_scorecard2_shot3.grid(row=3, column=3, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot4 = tk.IntVar(frame_inner_top_right)
         value_scorecard2_shot4.set(0)
-        option_menu_scorecard2_shot4 = ttk.OptionMenu(frame_inner_top_right, value_scorecard2_shot4, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard2_shot4.config(width=2)
-        option_menu_scorecard2_shot4.grid(row=3, column=4, padx=5, pady=5, sticky="W")
+        entry_scorecard2_shot4 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard2_shot4, width=3)
+        entry_scorecard2_shot4.grid(row=3, column=4, padx=5, pady=5, sticky="W")
 
         value_scorecard2_shot5 = tk.IntVar(frame_inner_top_right)
         value_scorecard2_shot5.set(0)
-        option_menu_scorecard2_shot5 = ttk.OptionMenu(frame_inner_top_right, value_scorecard2_shot5, list_score[0],
-                                                      *list_score)
-        option_menu_scorecard2_shot5.config(width=2)
-        option_menu_scorecard2_shot5.grid(row=3, column=5, padx=5, pady=5, sticky="W")
+        entry_scorecard2_shot5 = ttk.Entry(frame_inner_top_right, textvariable=value_scorecard2_shot5, width=3)
+        entry_scorecard2_shot5.grid(row=3, column=5, padx=5, pady=5, sticky="W")
 
         label_scorecard2_valuation = ttk.Label(frame_inner_top_right, text="Totaal Scorecard 2:") \
             .grid(row=3, column=6, padx=5, pady=5, sticky="W")
@@ -1338,10 +1259,10 @@ class ScorePage(tk.Frame):
 
             last_entries = database_manager.execute_sql(
                 '''SELECT date FROM score WHERE shooter = ? AND discipline = ? AND date BETWEEN ? AND ?''',
-                (value_user_left.get()[1:7], value_discipline.get()[2:-3], dates[0], dates[1]))
+                (value_user_left.get()[-6:], value_discipline.get(), dates[0], dates[1]))
 
             if last_entries:
-                messagebox.showerror(title="Error", message="De gebruiker " + value_user_left.get()[1:7] +
+                messagebox.showerror(title="Error", message="De gebruiker " + value_user_left.get()[-6:] +
                                                             " heeft al scores ingediend deze week,"
                                                             " voor deze discipline naamelijks op " +
                                                             last_entries[0])
@@ -1376,16 +1297,16 @@ class ScorePage(tk.Frame):
                         value_scorecard2_shot5.get(),
                         total_card2,
                         date.today(),
-                        value_user_left.get()[1:7],
+                        value_user_left.get()[-6:],
                         user_session,
-                        value_discipline.get()[2:-3],
-                        value_firearm_left.get()[2:-3],
+                        value_discipline.get(),
+                        value_firearm_left.get(),
                         value_own_firearm.get()))
 
                 if result_submit_left:
                     messagebox.showinfo(title="Information",
                                         message="Het systeem heeft met success de score voor "
-                                                + value_user_left.get()[1:7] + " ingevoerd")
+                                                + value_user_left.get()[-6:] + " ingevoerd")
 
                     sc1 = [value_scorecard1_shot1.get(),
                            value_scorecard1_shot2.get(),
@@ -1403,12 +1324,12 @@ class ScorePage(tk.Frame):
 
                     user_data = database_manager.execute_sql(
                         '''SELECT email_address, first_name FROM user WHERE knsa_licence_number = ?''',
-                        (value_user_left.get()[1:7],))
+                        (value_user_left.get()[-6:0],))
 
                     email_body = 'Hallo ' + user_data[0][1] + \
                                  ', \n\n U scores zijn voor ' + \
                                  date.today() + \
-                                 ' in de database ingevoerd. U heeft met ' + value_firearm_left.get()[12:-2] + \
+                                 ' in de database ingevoerd. U heeft met ' + value_firearm_left.get() + \
                                  ' geschoten. \n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(sc1[0]) + \
                                  '\n schot 2: ' + str(sc1[1]) + \
                                  '\n schot 3: ' + str(sc1[2]) + \
@@ -1448,6 +1369,9 @@ class ScorePage(tk.Frame):
             total_scorecard1.set(0)
             total_scorecard2.set(0)
             value_own_firearm.set(0)
+            value_discipline.set('Select')
+            value_firearm_left.set('Select')
+            value_user_left.set('Select')
 
         button_reset = ttk.Button(frame_inner_bottom_right, text="Reset", command=lambda: clicked_reset_top()) \
             .grid(row=0, column=5, padx=10, pady=15, sticky="W")
@@ -1477,26 +1401,29 @@ class ScorePage(tk.Frame):
         label_user_matplot = ttk.Label(frame_menu, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
         value_user_matplot = tk.StringVar(frame_menu)
         value_user_matplot.set("Select")
-        option_menu_user_matplot = ttk.OptionMenu(frame_menu, value_user_matplot, users[0], *users)
-        option_menu_user_matplot.config(width=max([sum([len(str(q)) for q in i]) for i in users]) + 3)
-        option_menu_user_matplot.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+        autocomplete_combobox_user2 = AutocompleteCombobox(frame_menu, textvariable=value_user_matplot)
+        autocomplete_combobox_user2.set_completion_list(user_list)
+        autocomplete_combobox_user2.config(width=max([sum([len(str(q)) for q in i]) for i in user_list]) - 3)
+        autocomplete_combobox_user2.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
         label_firearm_matplot = ttk.Label(frame_menu, text="Vuurwapen:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
         value_firearm_matplot = tk.StringVar(frame_menu)
         value_firearm_matplot.set("Select")
         firearms = database_manager.execute_sql('''SELECT type FROM firearm''')
-        option_menu_firearm_matplot = ttk.OptionMenu(frame_menu, value_firearm_matplot, firearms[0], *firearms)
-        option_menu_firearm_matplot.config(width=max([sum([len(q) for q in i]) for i in firearms]))
-        option_menu_firearm_matplot.grid(row=0, column=3, padx=5, pady=5, sticky="W")
+        firearm_list = [firearm[0] for firearm in firearms]
+        autocomplete_combobox_firearm2 = AutocompleteCombobox(frame_menu, textvariable=value_firearm_matplot)
+        autocomplete_combobox_firearm2.set_completion_list(firearm_list)
+        autocomplete_combobox_firearm2.config(width=max([sum([len(str(q)) for q in i]) for i in firearm_list]) + 1)
+        autocomplete_combobox_firearm2.grid(row=0, column=3, padx=5, pady=2, sticky="W")
 
-        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van (YYYY-MM-DD):") \
+        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van (DD-MM-YYYY):") \
             .grid(row=0, column=4, padx=5, pady=2, sticky="W")
         value_date_from_matplot = tk.StringVar(frame_menu)
         entry_date_from_matplot = ttk.Entry(frame_menu, textvariable=value_date_from_matplot, width=10) \
             .grid(row=0, column=5, padx=5, pady=2, sticky="W")
 
-        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot (YYYY-MM-DD):") \
+        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot (DD-MM-YYYY):") \
             .grid(row=1, column=4, padx=5, pady=2, sticky="W")
         value_date_to_matplot = tk.StringVar(frame_menu)
         entry_date_to_matplot = ttk.Entry(frame_menu, textvariable=value_date_to_matplot, width=10) \
@@ -1509,16 +1436,17 @@ class ScorePage(tk.Frame):
                 value_date_from_matplot.set('')
                 value_date_to_matplot.set('')
             else:
-                if value_date_from_matplot.get() and value_date_to_matplot.get() == '':
+                if value_date_from_matplot.get() == '' and value_date_to_matplot.get() == '':
                     result = database_manager.execute_sql(
                         '''SELECT date, card_one_total, card_two_total FROM score WHERE shooter = ? AND firearm= ?
-                         ORDER BY date''', (value_user_matplot.get()[1:7], value_firearm_matplot.get()[2:-3]))
+                         ORDER BY date''', (value_user_matplot.get()[-6:], value_firearm_matplot.get()))
                 else:
                     result = database_manager.execute_sql(
                         '''SELECT date, card_one_total, card_two_total FROM score WHERE shooter = ? AND firearm = ? 
                         AND date BETWEEN ? AND ? ORDER BY date''',
-                        (value_user_matplot.get()[1:7], value_firearm_matplot.get()[2:-3],
-                         value_date_from_matplot.get(), value_date_to_matplot.get()))
+                        (value_user_matplot.get()[-6:], value_firearm_matplot.get(),
+                         input_validation.convert_input_date(value_date_from_matplot.get()),
+                         input_validation.convert_input_date(value_date_to_matplot.get())))
 
         button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
             .grid(row=0, column=6, padx=5, pady=2, sticky="W")
@@ -1526,6 +1454,8 @@ class ScorePage(tk.Frame):
         def clicked_reset_matplot():
             value_date_from_matplot.set('')
             value_date_to_matplot.set('')
+            value_user_matplot.set('Select')
+            value_firearm_matplot.set('Select')
 
         button_reser_matplot = ttk.Button(frame_menu, text="Reset", command=lambda: clicked_reset_matplot()) \
             .grid(row=1, column=6, padx=5, pady=2, sticky="W")
@@ -1583,21 +1513,21 @@ class FinancePage(tk.Frame):
         label_ammunition_type = ttk.Label(frame_ammunition_middle, text="Munitie type:") \
             .grid(row=0, column=0, padx=5, pady=2, sticky="W")
         ammunition_types = database_manager.execute_sql('''SELECT type FROM ammunition;''')
+        ammunition_list = [a[0] for a in ammunition_types]
         value_ammunition_type = tk.StringVar(frame_ammunition_middle)
         value_ammunition_type.set("Select")
-        option_menu_ammunition_type = ttk.OptionMenu(frame_ammunition_middle,
-                                                     value_ammunition_type,
-                                                     ammunition_types[0],
-                                                     *ammunition_types)
-        option_menu_ammunition_type.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
-        option_menu_ammunition_type.grid(row=0, column=1, padx=5, pady=2, sticky="W")
+        autocomplete_combobox_ammunition = AutocompleteCombobox(frame_ammunition_middle,
+                                                                textvariable=value_ammunition_type)
+        autocomplete_combobox_ammunition.set_completion_list(ammunition_list)
+        autocomplete_combobox_ammunition.config(width=max([sum([len(str(q)) for q in i]) for i in ammunition_list]) + 2)
+        autocomplete_combobox_ammunition.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
         label_ammunition_quantity = ttk.Label(frame_ammunition_middle, text="Aantal:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
         value_ammunition_quantity = tk.IntVar(frame_ammunition_middle)
         entry_ammunition_quantity = ttk.Entry(frame_ammunition_middle,
                                               textvariable=value_ammunition_quantity,
-                                              width=5).grid(row=0, column=3, padx=5, pady=5, sticky="W")
+                                              width=3).grid(row=0, column=3, padx=5, pady=5, sticky="W")
 
         label_ammunition_valuation = ttk.Label(frame_ammunition_middle, text="Totaal (EUR):") \
             .grid(row=1, column=0, padx=5, pady=2, sticky="W")
@@ -1611,7 +1541,7 @@ class FinancePage(tk.Frame):
                 messagebox.showerror(title="Error", message="Vul aub een valide munitie waarde in")
             else:
                 ammunition_stock = database_manager.execute_sql(
-                    '''SELECT stock FROM ammunition WHERE type = ?''', (value_ammunition_type.get()[2:-3],))
+                    '''SELECT stock FROM ammunition WHERE type = ?''', (value_ammunition_type.get(),))
                 new_ammunition_stock = ammunition_stock[0][0] - value_ammunition_quantity.get()
 
                 if new_ammunition_stock < 0:
@@ -1623,10 +1553,10 @@ class FinancePage(tk.Frame):
                 else:
                     database_manager.execute_sql(
                         '''UPDATE ammunition SET stock = ? WHERE type = ?''',
-                        (new_ammunition_stock, value_ammunition_type.get()[2:-3],))
+                        (new_ammunition_stock, value_ammunition_type.get(),))
 
                     ammunition_price = database_manager.execute_sql(
-                        '''SELECT price FROM ammunition WHERE type = ?''', (value_ammunition_type.get()[2:-3],))
+                        '''SELECT price FROM ammunition WHERE type = ?''', (value_ammunition_type.get(),))
 
                     total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
 
@@ -1635,9 +1565,9 @@ class FinancePage(tk.Frame):
                          VALUES (?, ?, ?, ?, ?, ?)''', (
                             date.today(),
                             value_ammunition_quantity.get(),
-                            value_ammunition_type.get()[2:-3],
+                            value_ammunition_type.get(),
                             user_session,
-                            value_user_middle.get()[1:7],
+                            value_user_middle.get()[-6:],
                             total_ammunition_price
                         ))
 
@@ -1645,17 +1575,17 @@ class FinancePage(tk.Frame):
                         messagebox.showinfo(title="Information",
                                             message="Het systeem heeft met succes munitie verkocht er is nu " +
                                                     str(new_ammunition_stock) + " voorraad van " +
-                                                    value_ammunition_type.get()[2:-3] + " over")
+                                                    value_ammunition_type.get() + " over")
 
                         user_data = database_manager.execute_sql(
                             '''SELECT email_address, first_name FROM user WHERE knsa_licence_number = ?''',
-                            (value_user_middle.get()[1:7],))
+                            (value_user_middle.get()[-6:],))
 
                         email_body = 'Hallo ' + user_data[0][1] + \
                                      ', \n\n U heeft een transactie afgerond bij de scheitvereniging op ' \
                                      + str(date.today()) + \
                                      '. \n\n U heeft ' + str(value_ammunition_quantity.get()) + ' van ' + \
-                                     value_ammunition_type.get()[2:-3] + \
+                                     value_ammunition_type.get() + \
                                      ' gekocht voor een prijs van totaal €' + str(total_price_left.get()) + \
                                      '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
 
@@ -1675,13 +1605,14 @@ class FinancePage(tk.Frame):
         def clicked_reset_left():
             value_ammunition_quantity.set(0)
             total_price_left.set(0.0)
+            value_ammunition_type.set('Select')
 
         def clicked_total_left():
             if input_validation.is_int(value_ammunition_quantity.get()) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide munitie waarde in")
             else:
                 ammunition_price = database_manager.execute_sql(
-                    '''SELECT price FROM ammunition WHERE type = ?''', (value_ammunition_type.get()[2:-3],))
+                    '''SELECT price FROM ammunition WHERE type = ?''', (value_ammunition_type.get(),))
 
                 total_ammunition_price = round(value_ammunition_quantity.get() * ammunition_price[0][0], 2)
 
@@ -1701,8 +1632,6 @@ class FinancePage(tk.Frame):
         frame_scorecard_top = tk.Frame(label_frame_top_right)
         frame_scorecard_top.pack(side="top", anchor="nw")
 
-        # HERE WAS THE USER FOR SCORECARD
-
         frame_scorecard_middle = tk.Frame(label_frame_top_right)
         frame_scorecard_middle.pack(anchor="nw")
 
@@ -1711,7 +1640,7 @@ class FinancePage(tk.Frame):
         value_scorecard_regular_quantity = tk.IntVar(frame_scorecard_middle)
         entry_scorecard_regular_quantity = ttk.Entry(frame_scorecard_middle,
                                                      textvariable=value_scorecard_regular_quantity,
-                                                     width=5).grid(row=0, column=1, padx=5, pady=5, sticky="W")
+                                                     width=3).grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
         label_scorecard_competition = ttk.Label(frame_scorecard_middle, text="Competitie Kaarten:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
@@ -1729,7 +1658,7 @@ class FinancePage(tk.Frame):
             .grid(row=2, column=1, padx=5, pady=2, sticky="W")
 
         def clicked_submit_right():
-            if input_validation.is_int(value_scorecard_regular_quantity.get()) is False:
+            if input_validation.is_int(int(value_scorecard_regular_quantity.get())) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide scorecard waarde in")
             else:
                 if value_scorecard_competition.get() == 1:
@@ -1786,7 +1715,7 @@ class FinancePage(tk.Frame):
                              value_scorecard_competition_quantity,
                              'competition',
                              user_session,
-                             value_user_middle.get()[1:7],
+                             value_user_middle.get()[-6:],
                              total_scorecard_price_competition))
 
                     if value_scorecard_regular_quantity.get() > 0:
@@ -1797,7 +1726,7 @@ class FinancePage(tk.Frame):
                              value_scorecard_regular_quantity.get(),
                              'regular',
                              user_session,
-                             value_user_middle.get()[1:7],
+                             value_user_middle.get()[-6:],
                              total_scorecard_price_regular))
 
                     if result_submit_competition and result_submit_regular:
@@ -1808,7 +1737,7 @@ class FinancePage(tk.Frame):
 
                         user_data = database_manager.execute_sql(
                             '''SELECT email_address, first_name FROM user WHERE knsa_licence_number = ?''',
-                            (value_user_middle.get()[1:7],))
+                            (value_user_middle.get()[-6:],))
 
                         total_scorecard_price = total_scorecard_price_regular + total_scorecard_price_competition
 
@@ -1866,11 +1795,13 @@ class FinancePage(tk.Frame):
         label_user_middle = ttk.Label(frame_bottom_left, text="Lid:") \
             .grid(row=0, column=0, padx=5, pady=5, sticky="W")
         users = database_manager.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
-        value_user_middle = tk.StringVar(frame_inner_bottom)
+        user_list = [str(u[2]) + ' ' + str(u[1]) + ' - ' + str(u[0]) for u in users]
+        value_user_middle = tk.StringVar(frame_bottom_left)
         value_user_middle.set("Select")
-        option_menu_user_middle = ttk.OptionMenu(frame_bottom_left, value_user_middle, users[0], *users)
-        option_menu_user_middle.config(width=max([sum([len(str(q)) for q in i]) for i in users]) + 3)
-        option_menu_user_middle.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+        autocomplete_combobox_user = AutocompleteCombobox(frame_bottom_left, textvariable=value_user_middle)
+        autocomplete_combobox_user.set_completion_list(user_list)
+        autocomplete_combobox_user.config(width=max([sum([len(str(q)) for q in i]) for i in user_list]) - 3)
+        autocomplete_combobox_user.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
         label_middle_price = ttk.Label(frame_bottom_left, text="Totaal (EUR):") \
             .grid(row=1, column=0, padx=5, pady=5, sticky="W")
@@ -1895,6 +1826,7 @@ class FinancePage(tk.Frame):
             clicked_reset_left()
             clicked_reset_right()
             total_price.set(0.0)
+            value_user_middle.set('Select')
 
         button_middle_reset = ttk.Button(frame_bottom_right, text="Reset", command=lambda: clicked_reset()) \
             .grid(row=0, column=1, padx=10, pady=15)
@@ -1917,51 +1849,50 @@ class FinancePage(tk.Frame):
         label_user_matplot = ttk.Label(frame_menu, text="Lid:").grid(row=0, column=0, padx=5, pady=2, sticky="W")
         value_user_matplot = tk.StringVar(frame_menu)
         value_user_matplot.set("Select")
-        option_menu_user_matplot = ttk.OptionMenu(frame_menu, value_user_matplot, users[0], *users)
-        option_menu_user_matplot.config(width=max([sum([len(str(q)) for q in i]) for i in users]) + 3)
-        option_menu_user_matplot.grid(row=0, column=1, padx=5, pady=5, sticky="W")
+        autocomplete_combobox_user2 = AutocompleteCombobox(frame_menu, textvariable=value_user_matplot)
+        autocomplete_combobox_user2.set_completion_list(user_list)
+        autocomplete_combobox_user2.config(width=max([sum([len(str(q)) for q in i]) for i in user_list]) - 3)
+        autocomplete_combobox_user2.grid(row=0, column=1, padx=5, pady=2, sticky="W")
 
-        matplot_scorecard_types = ['Niets', 'Alles']
-        scorecards = database_manager.execute_sql('''SELECT type FROM scorecard''')
-        for s in scorecards:
-            matplot_scorecard_types.append(s)
+        fields2 = {
+            'Standaard': 'regular',
+            'Competitie': 'competition',
+        }
+
         label_scorecard_matplot = ttk.Label(frame_menu, text="Scorecard Type:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
         value_scorecard_matplot = tk.StringVar(frame_menu)
         value_scorecard_matplot.set("Select")
-        option_menu_scorecard_matplot = ttk.OptionMenu(frame_menu,
-                                                       value_scorecard_matplot,
-                                                       next(iter(matplot_scorecard_types)),
-                                                       *matplot_scorecard_types)
-        option_menu_scorecard_matplot.config(width=max([len(i) for i in matplot_scorecard_types]) + 1)
-        option_menu_scorecard_matplot.grid(row=0, column=3, padx=5, pady=5, sticky="W")
+        autocomplete_combobox_user = AutocompleteCombobox(frame_menu, textvariable=value_scorecard_matplot)
+        autocomplete_combobox_user.set_completion_list(fields2.keys())
+        autocomplete_combobox_user.config(width=max([sum([len(str(q)) for q in i]) for i in fields2.keys()]))
+        autocomplete_combobox_user.grid(row=0, column=3, padx=5, pady=2, sticky="W")
 
         label_ammunition_matplot = ttk.Label(frame_menu, text="Munitie Type:") \
             .grid(row=1, column=2, padx=5, pady=2, sticky="W")
         value_ammunition_matplot = tk.StringVar(frame_menu)
         value_ammunition_matplot.set("Select")
-        option_menu_ammunition_matplot = ttk.OptionMenu(frame_menu,
-                                                        value_ammunition_matplot,
-                                                        ammunition_types[0],
-                                                        *ammunition_types)
-        option_menu_ammunition_matplot.config(width=max([sum([len(q) for q in i]) for i in ammunition_types]) + 1)
-        option_menu_ammunition_matplot.grid(row=1, column=3, padx=5, pady=5, sticky="W")
+        autocomplete_combobox_user = AutocompleteCombobox(frame_menu, textvariable=value_ammunition_matplot)
+        autocomplete_combobox_user.set_completion_list(ammunition_list)
+        autocomplete_combobox_user.config(width=max([sum([len(str(q)) for q in i]) for i in ammunition_list]) + 2)
+        autocomplete_combobox_user.grid(row=1, column=3, padx=5, pady=2, sticky="W")
 
-        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van (YYYY-MM-DD):") \
+        label_date_from_matplot = ttk.Label(frame_menu, text="Datum van (DD-MM-YYYY):") \
             .grid(row=0, column=4, padx=5, pady=2, sticky="W")
         value_date_from_matplot = tk.StringVar(frame_menu)
         entry_date_from_matplot = ttk.Entry(frame_menu, textvariable=value_date_from_matplot, width=10) \
             .grid(row=0, column=5, padx=5, pady=2, sticky="W")
 
-        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot (YYYY-MM-DD):") \
+        label_date_to_matplot = ttk.Label(frame_menu, text="Datum tot (DD-MM-YYYY):") \
             .grid(row=1, column=4, padx=5, pady=2, sticky="W")
         value_date_to_matplot = tk.StringVar(frame_menu)
         entry_date_to_matplot = ttk.Entry(frame_menu, textvariable=value_date_to_matplot, width=10) \
             .grid(row=1, column=5, padx=5, pady=2, sticky="W")
 
         def clicked_show():
-            if input_validation.is_date(value_date_from_matplot.get()) is False \
-                    and input_validation.is_date(value_date_to_matplot.get()) is False:
+            if input_validation.is_date(input_validation.convert_input_date(
+                    value_date_from_matplot.get())) is False and input_validation.is_date(
+                    input_validation.convert_input_date(value_date_to_matplot.get())) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide datum in")
                 value_date_from_matplot.set('')
                 value_date_to_matplot.set('')
@@ -1972,6 +1903,9 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=6, padx=5, pady=2, sticky="W")
 
         def clicked_reset_matplot():
+            value_user_matplot.set('Select')
+            value_scorecard_matplot.set('Select')
+            value_ammunition_matplot.set('Select')
             value_date_from_matplot.set('')
             value_date_to_matplot.set('')
 
@@ -1985,6 +1919,56 @@ class FinancePage(tk.Frame):
         canvas = FigureCanvasTkAgg(f, frame_matplot)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+
+class AutocompleteCombobox(ttk.Combobox):
+
+    def set_completion_list(self, completion_list):
+        self._completion_list = sorted(completion_list, key=str.lower)  # Work with a sorted list
+        self._hits = []
+        self._hit_index = 0
+        self.position = 0
+        self.bind('<KeyRelease>', self.handle_keyrelease)
+        self['values'] = self._completion_list  # Setup our popup menu
+
+    def autocomplete(self, delta=0):
+        if delta:  # need to delete selection otherwise we would fix the current position
+            self.delete(self.position, tk.END)
+        else:  # set position to end so selection starts where textentry ended
+            self.position = len(self.get())
+        # collect hits
+        _hits = []
+        for element in self._completion_list:
+            if element.lower().startswith(self.get().lower()):  # Match case insensitively
+                _hits.append(element)
+        # if we have a new hit list, keep this in mind
+        if _hits != self._hits:
+            self._hit_index = 0
+            self._hits = _hits
+        # only allow cycling if we are in a known hit list
+        if _hits == self._hits and self._hits:
+            self._hit_index = (self._hit_index + delta) % len(self._hits)
+        # now finally perform the auto completion
+        if self._hits:
+            self.delete(0, tk.END)
+            self.insert(0, self._hits[self._hit_index])
+            self.select_range(self.position, tk.END)
+
+    def handle_keyrelease(self, event):
+        if event.keysym == "BackSpace":
+            self.delete(self.index(tk.INSERT), tk.END)
+            self.position = self.index(tk.END)
+        if event.keysym == "Left":
+            if self.position < self.index(tk.END):  # delete the selection
+                self.delete(self.position, tk.END)
+            else:
+                self.position = self.position - 1  # delete one character
+                self.delete(self.position, tk.END)
+        if event.keysym == "Right":
+            self.position = self.index(tk.END)  # go to end (no selection)
+        if len(event.keysym) == 1:
+            self.autocomplete()
+        # list at the position of the autocompletion
 
 
 app2 = LoginPage()
