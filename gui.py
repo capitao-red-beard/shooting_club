@@ -1095,10 +1095,10 @@ class MainMenu(tk.Frame):
         label = ttk.Label(self, text="Main Menu", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
-        button1 = ttk.Button(self, text="Score Page", command=lambda: controller.show_frame(ScorePage))
+        button1 = ttk.Button(self, text="Score", command=lambda: controller.show_frame(ScorePage))
         button1.pack()
 
-        button2 = ttk.Button(self, text="Finance Page", command=lambda: controller.show_frame(FinancePage))
+        button2 = ttk.Button(self, text="Finance", command=lambda: controller.show_frame(FinancePage))
         button2.pack()
 
 
@@ -1118,7 +1118,7 @@ class ScorePage(tk.Frame):
         button_main_menu.pack()
 
         button_finance_page = ttk.Button(frame_left,
-                                         text="Finance Page",
+                                         text="Finance",
                                          command=lambda: controller.show_frame(FinancePage))
         button_finance_page.pack()
 
@@ -1255,105 +1255,99 @@ class ScorePage(tk.Frame):
             .grid(row=0, column=4, padx=10, pady=15, sticky="W")
 
         def clicked_submit_top():
-            dates = input_validation.date_range(1)
+            if value_user_left.get in user_list or value_firearm_left.get() in firearm_list or value_discipline.get() in discipline_list:
+                dates = input_validation.date_range(1)
 
-            last_entries = database_manager.execute_sql(
-                '''SELECT date FROM score WHERE shooter = ? AND discipline = ? AND date BETWEEN ? AND ?''',
-                (value_user_left.get()[-6:], value_discipline.get(), dates[0], dates[1]))
+                last_entries = database_manager.execute_sql(
+                    '''SELECT date FROM score WHERE shooter = ? AND discipline = ? AND date BETWEEN ? AND ?''',
+                    (value_user_left.get()[-6:], value_discipline.get(), dates[0], dates[1]))
 
-            if last_entries:
-                messagebox.showerror(title="Error", message="De gebruiker " + value_user_left.get()[-6:] +
-                                                            " heeft al scores ingediend deze week,"
-                                                            " voor deze discipline naamelijks op " +
-                                                            last_entries[0])
-            else:
-                total_card1 = int(value_scorecard1_shot1.get()
-                                  + value_scorecard1_shot2.get()
-                                  + value_scorecard1_shot3.get()
-                                  + value_scorecard1_shot4.get()
-                                  + value_scorecard1_shot5.get())
-
-                total_card2 = int(value_scorecard2_shot1.get()
-                                  + value_scorecard2_shot2.get()
-                                  + value_scorecard2_shot3.get()
-                                  + value_scorecard2_shot4.get()
-                                  + value_scorecard2_shot5.get())
-
-                result_submit_left = database_manager.execute_sql(
-                    '''INSERT INTO score (card_one_shot_one, card_one_shot_two, card_one_shot_three, card_one_shot_four,
-                    card_one_shot_five,card_one_total, card_two_shot_one, card_two_shot_two, card_two_shot_three,
-                    card_two_shot_four, card_two_shot_five, card_two_total, date, shooter, submitter, discipline,
-                    firearm, own_firearm) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
-                        value_scorecard1_shot1.get(),
-                        value_scorecard1_shot2.get(),
-                        value_scorecard1_shot3.get(),
-                        value_scorecard1_shot4.get(),
-                        value_scorecard1_shot5.get(),
-                        total_card1,
-                        value_scorecard2_shot1.get(),
-                        value_scorecard2_shot2.get(),
-                        value_scorecard2_shot3.get(),
-                        value_scorecard2_shot4.get(),
-                        value_scorecard2_shot5.get(),
-                        total_card2,
-                        date.today(),
-                        value_user_left.get()[-6:],
-                        user_session,
-                        value_discipline.get(),
-                        value_firearm_left.get(),
-                        value_own_firearm.get()))
-
-                if result_submit_left:
-                    messagebox.showinfo(title="Information",
-                                        message="Het systeem heeft met success de score voor "
-                                                + value_user_left.get()[-6:] + " ingevoerd")
-
-                    sc1 = [value_scorecard1_shot1.get(),
-                           value_scorecard1_shot2.get(),
-                           value_scorecard1_shot3.get(),
-                           value_scorecard1_shot4.get(),
-                           value_scorecard1_shot5.get(),
-                           total_card1]
-
-                    sc2 = [value_scorecard2_shot1.get(),
-                           value_scorecard2_shot2.get(),
-                           value_scorecard2_shot3.get(),
-                           value_scorecard2_shot4.get(),
-                           value_scorecard2_shot5.get(),
-                           total_card2]
-
-                    user_data = database_manager.execute_sql(
-                        '''SELECT email_address, first_name FROM user WHERE knsa_licence_number = ?''',
-                        (value_user_left.get()[-6:0],))
-
-                    email_body = 'Hallo ' + user_data[0][1] + \
-                                 ', \n\n U scores zijn voor ' + \
-                                 date.today() + \
-                                 ' in de database ingevoerd. U heeft met ' + value_firearm_left.get() + \
-                                 ' geschoten. \n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(sc1[0]) + \
-                                 '\n schot 2: ' + str(sc1[1]) + \
-                                 '\n schot 3: ' + str(sc1[2]) + \
-                                 '\n schot 4: ' + str(sc1[3]) + \
-                                 '\n schot 5: ' + str(sc1[4]) + \
-                                 '\n met een totaal score van: ' + str(sc1[5]) + \
-                                 '\n\n en voor uw tweede kaart: \n schot 1: ' + str(sc2[0]) + \
-                                 '\n schot 2: ' + str(sc2[1]) + \
-                                 '\n schot 3: ' + str(sc2[2]) + \
-                                 '\n schot 4: ' + str(sc2[3]) + \
-                                 '\n schot 5: ' + str(sc2[4]) + \
-                                 '\n met een totaal score van: ' + str(sc2[5]) + \
-                                 '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
-
-                    email_result = email_manager.send_email(user_data[0][0], 'U heeft nieuwe scores ingediend',
-                                                            email_body)
-
-                    if email_result:
-                        clicked_reset_top()
-                    else:
-                        messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
-
+                if last_entries:
+                    messagebox.showerror(title="Error", message="De gebruiker " + value_user_left.get()[-6:] +
+                                                                " heeft al scores ingediend deze week,"
+                                                                " voor deze discipline naamelijks op " +
+                                                                str(last_entries[0]))
                 else:
-                    messagebox.showerror(title="Error", message="Er was een fout met verwijderen van de data")
+                    if clicked_total_top() is not False:
+                        totals = clicked_total_top()
+
+                        result_submit_left = database_manager.execute_sql(
+                            '''INSERT INTO score (card_one_shot_one, card_one_shot_two, card_one_shot_three, card_one_shot_four,
+                            card_one_shot_five,card_one_total, card_two_shot_one, card_two_shot_two, card_two_shot_three,
+                            card_two_shot_four, card_two_shot_five, card_two_total, date, shooter, submitter, discipline,
+                            firearm, own_firearm) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
+                                value_scorecard1_shot1.get(),
+                                value_scorecard1_shot2.get(),
+                                value_scorecard1_shot3.get(),
+                                value_scorecard1_shot4.get(),
+                                value_scorecard1_shot5.get(),
+                                totals[0],
+                                value_scorecard2_shot1.get(),
+                                value_scorecard2_shot2.get(),
+                                value_scorecard2_shot3.get(),
+                                value_scorecard2_shot4.get(),
+                                value_scorecard2_shot5.get(),
+                                totals[1],
+                                date.today(),
+                                value_user_left.get()[-6:],
+                                user_session,
+                                value_discipline.get(),
+                                value_firearm_left.get(),
+                                value_own_firearm.get()))
+
+                        if result_submit_left:
+                            messagebox.showinfo(title="Information",
+                                                message="Het systeem heeft met success de score voor "
+                                                        + value_user_left.get()[-6:] + " ingevoerd")
+
+                            sc1 = [value_scorecard1_shot1.get(),
+                                   value_scorecard1_shot2.get(),
+                                   value_scorecard1_shot3.get(),
+                                   value_scorecard1_shot4.get(),
+                                   value_scorecard1_shot5.get(),
+                                   totals[0]]
+
+                            sc2 = [value_scorecard2_shot1.get(),
+                                   value_scorecard2_shot2.get(),
+                                   value_scorecard2_shot3.get(),
+                                   value_scorecard2_shot4.get(),
+                                   value_scorecard2_shot5.get(),
+                                   totals[1]]
+
+                            user_data = database_manager.execute_sql(
+                                '''SELECT email_address, first_name FROM user WHERE knsa_licence_number = ?''',
+                                (value_user_left.get()[-6:],))
+
+                            email_body = 'Hallo ' + user_data[0][1] + ', \n\n U scores zijn voor ' + str(
+                                input_validation.convert_output_date(str(date.today()))) + \
+                                         ' in de database ingevoerd. U heeft met ' + value_firearm_left.get() + \
+                                         ' geschoten. \n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(
+                                value_scorecard1_shot1.get()) + '\n schot 2: ' + str(
+                                value_scorecard1_shot2.get()) + '\n schot 3: ' + str(
+                                value_scorecard1_shot3.get()) + '\n schot 4: ' + str(
+                                value_scorecard1_shot4.get()) + '\n schot 5: ' + str(
+                                value_scorecard1_shot5.get()) + '\n met een totaal score van: ' + str(
+                                totals[0]) + '\n\n en voor uw tweede kaart: \n schot 1: ' + str(
+                                value_scorecard2_shot1.get()) + '\n schot 2: ' + str(
+                                value_scorecard2_shot2.get()) + '\n schot 3: ' + str(
+                                value_scorecard2_shot3.get()) + '\n schot 4: ' + str(
+                                value_scorecard2_shot4.get()) + '\n schot 5: ' + str(
+                                value_scorecard2_shot5.get()) + '\n met een totaal score van: ' + str(
+                                totals[1]) + '\n\n reageer aub niet op deze email. \n\n Fijne dag!'
+
+                            email_result = email_manager.send_email(user_data[0][0], 'U heeft nieuwe scores ingediend',
+                                                                    email_body)
+
+                            if email_result:
+                                clicked_reset_top()
+                            else:
+                                messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+                        else:
+                            messagebox.showerror(title="Error",
+                                                 message="Er was een fout met de stuuren van scores naar de database")
+            else:
+                messagebox.showerror(title="Error",
+                                     message="Vul aub een valide waarde in voor gebruiker, wapen of discipline")
 
         def clicked_reset_top():
             value_scorecard1_shot1.set(0)
@@ -1377,17 +1371,34 @@ class ScorePage(tk.Frame):
             .grid(row=0, column=5, padx=10, pady=15, sticky="W")
 
         def clicked_total_top():
-            total_scorecard1.set(value_scorecard1_shot1.get() +
-                                 value_scorecard1_shot2.get() +
-                                 value_scorecard1_shot3.get() +
-                                 value_scorecard1_shot4.get() +
-                                 value_scorecard1_shot5.get())
+            scores = [value_scorecard1_shot1.get(),
+                      value_scorecard1_shot2.get(),
+                      value_scorecard1_shot3.get(),
+                      value_scorecard1_shot4.get(),
+                      value_scorecard1_shot5.get(),
+                      value_scorecard2_shot1.get(),
+                      value_scorecard2_shot2.get(),
+                      value_scorecard2_shot3.get(),
+                      value_scorecard2_shot4.get(),
+                      value_scorecard2_shot5.get()]
 
-            total_scorecard2.set(value_scorecard2_shot1.get() +
-                                 value_scorecard2_shot2.get() +
-                                 value_scorecard2_shot3.get() +
-                                 value_scorecard2_shot4.get() +
-                                 value_scorecard2_shot5.get())
+            if all(i <= 10 for i in scores):
+                total_scorecard1.set(value_scorecard1_shot1.get() +
+                                     value_scorecard1_shot2.get() +
+                                     value_scorecard1_shot3.get() +
+                                     value_scorecard1_shot4.get() +
+                                     value_scorecard1_shot5.get())
+
+                total_scorecard2.set(value_scorecard2_shot1.get() +
+                                     value_scorecard2_shot2.get() +
+                                     value_scorecard2_shot3.get() +
+                                     value_scorecard2_shot4.get() +
+                                     value_scorecard2_shot5.get())
+
+                return [total_scorecard1.get(), total_scorecard2.get()]
+            else:
+                messagebox.showerror(title="Error", message="U heeft een score ingevuld die meer dan 10 is")
+                return False
 
         button_total = ttk.Button(frame_inner_bottom_right, text="Reken Totaal", command=lambda: clicked_total_top()) \
             .grid(row=0, column=6, padx=10, pady=15, sticky="W")
@@ -1482,7 +1493,7 @@ class FinancePage(tk.Frame):
         button_main_menu.pack()
 
         button_finance_page = ttk.Button(frame_left,
-                                         text="Score Page",
+                                         text="Score",
                                          command=lambda: controller.show_frame(ScorePage))
         button_finance_page.pack()
 
@@ -1832,16 +1843,18 @@ class FinancePage(tk.Frame):
             .grid(row=0, column=1, padx=10, pady=15)
 
         def clicked_total():
-            total_price.set(round(clicked_total_left() + clicked_total_right(), 2))
+            if value_ammunition_quantity.get() == 0 or \
+                    value_scorecard_regular_quantity.get() == 0 or \
+                    value_scorecard_competition.get() == 0:
+                pass
+            else:
+                total_price.set(round(clicked_total_left() + clicked_total_right(), 2))
 
         button_middle_total = ttk.Button(frame_bottom_right, text="Reken Totaal", command=lambda: clicked_total()) \
             .grid(row=0, column=2, padx=10, pady=15)
 
-        frame_bottom = tk.Frame(frame_right)
-        frame_bottom.pack(side="bottom", fill="both", expand=True)
-
-        label_frame_bottom = tk.LabelFrame(frame_bottom, text="View Transactions")
-        label_frame_bottom.pack(side="bottom", fill="x", expand=True)
+        label_frame_bottom = tk.LabelFrame(frame_right, text="View Transactions")
+        label_frame_bottom.pack(side="right", fill="x", expand=True)
 
         frame_menu = tk.Frame(label_frame_bottom)
         frame_menu.pack(side="bottom", fill="x")
