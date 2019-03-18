@@ -1436,6 +1436,16 @@ class ScorePage(tk.Frame):
         a_c_matplot_score_firearm.config(width=max([sum([len(str(q)) for q in i]) for i in get_firearm_type()]) + 1)
         a_c_matplot_score_firearm.grid(row=0, column=3, padx=5, pady=2, sticky="W")
 
+        label_discipline_matplot = ttk.Label(frame_menu, text="Discipline:") \
+            .grid(row=1, column=2, padx=5, pady=2, sticky="W")
+        value_discipline_matplot = tk.StringVar(frame_menu)
+        value_discipline_matplot.set("Select")
+        a_c_matplot_score_discipline = AutocompleteCombobox(frame_menu, textvariable=value_discipline_matplot)
+        a_c_matplot_score_discipline.set_completion_list(get_firearm_type())
+        a_c_matplot_score_discipline.config(
+            width=max([sum([len(str(q)) for q in i]) for i in get_discipline_type()]) + 1)
+        a_c_matplot_score_discipline.grid(row=1, column=3, padx=5, pady=2, sticky="W")
+
         label_date_from_matplot = ttk.Label(frame_menu, text="Datum van (DD-MM-YYYY):") \
             .grid(row=0, column=4, padx=5, pady=2, sticky="W")
         value_date_from_matplot = tk.StringVar(frame_menu)
@@ -1449,13 +1459,16 @@ class ScorePage(tk.Frame):
             .grid(row=1, column=5, padx=5, pady=2, sticky="W")
 
         def clicked_show():
-            if input_validation.is_date(value_date_from_matplot.get()) is False \
-                    and input_validation.is_date(value_date_to_matplot.get()) is False:
+            if input_validation.is_date(str(input_validation.convert_input_date(
+                    value_date_from_matplot.get()))) is False and input_validation.is_date(
+                    str(input_validation.convert_input_date(value_date_to_matplot.get()))) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide datum in")
                 value_date_from_matplot.set('')
                 value_date_to_matplot.set('')
+            elif value_user_matplot.get() not in get_user_data():
+                messagebox.showerror(title="Error", message="Vul aub een valide lid in")
             else:
-                if value_date_from_matplot.get() == '' and value_date_to_matplot.get() == '':
+                if value_date_from_matplot.get() == 'Select' and value_date_to_matplot.get() == 'Select':
                     result = database_manager.execute_sql(
                         '''SELECT date, card_one_total, card_two_total FROM score WHERE shooter = ? AND firearm= ?
                          ORDER BY date''', (value_user_matplot.get()[-6:], value_firearm_matplot.get()))
@@ -1467,6 +1480,8 @@ class ScorePage(tk.Frame):
                          input_validation.convert_input_date(value_date_from_matplot.get()),
                          input_validation.convert_input_date(value_date_to_matplot.get())))
 
+            print(result)
+
         button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
             .grid(row=0, column=6, padx=5, pady=2, sticky="W")
 
@@ -1475,6 +1490,7 @@ class ScorePage(tk.Frame):
             value_date_to_matplot.set('')
             value_user_matplot.set('Select')
             value_firearm_matplot.set('Select')
+            value_discipline_matplot.set('Select')
 
         button_reser_matplot = ttk.Button(frame_menu, text="Reset", command=lambda: clicked_reset_matplot()) \
             .grid(row=1, column=6, padx=5, pady=2, sticky="W")
@@ -1874,7 +1890,7 @@ class FinancePage(tk.Frame):
             'Competitie': 'competition',
         }
 
-        label_scorecard_matplot = ttk.Label(frame_menu, text="Scorecard Type:") \
+        label_scorecard_matplot = ttk.Label(frame_menu, text="Scorekaart:") \
             .grid(row=0, column=2, padx=5, pady=2, sticky="W")
         value_scorecard_matplot = tk.StringVar(frame_menu)
         value_scorecard_matplot.set("Select")
@@ -1883,7 +1899,7 @@ class FinancePage(tk.Frame):
         a_c_matplot_transaction_scorecard.config(width=max([sum([len(str(q)) for q in i]) for i in fields2.keys()]))
         a_c_matplot_transaction_scorecard.grid(row=0, column=3, padx=5, pady=2, sticky="W")
 
-        label_ammunition_matplot = ttk.Label(frame_menu, text="Munitie Type:") \
+        label_ammunition_matplot = ttk.Label(frame_menu, text="Munitie:") \
             .grid(row=1, column=2, padx=5, pady=2, sticky="W")
         value_ammunition_matplot = tk.StringVar(frame_menu)
         value_ammunition_matplot.set("Select")
