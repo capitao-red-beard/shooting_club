@@ -1045,6 +1045,10 @@ class LoginPage(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         self.resizable(0, 0)
 
+        '''self.style = ttk.Style()
+        print(self.style.theme_names())
+        self.style.theme_use('xpnative')'''
+
         # tk.Tk.iconbitmap(self, default="logo_16_16.ico")
         tk.Tk.wm_title(self, "Schietvereniging - Prinses Juliana")
 
@@ -1104,6 +1108,7 @@ class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller, user_session):
         self.user_session = user_session
+
         tk.Frame.__init__(self, parent)
 
         label = ttk.Label(self, text="Main Menu", font=LARGE_FONT)
@@ -1114,6 +1119,19 @@ class MainMenu(tk.Frame):
 
         button2 = ttk.Button(self, text="Finance", command=lambda: controller.show_frame(FinancePage))
         button2.pack()
+
+        results = database_manager.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
+
+        tree = ttk.Treeview(self)
+        tree["columns"] = 'KNSA', 'First Name', 'Last Name'
+        tree.column('KNSA', stretch="yes")
+        tree.column('First Name', stretch="yes")
+        tree.column('Last Name', stretch="yes")
+        tree.heading('KNSA', text='KNSA')
+        tree.heading('First Name', text='Voornaam')
+        tree.heading('Last Name', text='Familienaam')
+        tree.insert("", 'end', values=(results[0][0], results[0][1], results[0][2]))
+        tree.pack()
 
 
 # TODO add matplotlib functionality
@@ -1331,7 +1349,8 @@ class ScorePage(tk.Frame):
                             email_body = 'Hallo ' + user_data[0][1] + ', \n\n U scores zijn voor ' + str(
                                 input_validation.convert_output_date(str(date.today()))) + \
                                          ' in de database ingevoerd. U heeft met ' + value_firearm_left.get() + \
-                                         ' geschoten. \n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(
+                                         ' geschoten. En discipline ' + value_discipline.get() + \
+                                         '\n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(
                                 value_scorecard1_shot1.get()) + '\n schot 2: ' + str(
                                 value_scorecard1_shot2.get()) + '\n schot 3: ' + str(
                                 value_scorecard1_shot3.get()) + '\n schot 4: ' + str(
@@ -1461,7 +1480,7 @@ class ScorePage(tk.Frame):
         def clicked_show():
             if input_validation.is_date(str(input_validation.convert_input_date(
                     value_date_from_matplot.get()))) is False and input_validation.is_date(
-                    str(input_validation.convert_input_date(value_date_to_matplot.get()))) is False:
+                str(input_validation.convert_input_date(value_date_to_matplot.get()))) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide datum in")
                 value_date_from_matplot.set('')
                 value_date_to_matplot.set('')
@@ -1509,7 +1528,9 @@ class FinancePage(tk.Frame):
 
     def __init__(self, parent, controller, user_session):
         self.user_session = user_session
+
         tk.Frame.__init__(self, parent)
+
         frame_left = tk.Frame(self)
         frame_left.pack(side="left")
 
