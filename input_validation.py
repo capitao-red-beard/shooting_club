@@ -33,7 +33,7 @@ def is_date(i):
 
 
 def is_int(i):
-    if int(i):
+    if isinstance(i, int):
         return True
     else:
         return False

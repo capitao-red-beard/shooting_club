@@ -128,9 +128,7 @@ statement6 = '''CREATE TABLE IF NOT EXISTS sale_scorecard (
                             FOREIGN KEY (seller) REFERENCES user (knsa_licence_number)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (buyer) REFERENCES user (knsa_licence_number)
-                            ON DELETE NO ACTION ON UPDATE CASCADE,
-                            FOREIGN KEY (price) REFERENCES scorecard (price)
-                            ON DELETE NO ACTION ON UPDATE NO ACTION);'''
+                            ON DELETE NO ACTION ON UPDATE CASCADE);'''
 
 statement7 = '''CREATE TABLE IF NOT EXISTS sale_ammunition (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,6 +143,4 @@ statement7 = '''CREATE TABLE IF NOT EXISTS sale_ammunition (
                             FOREIGN KEY (seller) REFERENCES user (knsa_licence_number)
                             ON DELETE NO ACTION ON UPDATE CASCADE,
                             FOREIGN KEY (buyer) REFERENCES user (knsa_licence_number)
-                            ON DELETE NO ACTION ON UPDATE CASCADE,
-                            FOREIGN KEY (price) REFERENCES ammunition (price)
-                            ON DELETE NO ACTION ON UPDATE NO ACTION);'''
+                            ON DELETE NO ACTION ON UPDATE CASCADE);'''
