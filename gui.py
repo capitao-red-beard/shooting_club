@@ -5,6 +5,7 @@ from tkinter import ttk
 
 import matplotlib
 import matplotlib.animation as animation
+import pandas as pd
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -1120,18 +1121,41 @@ class MainMenu(tk.Frame):
         button2 = ttk.Button(self, text="Finance", command=lambda: controller.show_frame(FinancePage))
         button2.pack()
 
-        results = database_manager.execute_sql('''SELECT knsa_licence_number, first_name, last_name FROM user;''')
+        button3 = ttk.Button(self, text="Send", command=lambda: send_to_excel())
+        button3.pack()
 
-        tree = ttk.Treeview(self)
-        tree["columns"] = 'KNSA', 'First Name', 'Last Name'
-        tree.column('KNSA', stretch="yes")
-        tree.column('First Name', stretch="yes")
-        tree.column('Last Name', stretch="yes")
-        tree.heading('KNSA', text='KNSA')
-        tree.heading('First Name', text='Voornaam')
-        tree.heading('Last Name', text='Familienaam')
-        tree.insert("", 'end', values=(results[0][0], results[0][1], results[0][2]))
-        tree.pack()
+        def send_to_excel():
+            scores = database_manager.execute_sql(
+                '''SELECT s.date, s.shooter, u.first_name, u.last_name, s.discipline, s.firearm, s.own_firearm, 
+                 s.card_one_shot_one, s.card_one_shot_two, s.card_one_shot_three, s.card_one_shot_four, 
+                  s.card_one_shot_five, s.card_one_total, s.card_two_shot_one, s.card_two_shot_two, 
+                   s.card_two_shot_three, s.card_two_shot_four, s.card_two_shot_five, s.card_two_total, s.submitter,
+                    t.first_name, t.last_name FROM score s LEFT JOIN user u ON s.shooter = u.knsa_licence_number
+                     LEFT JOIN user t ON s.submitter = t.knsa_licence_number
+                      WHERE date = ?''', (str(date.today()),))
+
+            if not scores:
+                messagebox.showerror(title="Error", message="Er zijn nog geen scores ingediend voor vandaag")
+            else:
+                df = pd.DataFrame(scores)
+
+                df.columns = ['Datum', 'Schutter', 'sfn', 'sln', 'Discipline', 'Vuurwapen', 'Eigen Wapen',
+                              '1e Kaart | 1e Schot', '1e Kaart | 2e Schot', '1e Kaart | 3e Schot',
+                              '1e Kaart | 4e Schot', '1e Kaart | 5e Schot', 'Kaart 1 Totaal', '2e Kaart | 1e Schot',
+                              '2e Kaart | 2e Schot', '2e Kaart | 3e Schot', '2e Kaart | 4e Schot',
+                              '2e Kaart | 5e Schot', 'Kaart 2 Totaal', 'Indiener', 'ifn', 'iln']
+
+                df['Schutter'] = df['Schutter'].astype(str) + ' ' + df['sfn'] + ' ' + df['sln']
+                df['Indiener'] = df['Indiener'].astype(str) + ' ' + df['ifn'] + ' ' + df['iln']
+                df.drop(['sfn', 'sln', 'ifn', 'iln'], 1, inplace=True)
+
+                df['Eigen Wapen'].replace({
+                    1: 'Ja',
+                    0: 'Nee'
+                }, inplace=True)
+
+                df.to_excel('score_sheet_' + str(input_validation.convert_output_date(str(date.today()))) +
+                            '.xlsx', sheet_name=str(input_validation.convert_output_date(str(date.today()))))
 
 
 # TODO add matplotlib functionality
@@ -1157,7 +1181,7 @@ class ScorePage(tk.Frame):
         frame_right.pack(side="right", fill='both', expand=True)
 
         label_frame_top = tk.LabelFrame(frame_right, text="Submit Score")
-        label_frame_top.pack(side="top", fill="x", expand=True)
+        label_frame_top.pack(side="top", fill="both", expand=True)
 
         frame_top_left = tk.Frame(label_frame_top)
         frame_top_left.pack(side="left", anchor="nw")
@@ -1196,11 +1220,12 @@ class ScorePage(tk.Frame):
         checkbutton_own_firearm = ttk.Checkbutton(frame_top_left, variable=value_own_firearm) \
             .grid(row=3, column=1, padx=5, pady=5, sticky="W")
 
+        # here to space
         frame_top_right = tk.Frame(label_frame_top)
-        frame_top_right.pack(side="top", anchor="nw")
+        frame_top_right.pack(side="right", fill="both", expand=True)
 
         frame_inner_top_right = tk.Frame(frame_top_right)
-        frame_inner_top_right.pack(side="top", anchor="nw")
+        frame_inner_top_right.pack(side="top")
 
         label_scorecard1 = ttk.Label(frame_inner_top_right, text="1e Scorecard:") \
             .grid(row=2, column=0, padx=5, pady=5, sticky="W")
@@ -1349,8 +1374,8 @@ class ScorePage(tk.Frame):
                             email_body = 'Hallo ' + user_data[0][1] + ', \n\n U scores zijn voor ' + str(
                                 input_validation.convert_output_date(str(date.today()))) + \
                                          ' in de database ingevoerd. U heeft met ' + value_firearm_left.get() + \
-                                         ' geschoten. En discipline ' + value_discipline.get() + \
-                                         '\n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(
+                                         ' geschoten, en discipline ' + value_discipline.get() + \
+                                         '.\n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(
                                 value_scorecard1_shot1.get()) + '\n schot 2: ' + str(
                                 value_scorecard1_shot2.get()) + '\n schot 3: ' + str(
                                 value_scorecard1_shot3.get()) + '\n schot 4: ' + str(
@@ -1487,19 +1512,7 @@ class ScorePage(tk.Frame):
             elif value_user_matplot.get() not in get_user_data():
                 messagebox.showerror(title="Error", message="Vul aub een valide lid in")
             else:
-                if value_date_from_matplot.get() == 'Select' and value_date_to_matplot.get() == 'Select':
-                    result = database_manager.execute_sql(
-                        '''SELECT date, card_one_total, card_two_total FROM score WHERE shooter = ? AND firearm= ?
-                         ORDER BY date''', (value_user_matplot.get()[-6:], value_firearm_matplot.get()))
-                else:
-                    result = database_manager.execute_sql(
-                        '''SELECT date, card_one_total, card_two_total FROM score WHERE shooter = ? AND firearm = ? 
-                        AND date BETWEEN ? AND ? ORDER BY date''',
-                        (value_user_matplot.get()[-6:], value_firearm_matplot.get(),
-                         input_validation.convert_input_date(value_date_from_matplot.get()),
-                         input_validation.convert_input_date(value_date_to_matplot.get())))
-
-            print(result)
+                print('Clicked')
 
         button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
             .grid(row=0, column=6, padx=5, pady=2, sticky="W")
@@ -1559,9 +1572,6 @@ class FinancePage(tk.Frame):
 
         label_frame_top_left = tk.Frame(frame_inner_top)
         label_frame_top_left.pack(side="left", fill="both", expand=True)
-
-        frame_ammunition_top = tk.Frame(label_frame_top_left)
-        frame_ammunition_top.pack(side="top", anchor="nw")
 
         frame_ammunition_middle = tk.Frame(label_frame_top_left)
         frame_ammunition_middle.pack(anchor="nw")
@@ -1683,9 +1693,6 @@ class FinancePage(tk.Frame):
 
         label_frame_top_right = tk.Frame(frame_inner_top)
         label_frame_top_right.pack(side="right", fill="both", expand=True)
-
-        frame_scorecard_top = tk.Frame(label_frame_top_right)
-        frame_scorecard_top.pack(side="top", anchor="nw")
 
         frame_scorecard_middle = tk.Frame(label_frame_top_right)
         frame_scorecard_middle.pack(anchor="nw")
@@ -2024,8 +2031,30 @@ class AutocompleteCombobox(ttk.Combobox):
         # list at the position of the autocompletion
 
 
+class Table(tk.Frame):
+    def __init__(self, parent, rows=10, columns=3):
+        # use black background so it "peeks through" to
+        # form grid lines
+        tk.Frame.__init__(self, parent, background="black")
+        self._widgets = []
+        for row in range(rows):
+            current_row = []
+            for column in range(columns):
+                label = tk.Label(self, text="%s/%s" % (row, column), borderwidth=0, width=10, bg='white')
+                label.grid(row=row, column=column, sticky="nsew", padx=1, pady=1)
+                current_row.append(label)
+            self._widgets.append(current_row)
+
+        for column in range(columns):
+            self.grid_columnconfigure(column, weight=1)
+
+    def set(self, row, column, value):
+        widget = self._widgets[row][column]
+        widget.configure(text=value)
+
+
 app2 = LoginPage()
 app2.geometry("285x120")
-app2.minsize(285, 120)
-app2.maxsize(285, 120)
+app2.minsize(285, 115)
+app2.maxsize(285, 115)
 app2.mainloop()
