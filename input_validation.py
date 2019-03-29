@@ -17,11 +17,15 @@ def date_range(i):
             date.today() + datetime.timedelta(-date.today().weekday(), weeks=i)]
 
 
-def convert_input_date(i):
+def date_from_today(i):
+    return date.today() + datetime.timedelta(-date.today().weekday(), weeks=i)
+
+
+def date_from_human(i):
     return datetime.datetime.strptime(i, '%d-%m-%Y').date()
 
 
-def convert_output_date(i):
+def date_to_human(i):
     return datetime.datetime.strptime(i, '%Y-%m-%d').date().strftime('%d-%m-%Y')
 
 

@@ -27,8 +27,7 @@ a = f.add_subplot(111)
 
 
 def animate(i):
-    pull_data = open("sample_data.txt", "r").read()
-    data_list = pull_data.split('\n')
+    data_list = i.split('\n')
 
     x_list = []
     y_list = []
@@ -174,7 +173,7 @@ def popup_user_settings(user_session):
             error_message.append('Vul aub een voornaam in voordat je verder gaat\n')
         elif data[2] == '':
             error_message.append('Vul aub een familienaam in voordat je verder gaat\n')
-        elif input_validation.is_date(str(input_validation.convert_input_date(data[3]))) is False:
+        elif input_validation.is_date(str(input_validation.date_from_human(data[3]))) is False:
             error_message.append('Vul aub een valide gebortedatum in voordat je verder gaat\n')
         elif input_validation.is_address(data[4], data[5], data[6]) is None:
             error_message.append('Vul aub een valide adres in in voordat je verder gaat\n')
@@ -182,9 +181,8 @@ def popup_user_settings(user_session):
             error_message.append('Vul aub een valide telefoonnummer in voor dat je verder gaat\n')
         elif input_validation.is_knsa(data[10]) is False:
             error_message.append('Vul aub een valide KNSA licentienummer in voordat je verder gaat\n')
-        elif input_validation.is_date(str(input_validation.convert_input_date(data[11]))) is False:
+        elif input_validation.is_date(str(input_validation.date_from_human(data[11]))) is False:
             error_message.append('Vul aub een valide datum van litmaatschap ingang in voordat je verder gaat\n')
-
         if data[0] == 2:
             if input_validation.is_email(data[8]) is False:
                 error_message.append('Vul aub een valide email adres in voor dat je verder gaat\n')
@@ -192,6 +190,7 @@ def popup_user_settings(user_session):
                 error_message.append('Vul aub een valide wachtwoord in voor dat je verder gaat\n')
             else:
                 hashed_password = password_manager.hash_password(data[9])
+
         elif data[0] == 1:
             if len(data[8]) > 0:
                 if input_validation.is_email(data[8]) is False:
@@ -205,6 +204,7 @@ def popup_user_settings(user_session):
             for m in error_message:
                 messagebox.showerror(title="Error", message=m)
             popup.lift()
+
         else:
             result_new = database_manager.execute_sql(
                 '''INSERT INTO user (type, first_name,last_name, date_of_birth, address, city, post_code, 
@@ -213,7 +213,7 @@ def popup_user_settings(user_session):
                     data[0],
                     data[1],
                     data[2],
-                    input_validation.convert_input_date(data[3]),
+                    input_validation.date_from_human(data[3]),
                     data[4],
                     data[5],
                     data[6],
@@ -221,11 +221,10 @@ def popup_user_settings(user_session):
                     data[8],
                     hashed_password,
                     data[10],
-                    input_validation.convert_input_date(data[11])))
+                    input_validation.date_from_human(data[11])))
 
             if result_new:
                 email_result_user = True
-
                 if data[8] is not None:
                     email_body_user = 'Gefeliciteerd ' + value_first_name_new.get() + \
                                       ', \n\n Uw gegevens zijn nu opgeslaan in het schietvereniging systeem. ' \
@@ -478,14 +477,14 @@ def popup_user_settings(user_session):
         value_user_type_view.set(fields3.get(result_view[0][0]))
         value_first_name_view.set(result_view[0][1])
         value_last_name_view.set(result_view[0][2])
-        value_date_of_birth_view.set(input_validation.convert_output_date(result_view[0][3]))
+        value_date_of_birth_view.set(input_validation.date_to_human(result_view[0][3]))
         value_address_view.set(result_view[0][4])
         value_city_view.set(result_view[0][5])
         value_post_code_view.set(result_view[0][6])
         value_telephone_number_view.set(result_view[0][7])
         value_email_address_view.set(result_view[0][8])
         value_knsa_licence_number_view.set(result_view[0][9])
-        value_date_of_membership_view.set(input_validation.convert_output_date(result_view[0][10]))
+        value_date_of_membership_view.set(input_validation.date_to_human(result_view[0][10]))
 
     button_cancel_view = ttk.Button(tab_view, text="Annuleren", command=popup.destroy) \
         .grid(row=12, column=1, padx=10, pady=15)
@@ -1104,7 +1103,6 @@ class LoginPage(tk.Tk):
 
 
 # TODO add feature to track users, classes and stock
-# TODO add feature to allow sending of data to EXCEL
 class MainMenu(tk.Frame):
 
     def __init__(self, parent, controller, user_session):
@@ -1124,14 +1122,34 @@ class MainMenu(tk.Frame):
         button3 = ttk.Button(self, text="Send", command=lambda: send_to_excel())
         button3.pack()
 
+        scores_frame = ttk.Frame(self)
+        scores_frame.pack()
+
+        ammunition_data = database_manager.execute_sql(
+            '''SELECT type, stock FROM ammunition;''')
+
+        df2 = pd.DataFrame(ammunition_data)
+
+        df2.columns = ['Type', 'Voorraad']
+
+        rows, cols = df2.shape
+
+        table = Table(scores_frame, rows, cols)
+
+        for r in range(rows):
+            for c in range(cols):
+                table.set(r, c, df2.iloc[r, c])
+
+        table.grid()
+
         def send_to_excel():
             scores = database_manager.execute_sql(
                 '''SELECT s.date, s.shooter, u.first_name, u.last_name, s.discipline, s.firearm, s.own_firearm, 
                  s.card_one_shot_one, s.card_one_shot_two, s.card_one_shot_three, s.card_one_shot_four, 
                   s.card_one_shot_five, s.card_one_total, s.card_two_shot_one, s.card_two_shot_two, 
-                   s.card_two_shot_three, s.card_two_shot_four, s.card_two_shot_five, s.card_two_total, s.submitter,
-                    t.first_name, t.last_name FROM score s LEFT JOIN user u ON s.shooter = u.knsa_licence_number
-                     LEFT JOIN user t ON s.submitter = t.knsa_licence_number
+                   s.card_two_shot_three, s.card_two_shot_four, s.card_two_shot_five, s.card_two_total, s.submitter, 
+                    t.first_name, t.last_name FROM score s LEFT JOIN user u ON s.shooter = u.knsa_licence_number 
+                     LEFT JOIN user t ON s.submitter = t.knsa_licence_number 
                       WHERE date = ?''', (str(date.today()),))
 
             if not scores:
@@ -1139,23 +1157,24 @@ class MainMenu(tk.Frame):
             else:
                 df = pd.DataFrame(scores)
 
-                df.columns = ['Datum', 'Schutter', 'sfn', 'sln', 'Discipline', 'Vuurwapen', 'Eigen Wapen',
+                df.columns = ['Datum', 'Schutter', 'temp0', 'temp1', 'Discipline', 'Vuurwapen', 'Eigen Wapen',
                               '1e Kaart | 1e Schot', '1e Kaart | 2e Schot', '1e Kaart | 3e Schot',
                               '1e Kaart | 4e Schot', '1e Kaart | 5e Schot', 'Kaart 1 Totaal', '2e Kaart | 1e Schot',
                               '2e Kaart | 2e Schot', '2e Kaart | 3e Schot', '2e Kaart | 4e Schot',
-                              '2e Kaart | 5e Schot', 'Kaart 2 Totaal', 'Indiener', 'ifn', 'iln']
+                              '2e Kaart | 5e Schot', 'Kaart 2 Totaal', 'Indiener', 'temp2', 'temp3']
 
-                df['Schutter'] = df['Schutter'].astype(str) + ' ' + df['sfn'] + ' ' + df['sln']
-                df['Indiener'] = df['Indiener'].astype(str) + ' ' + df['ifn'] + ' ' + df['iln']
-                df.drop(['sfn', 'sln', 'ifn', 'iln'], 1, inplace=True)
+                df['Schutter'] = df['Schutter'].astype(str) + ' ' + df['temp0'] + ' ' + df['temp1']
+                df['Indiener'] = df['Indiener'].astype(str) + ' ' + df['temp2'] + ' ' + df['temp3']
+                df['Datum'] = [input_validation.date_to_human(d) for d in df['Datum']]
+                df.drop(['temp0', 'temp1', 'temp2', 'temp3'], 1, inplace=True)
 
                 df['Eigen Wapen'].replace({
                     1: 'Ja',
                     0: 'Nee'
                 }, inplace=True)
 
-                df.to_excel('score_sheet_' + str(input_validation.convert_output_date(str(date.today()))) +
-                            '.xlsx', sheet_name=str(input_validation.convert_output_date(str(date.today()))))
+                df.to_excel('score_sheet_' + str(input_validation.date_to_human(str(date.today()))) +
+                            '.xlsx', sheet_name=str(input_validation.date_to_human(str(date.today()))))
 
 
 # TODO add matplotlib functionality
@@ -1325,10 +1344,11 @@ class ScorePage(tk.Frame):
                         totals = clicked_total_top()
 
                         result_submit_left = database_manager.execute_sql(
-                            '''INSERT INTO score (card_one_shot_one, card_one_shot_two, card_one_shot_three, card_one_shot_four,
-                            card_one_shot_five,card_one_total, card_two_shot_one, card_two_shot_two, card_two_shot_three,
-                            card_two_shot_four, card_two_shot_five, card_two_total, date, shooter, submitter, discipline,
-                            firearm, own_firearm) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
+                            '''INSERT INTO score (card_one_shot_one, card_one_shot_two, card_one_shot_three,
+                            card_one_shot_four, card_one_shot_five,card_one_total, card_two_shot_one, card_two_shot_two,
+                             card_two_shot_three, card_two_shot_four, card_two_shot_five, card_two_total, date, shooter,
+                              submitter, discipline, firearm, own_firearm) 
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''', (
                                 value_scorecard1_shot1.get(),
                                 value_scorecard1_shot2.get(),
                                 value_scorecard1_shot3.get(),
@@ -1372,7 +1392,7 @@ class ScorePage(tk.Frame):
                                 (value_user_left.get()[-6:],))
 
                             email_body = 'Hallo ' + user_data[0][1] + ', \n\n U scores zijn voor ' + str(
-                                input_validation.convert_output_date(str(date.today()))) + \
+                                input_validation.date_to_human(str(date.today()))) + \
                                          ' in de database ingevoerd. U heeft met ' + value_firearm_left.get() + \
                                          ' geschoten, en discipline ' + value_discipline.get() + \
                                          '.\n\n U heeft voor uw eerste kaart: \n schot 1: ' + str(
@@ -1396,9 +1416,11 @@ class ScorePage(tk.Frame):
                                 clicked_reset_top()
                             else:
                                 messagebox.showerror(title="Error", message="Er was een fout met stuuren van de email")
+
                         else:
                             messagebox.showerror(title="Error",
                                                  message="Er was een fout met de stuuren van scores naar de database")
+
             else:
                 messagebox.showerror(title="Error",
                                      message="Vul aub een valide waarde in voor gebruiker, wapen of discipline")
@@ -1450,8 +1472,10 @@ class ScorePage(tk.Frame):
                                      value_scorecard2_shot5.get())
 
                 return [total_scorecard1.get(), total_scorecard2.get()]
+
             else:
                 messagebox.showerror(title="Error", message="U heeft een score ingevuld die meer dan 10 is")
+
                 return False
 
         button_total = ttk.Button(frame_inner_bottom_right, text="Reken Totaal", command=lambda: clicked_total_top()) \
@@ -1503,16 +1527,37 @@ class ScorePage(tk.Frame):
             .grid(row=1, column=5, padx=5, pady=2, sticky="W")
 
         def clicked_show():
-            if input_validation.is_date(str(input_validation.convert_input_date(
+            if input_validation.is_date(str(input_validation.date_from_human(
                     value_date_from_matplot.get()))) is False and input_validation.is_date(
-                str(input_validation.convert_input_date(value_date_to_matplot.get()))) is False:
+                str(input_validation.date_from_human(value_date_to_matplot.get()))) is False:
+
                 messagebox.showerror(title="Error", message="Vul aub een valide datum in")
                 value_date_from_matplot.set('')
                 value_date_to_matplot.set('')
+
             elif value_user_matplot.get() not in get_user_data():
                 messagebox.showerror(title="Error", message="Vul aub een valide lid in")
+
+            elif value_firearm_matplot.get() not in get_firearm_type():
+                messagebox.showerror(title="Error", message="Vul aub een valide vuurwapen in")
+
+            elif value_discipline_matplot.get() not in get_discipline_type():
+                messagebox.showerror(title="Error", message="Vul aub een valide discipline in")
+
             else:
-                print('Clicked')
+                matplot_data = database_manager.execute_sql(
+                    '''SELECT card_one_total, card_two_total FROM score 
+                    WHERE shooter = ? AND firearm = ? AND discipline = ?
+                    AND date BETWEEN ? AND ?''', (value_user_matplot.get()[-6:], value_firearm_matplot.get(),
+                                                  value_discipline_matplot.get(),
+                                                  input_validation.date_from_human(value_date_from_matplot.get()),
+                                                  input_validation.date_from_human(value_date_to_matplot.get())))
+
+                df_matplot = pd.DataFrame(matplot_data)
+                for m in matplot_data:
+                    print(m)
+
+                # animate()
 
         button_show = ttk.Button(frame_menu, text="Laden", command=lambda: clicked_show()) \
             .grid(row=0, column=6, padx=5, pady=2, sticky="W")
@@ -1950,9 +1995,9 @@ class FinancePage(tk.Frame):
             .grid(row=1, column=5, padx=5, pady=2, sticky="W")
 
         def clicked_show():
-            if input_validation.is_date(input_validation.convert_input_date(
+            if input_validation.is_date(input_validation.date_from_human(
                     value_date_from_matplot.get())) is False and \
-                    input_validation.is_date(input_validation.convert_input_date(value_date_to_matplot.get())) is False:
+                    input_validation.is_date(input_validation.date_from_human(value_date_to_matplot.get())) is False:
                 messagebox.showerror(title="Error", message="Vul aub een valide datum in")
                 value_date_from_matplot.set('')
                 value_date_to_matplot.set('')
@@ -2032,9 +2077,7 @@ class AutocompleteCombobox(ttk.Combobox):
 
 
 class Table(tk.Frame):
-    def __init__(self, parent, rows=10, columns=3):
-        # use black background so it "peeks through" to
-        # form grid lines
+    def __init__(self, parent, rows, columns):
         tk.Frame.__init__(self, parent, background="black")
         self._widgets = []
         for row in range(rows):
