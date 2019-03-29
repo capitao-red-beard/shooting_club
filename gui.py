@@ -1007,8 +1007,10 @@ class ShootingClub(tk.Tk):
         file_menu = tk.Menu(menu_bar, tearoff=0)
 
         file_menu.add_command(label="Lid Instellingen", command=lambda: popup_user_settings(user_session))
+        file_menu.add_separator()
         file_menu.add_command(label="Vuurapen Instellingen", command=lambda: popup_firearm_settings(user_session))
         file_menu.add_command(label="Discipline Instellingen", command=lambda: popup_discipline_settings(user_session))
+        file_menu.add_separator()
         file_menu.add_command(label="Munitie Instellingen", command=lambda: popup_ammunition_settings(user_session))
         file_menu.add_command(label="Score Kaart Instellingen", command=lambda: popup_scorecard_settings(user_session))
         file_menu.add_separator()
@@ -1110,39 +1112,25 @@ class MainMenu(tk.Frame):
 
         tk.Frame.__init__(self, parent)
 
-        label = ttk.Label(self, text="Main Menu", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
+        frame_left = tk.Frame(self)
+        frame_left.pack(side="left")
 
-        button1 = ttk.Button(self, text="Score", command=lambda: controller.show_frame(ScorePage))
-        button1.pack()
+        button_score = ttk.Button(frame_left, text="Score", command=lambda: controller.show_frame(ScorePage))
+        button_score.pack()
 
-        button2 = ttk.Button(self, text="Finance", command=lambda: controller.show_frame(FinancePage))
-        button2.pack()
+        button_finance = ttk.Button(frame_left, text="Finance", command=lambda: controller.show_frame(FinancePage))
+        button_finance.pack()
 
-        button3 = ttk.Button(self, text="Send", command=lambda: send_to_excel())
-        button3.pack()
+        frame_right = tk.Frame(self)
+        frame_right.pack(side="right", fill='both', expand=True)
 
-        scores_frame = ttk.Frame(self)
-        scores_frame.pack()
+        label_frame_right = tk.LabelFrame(frame_right, text="Main Menu")
+        label_frame_right.pack(side="top", fill="both", expand=True)
 
-        ammunition_data = database_manager.execute_sql(
-            '''SELECT type, stock FROM ammunition;''')
+        button_excel_scores = ttk.Button(label_frame_right, text="Excel", command=lambda: send_scores_to_excel())
+        button_excel_scores.grid(row=0, column=0, padx=5, pady=5, sticky="W")
 
-        df2 = pd.DataFrame(ammunition_data)
-
-        df2.columns = ['Type', 'Voorraad']
-
-        rows, cols = df2.shape
-
-        table = Table(scores_frame, rows, cols)
-
-        for r in range(rows):
-            for c in range(cols):
-                table.set(r, c, df2.iloc[r, c])
-
-        table.grid()
-
-        def send_to_excel():
+        def send_scores_to_excel():
             scores = database_manager.execute_sql(
                 '''SELECT s.date, s.shooter, u.first_name, u.last_name, s.discipline, s.firearm, s.own_firearm, 
                  s.card_one_shot_one, s.card_one_shot_two, s.card_one_shot_three, s.card_one_shot_four, 
@@ -1153,7 +1141,7 @@ class MainMenu(tk.Frame):
                       WHERE date = ?''', (str(date.today()),))
 
             if not scores:
-                messagebox.showerror(title="Error", message="Er zijn nog geen scores ingediend voor vandaag")
+                messagebox.showinfo(title="Information", message="Er zijn nog geen scores ingediend voor vandaag")
             else:
                 df = pd.DataFrame(scores)
 
@@ -1199,7 +1187,7 @@ class ScorePage(tk.Frame):
         frame_right = tk.Frame(self)
         frame_right.pack(side="right", fill='both', expand=True)
 
-        label_frame_top = tk.LabelFrame(frame_right, text="Submit Score")
+        label_frame_top = tk.LabelFrame(frame_right, text="Score Indienen")
         label_frame_top.pack(side="top", fill="both", expand=True)
 
         frame_top_left = tk.Frame(label_frame_top)
@@ -1481,7 +1469,7 @@ class ScorePage(tk.Frame):
         button_total = ttk.Button(frame_inner_bottom_right, text="Reken Totaal", command=lambda: clicked_total_top()) \
             .grid(row=0, column=6, padx=10, pady=15, sticky="W")
 
-        label_frame_bottom = tk.LabelFrame(frame_right, text="View Scores")
+        label_frame_bottom = tk.LabelFrame(frame_right, text="Bekijk Scores")
         label_frame_bottom.pack(side="right", fill="both", expand=True)
 
         frame_menu = tk.Frame(label_frame_bottom)
@@ -1944,7 +1932,7 @@ class FinancePage(tk.Frame):
         button_middle_total = ttk.Button(frame_bottom_right, text="Reken Totaal", command=lambda: clicked_total()) \
             .grid(row=0, column=2, padx=10, pady=15)
 
-        label_frame_bottom = tk.LabelFrame(frame_right, text="View Transactions")
+        label_frame_bottom = tk.LabelFrame(frame_right, text="Bekijk Transacties")
         label_frame_bottom.pack(side="right", fill="x", expand=True)
 
         frame_menu = tk.Frame(label_frame_bottom)

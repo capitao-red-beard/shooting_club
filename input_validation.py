@@ -21,6 +21,12 @@ def date_from_today(i):
     return date.today() + datetime.timedelta(-date.today().weekday(), weeks=i)
 
 
+def date_difference(i):
+    delta = datetime.datetime.today() - datetime.datetime.strptime(i, '%Y-%m-%d')
+
+    return delta.days
+
+
 def date_from_human(i):
     return datetime.datetime.strptime(i, '%d-%m-%Y').date()
 
