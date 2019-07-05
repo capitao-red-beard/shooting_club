@@ -37,7 +37,7 @@ def date_to_human(i):
 
 def is_date(i):
     try:
-        datetime.datetime.strptime(i, '%Y-%m-%d')
+        datetime.datetime.strptime(str(i), '%Y-%m-%d')
     except ValueError:
         return False
 
