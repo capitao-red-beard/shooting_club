@@ -6,6 +6,7 @@ from tkinter import ttk
 import matplotlib
 import matplotlib.animation as animation
 import pandas as pd
+import openpyxl
 from matplotlib import style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -175,8 +176,6 @@ def popup_user_settings(user_session):
             error_message.append('Vul aub een familienaam in voordat je verder gaat\n')
         elif input_validation.is_date(str(input_validation.date_from_human(data[3]))) is False:
             error_message.append('Vul aub een valide gebortedatum in voordat je verder gaat\n')
-        elif input_validation.is_address(data[4], data[5], data[6]) is None:
-            error_message.append('Vul aub een valide adres in in voordat je verder gaat\n')
         elif input_validation.is_phone_number(data[7]) is False:
             error_message.append('Vul aub een valide telefoonnummer in voor dat je verder gaat\n')
         elif input_validation.is_knsa(data[10]) is False:
@@ -1127,8 +1126,11 @@ class MainMenu(tk.Frame):
         label_frame_right = tk.LabelFrame(frame_right, text="Main Menu")
         label_frame_right.pack(side="top", fill="both", expand=True)
 
-        button_excel_scores = ttk.Button(label_frame_right, text="Excel", command=lambda: send_scores_to_excel())
+        button_excel_scores = ttk.Button(label_frame_right, text="Druk scores af", command=lambda: send_scores_to_excel())
         button_excel_scores.grid(row=0, column=0, padx=5, pady=5, sticky="W")
+
+        button_excel_sales = ttk.Button(label_frame_right, text="Druk verkoop af", command=lambda: send_sales_to_excel())
+        button_excel_sales.grid(row=0, column=1, padx=5, pady=5, sticky="W")
 
         def send_scores_to_excel():
             scores = database_manager.execute_sql(
@@ -1163,6 +1165,26 @@ class MainMenu(tk.Frame):
 
                 df.to_excel('score_sheet_' + str(input_validation.date_to_human(str(date.today()))) +
                             '.xlsx', sheet_name=str(input_validation.date_to_human(str(date.today()))))
+
+        def send_sales_to_excel():
+            sales_ammunition = database_manager.execute_sql(
+                '''SELECT * FROM sale_ammunition WHERE date = ?''', (str(date.today()),))
+            
+            sales_scorecard = database_manager.execute_sql(
+                '''SELECT * FROM sale_scorecard WHERE date = ?''', (str(date.today()),))
+
+            if not sales_ammunition and not sales_scorecard:
+                messagebox.showinfo(title="Information", message="Er zijn nog geen verkoop acties ingediend voor vandaag")
+
+            else:
+                df1 = pd.DataFrame(sales_ammunition)
+                df2 = pd.DataFrame(sales_scorecard)
+
+                df = pd.concat([df1, df2])
+
+                df.to_excel('sales_sheet_' + str(input_validation.date_to_human(str(date.today()))) +
+                            '.xlsx', sheet_name=str(input_validation.date_to_human(str(date.today()))))
+
 
 
 # TODO add matplotlib functionality

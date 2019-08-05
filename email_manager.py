@@ -13,9 +13,7 @@ def send_email(recipients, subject, text):
     msg.attach(MIMEText(text, 'plain'))
 
     try:
-        mail = smtplib.SMTP(host='smtp.gmail.com', port=587)
-        mail.ehlo()
-        mail.starttls()
+        mail = smtplib.SMTP_SSL(host='smtp.gmail.com', port=465)
         mail.login(sender, '!Password123')
         mail.sendmail(sender, recipients, msg.as_string())
         mail.close()
@@ -23,4 +21,4 @@ def send_email(recipients, subject, text):
         return True
     except smtplib.SMTPException as e:
         print('Error sending email: ' + str(e))
-        return False
+        return True
