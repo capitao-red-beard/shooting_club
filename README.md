@@ -17,7 +17,7 @@ However, the main technologies of this project are:
 
 ## Functionality
 
-This app allows for the storage of members of the shooting club. From here they can submit scores to the database at a maximum rate of 1x per week, per discipline. Once a user has submitted scores they will also be e-mailed to them. 
+This app allows for the storage of members of the shooting club. From here they can submit scores to the database at a maximum rate of 1x per week, per discipline. Once a user has submitted scores they will also be e-mailed to them.
 
 This app also allows users to purchase products from the shooting club, namely scorecards and ammunition. This again will be emailed to the user as a receipt once they have made payment.
 
@@ -27,7 +27,7 @@ The app also has the ability to act as a monitoring tool for an admin user, they
 
 The app stores encrypted versions of users passwords, this is for security reasons, even though this app does not run online it is an important part of storing user credentials on a database.
 
-The app has a whole file dedicated to input validation, this being a GUI app it is important that we do not clutter the database with rubbish. There are checks built into the code to ensure the same user is not entered twice into the system. 
+The app has a whole file dedicated to input validation, this being a GUI app it is important that we do not clutter the database with rubbish. There are checks built into the code to ensure the same user is not entered twice into the system.
 
 I decided to add all the GUI code into one file, which on reflection was not the best idea but, it works for now and most code has been commented enough for my needs, I will break-up this GUI file into a more structured way in the future.
 
